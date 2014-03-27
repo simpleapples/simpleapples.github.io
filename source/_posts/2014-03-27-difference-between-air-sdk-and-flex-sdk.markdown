@@ -8,7 +8,7 @@ categories: Actionscript
 
 最近将AS开发的SDK从Flex SDK 4.9.1升级到了Air SDK 4.0，导致之前写的一个FLV播放器不能播放视频了，最后发现bug是一个方法内的变量名和类中的一个get方法重名了。类似下图中所示情况：
 
-->![Alt text](/upload/air-and-flex.png)<-
+->![Alt text](/upload/air-and-flex-sdk.png)<-
 
 图中变量time和get方法time重名，而编译器对这种重名的处理在Flex SDK和Air SDK下是不一样的。
 
