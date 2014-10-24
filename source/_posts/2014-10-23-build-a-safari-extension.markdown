@@ -48,7 +48,7 @@ categories: idea-and-demo
        <key>CFBundleIdentifier</key>
        <string>com.zangzhiya.url2qrcode</string>
        <key>Developer Identifier</key>
-       <string>GK8N5624WP</string>
+       <string>开发者ID</string>
        <key>CFBundleVersion</key>
        <string>1</string>
        <key>CFBundleShortVersionString</key>
