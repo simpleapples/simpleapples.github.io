@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "LaunchImage和LaunchScreen的完美结合"
-date: 2014-10-25 12:05
+title: "iOS8中LaunchImage和LaunchScreen的完美结合"
+date: 2014-10-25 13:20
 comments: true
 categories: Mobile
 ---
