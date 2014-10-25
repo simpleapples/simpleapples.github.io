@@ -3,7 +3,7 @@ layout: post
 title: "创建一个简单的Safari扩展"
 date: 2014-10-23 17:40
 comments: true
-categories: idea-and-demo
+categories: Idea&Demo
 ---
 
 之前做过一个把网址转为二维码的[Chrome扩展](https://chrome.google.com/webstore/detail/url2qrcode/dohkaoejmhididdilnijehaeegkgchfl?utm_source=chrome-ntp-icon)，想在Safari中也使用这样的扩展，搜索了一下貌似没有同类型的，所以自己打造了一个Safari扩展，并且把过程记录下来。
