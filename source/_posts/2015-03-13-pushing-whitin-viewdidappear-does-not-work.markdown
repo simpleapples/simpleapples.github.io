@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "iOS7无法在viewDidAppear中PushViewController"
+title: "在viewDidAppear中PushViewController失败的问题"
 date: 2015-03-13 11:03
 comments: true
 categories: Mobile
