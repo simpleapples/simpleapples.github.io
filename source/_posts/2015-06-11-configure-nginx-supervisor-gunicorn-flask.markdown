@@ -1,6 +1,6 @@
 ---
 --layout: post
-title: “在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目"
+title: 在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目
 date: 2015-06-11 11:00
 comments: true
 categories: Python
