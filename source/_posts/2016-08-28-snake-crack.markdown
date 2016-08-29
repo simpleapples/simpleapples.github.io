@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 「贪吃蛇大作战」
+title: 「贪吃蛇大作战」的刷分尝试
 date: 2016-08-28 23:30
 comments: true
 categories: Python
