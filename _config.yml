@@ -80,3 +80,9 @@ deploy:
   type: git
   repo: https://github.com/simpleapples/simpleapples.github.io.git
   branch: master
+
+# Google Analytics
+google_analytics:
+  enable: true
+  id: UA-37265556-1
+  site: auto
