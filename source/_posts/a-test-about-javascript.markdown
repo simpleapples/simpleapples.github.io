@@ -3,7 +3,7 @@ layout: post
 title: "一个关于Javascript的小测试"
 date: 2012-12-03 21:25
 comments: true
-categories: Javascript&&CSS
+categories: Javascript&CSS
 ---
 
 在SAE的微博上看到一个叫《你是否真的了解javascript？》的小测试，虽然只有几段代码，但却很能说明一些容易忽视的问题。  

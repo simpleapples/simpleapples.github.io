@@ -3,7 +3,7 @@ layout: post
 title: "Javascript中new操作符的探究"
 date: 2012-12-02 13:59
 comments: true
-categories: Javascript&&CSS
+categories: Javascript&CSS
 ---
 
 Javascript中有一个很有意思的new操作符，在[《Javascript语言精粹》（Javascript:The Good Parts）](http://book.douban.com/subject/3590768/)中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。  
