@@ -84,5 +84,5 @@ deploy:
 # Google Analytics
 google_analytics:
   enable: true
-  id: UA-37265556-1
+  id: UA-116134610-1
   site: auto
