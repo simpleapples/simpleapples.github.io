@@ -86,3 +86,6 @@ google_analytics:
   enable: true
   id: UA-116134610-1
   site: auto
+
+# Disqus
+disqus_shortname: simpleapples
