@@ -3,7 +3,7 @@ layout: post
 title: Ubuntu 18.04 LTS安装KVM虚拟机
 date: 2018-06-28 17:54
 comments: true
-categories: 生活
+categories: DevOps
 ---
 
 ![](/upload/20180628_01.png)
