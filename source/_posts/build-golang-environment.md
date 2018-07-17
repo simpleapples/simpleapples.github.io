@@ -6,6 +6,7 @@ comments: true
 categories: Golang
 ---
 
+2015年，Go 1.5加入了一个试验性的vendor机制（到2016年的Go 1.6版变为默认开启），vendor机制就是在项目中加入了vendor文件夹，用于存放依赖，这样就可以将不同项目的依赖隔离开。
 ![](/upload/20180710_02.png)
 
 
@@ -33,7 +34,6 @@ GOPATH路径下出了存放项目代码，还存放所有通过go get安装的�
 
 # Vendor
 
-2015年，Go 1.5加入了一个试验性的vendor机制（到2016年的Go 1.6版变为默认开启），vendor机制就是在项目中加入了vendor文件夹，用于存放依赖，这样就可以将不同项目的依赖隔离开。
 
 当使用go run或者go build命令时，会首先从当前路径下的vendor文件夹中查找依赖，如果vendor不存在，才会从GOPATH中查找依赖。
 
