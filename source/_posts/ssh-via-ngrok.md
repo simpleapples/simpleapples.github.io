@@ -3,7 +3,7 @@ layout: post
 title: 通过 ngrok 实现 ssh 内网穿透
 date: 2018-12-10 14:42
 comments: true
-categories: DevOps
+categories: Tech
 ---
 
 ### ngrok

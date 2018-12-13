@@ -3,7 +3,7 @@ layout: post
 title: 基于 JWT + Refresh Token 的用户认证实践
 date: 2018-12-13 13:07
 comments: true
-categories: Python
+categories: Tech
 ---
 
 ![](/upload/20181213_01.jpg)
@@ -116,3 +116,7 @@ JWT 拥有基于 Token 的会话管理方式所拥有的一切优势，不依赖
 ### 总结
 
 JWT 的使用，提高了开发者开发用户认证鉴权功能的效率，降低了系统架构复杂度，避免了大量的数据库和缓存查询，降低了业务接口的响应延迟。然而 JWT 的这些优点也增加了 Token 管理上的难度，通过引入 Refresh Token，既能继续使用 JWT 所带来的优势，又能使得 Token 管理的精度符合业务的需求。
+
+### 关注Python私房菜
+
+![](/upload/wechat-qrcode.jpg)

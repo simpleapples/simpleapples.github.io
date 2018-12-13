@@ -3,7 +3,7 @@ layout: post
 title: 大毒瘤！卸载WeGame解决XPS 15蓝屏问题
 date: 2018-06-20 14:00
 comments: true
-categories: 生活
+categories: Tech
 ---
 
 # 潜伏期

@@ -3,7 +3,7 @@ layout: post
 title: Unicode 和 UTF-8
 date: 2018-12-07 15:22
 comments: true
-categories: Python
+categories: Tech
 ---
 
 ![](/upload/20181207_01.jpg)
