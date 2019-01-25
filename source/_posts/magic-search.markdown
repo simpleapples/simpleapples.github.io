@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "MagicSearch"
+title: MagicSearch
 date: 2012-12-01 13:49
 comments: true
 categories: Idea&Demo
