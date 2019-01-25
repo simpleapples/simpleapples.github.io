@@ -191,3 +191,5 @@ sub_logger.warning('sub warn')  # sub warn
 > A “handler of last resort” is available through this attribute. This is a StreamHandler writing to sys.stderr with a level of WARNING, and is used to handle logging events in the absence of any logging configuration. The end result is to just print the message to sys.stderr. This replaces the earlier error message saying that “no handlers could be found for logger XYZ”. If you need the earlier behaviour for some reason, lastResort can be set to None.
 
 所以，当一个 logger 没有任何 handler 的时候，依然能输出 WARNING 及以上级别的日志。
+
+### [关注知乎专栏【Python私房菜】](https://zhuanlan.zhihu.com/python-fans)
