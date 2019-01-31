@@ -192,4 +192,12 @@ sub_logger.warning('sub warn')  # sub warn
 
 所以，当一个 logger 没有任何 handler 的时候，依然能输出 WARNING 及以上级别的日志。
 
+### 参考资料
+
+[Python日志库logging总结-可能是目前为止将logging库总结的最好的一篇文章 - 掘金](https://juejin.im/post/5bc2bd3a5188255c94465d31)
+
+[logging — Logging facility for Python](https://docs.python.org/3/library/logging.html)
+
+[Logging HOWTO](https://docs.python.org/3.7/howto/logging.html)
+
 ### [关注知乎专栏【Python私房菜】](https://zhuanlan.zhihu.com/python-fans)
