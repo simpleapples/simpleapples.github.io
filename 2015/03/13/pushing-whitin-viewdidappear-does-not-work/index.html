@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>在viewDidAppear中PushViewController失败的问题 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码： - (void)viewDidAppear:(BOOL)animated  {     [super viewDidAppear:animated];      UIViewContr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在viewDidAppear中PushViewController失败的问题">
+<meta property="og:url" content="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码： - (void)viewDidAppear:(BOOL)animated  {     [super viewDidAppear:animated];      UIViewContr">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在viewDidAppear中PushViewController失败的问题">
+<meta name="twitter:description" content="需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码： - (void)viewDidAppear:(BOOL)animated  {     [super viewDidAppear:animated];      UIViewContr">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-pushing-whitin-viewdidappear-does-not-work" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/" class="article-date">
+  <time datetime="2015-03-13T03:03:00.000Z" itemprop="datePublished">2015-03-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      在viewDidAppear中PushViewController失败的问题
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+{
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    [self.navigationController pushViewController:secondViewController animated:YES];
+}
+</code></pre><p>在iOS8中，这段代码工作良好，当FirstViewController出现时，由于立刻Push了SecondViewController，即使animated参数是YES，Push的动画都没有显示出来。但是在iOS7中却出现了不一样的情况，pushViewController方法似乎没有执行，SecondViewController也没有被推出。打断点可以发现pushViewController方法是被执行了的，但是界面上没有任何效果。</p>
+<p>由于pushViewController方法是在viewDidAppear中被调用的，会不会是因为viewDidAppear时FirstViewController还有什么UI上的动作没有处理完，导致立即调用pushViewController失败？那么将pushViewController放入dispatch_async中应该就能解决这个问题。使用如下代码实现：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+{
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.navigationController pushViewController:secondViewController animated:YES];
+       });
+}
+</code></pre><p>使用GCD后，SecondViewController被成功的Push了出来。虽然不能确定，但是也在一定程度上印证了上面的猜测。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/" data-id="cjtpp9f5d002qvk53w7fbi56d" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/10/30/beta-testing-with-testflight/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">使用TestFlight进行应用的Beta测试</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

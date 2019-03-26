@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>创建一个简单的Safari扩展 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="之前做过一个把网址转为二维码的Chrome扩展，想在Safari中也使用这样的扩展，搜索了一下貌似没有同类型的，所以自己打造了一个Safari扩展，并且把过程记录下来。 获得开发者证书要建立一个Safari扩展，首先需要生成一个开发者证书。访问Apple开发者中心，加入Safari Developer Program，加入开发者计划是免费的。加入开发者计划后就可以生成证书了，访问Certifica">
+<meta property="og:type" content="article">
+<meta property="og:title" content="创建一个简单的Safari扩展">
+<meta property="og:url" content="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="之前做过一个把网址转为二维码的Chrome扩展，想在Safari中也使用这样的扩展，搜索了一下貌似没有同类型的，所以自己打造了一个Safari扩展，并且把过程记录下来。 获得开发者证书要建立一个Safari扩展，首先需要生成一个开发者证书。访问Apple开发者中心，加入Safari Developer Program，加入开发者计划是免费的。加入开发者计划后就可以生成证书了，访问Certifica">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/safari-extension-1.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/safari-extension-2.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/safari-extension-3.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/safari-extension-4.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/safari-extension-5.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/safari-extension-6.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/safari-extension-7.png">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="创建一个简单的Safari扩展">
+<meta name="twitter:description" content="之前做过一个把网址转为二维码的Chrome扩展，想在Safari中也使用这样的扩展，搜索了一下貌似没有同类型的，所以自己打造了一个Safari扩展，并且把过程记录下来。 获得开发者证书要建立一个Safari扩展，首先需要生成一个开发者证书。访问Apple开发者中心，加入Safari Developer Program，加入开发者计划是免费的。加入开发者计划后就可以生成证书了，访问Certifica">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/safari-extension-1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-build-a-safari-extension" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/10/23/build-a-safari-extension/" class="article-date">
+  <time datetime="2014-10-23T09:40:00.000Z" itemprop="datePublished">2014-10-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Idea-Demo/">Idea&Demo</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      创建一个简单的Safari扩展
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前做过一个把网址转为二维码的<a href="https://chrome.google.com/webstore/detail/url2qrcode/dohkaoejmhididdilnijehaeegkgchfl?utm_source=chrome-ntp-icon" target="_blank" rel="noopener">Chrome扩展</a>，想在Safari中也使用这样的扩展，搜索了一下貌似没有同类型的，所以自己打造了一个Safari扩展，并且把过程记录下来。</p>
+<h2 id="获得开发者证书"><a href="#获得开发者证书" class="headerlink" title="获得开发者证书"></a>获得开发者证书</h2><p>要建立一个Safari扩展，首先需要生成一个开发者证书。访问<a href="https://developer.apple.com/account/overview.action" target="_blank" rel="noopener">Apple开发者中心</a>，加入Safari Developer Program，加入开发者计划是免费的。加入开发者计划后就可以生成证书了，访问<a href="https://developer.apple.com/account/safari/certificate/certificateList.action" target="_blank" rel="noopener">Certificates, Identifiers &amp; Profiles</a>，点击右上角的加号，生成一个开发者证书。成功后将证书下载到本地并导入Keychain Access中。</p>
+<h2 id="在Safari中创建扩展"><a href="#在Safari中创建扩展" class="headerlink" title="在Safari中创建扩展"></a>在Safari中创建扩展</h2><p>打开Safari，在菜单中选择<em>Safari—Preferences-Advanced</em>，勾选最下方的<em>Show Develop menu in menu bar</em>，如图。</p>
+<p><img src="/upload/safari-extension-1.png" alt="图1"></p>
+<p>这时在菜单栏中会出现<em>Develop</em>菜单，选择<em>Develope-Show Extension Builder</em>，打开扩展编辑器，点击左下角的<em>+</em>，选择<em>New Extension</em>，保存到一个位置（例如Desktop）。</p>
+<p><img src="/upload/safari-extension-2.png" alt="图2"></p>
+<p>这时，Desktop文件夹中会出现一个<em>demo.safariextension</em>文件夹，这个文件夹里的内容就是我们生成的Safari扩展的根目录。如果前面的开发者证书已经正确导入，扩展的介绍里会出现Safari开发者的Id。</p>
+<p><img src="/upload/safari-extension-3.png" alt="图3"></p>
+<h2 id="编辑扩展基本信息"><a href="#编辑扩展基本信息" class="headerlink" title="编辑扩展基本信息"></a>编辑扩展基本信息</h2><p>扩展建立后，下面会有一票东西需要填写，首先填写扩展的基本信息。</p>
+<ul>
+<li>Display Name: 扩展的显示名称</li>
+<li>Author: 作者名字</li>
+<li>Description: 插件介绍</li>
+<li>Website: 插件网站</li>
+<li>Bundle Identifier: 这里需要填写唯一id</li>
+<li>Update Manifest: 这里需要填写一个plist格式文件的地址，Apple会定期检查这个地址中的Version，如果有升级，就会访问插件的下载地址更新插件，当然，如果插件只是自用而不提交Safari Extensions Gallery的话，这一栏可以不填，plist文件格式如下：</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">key</span>&gt;</span>Extension Updates<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.zangzhiya.url2qrcode<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>Developer Identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>开发者ID<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleVersion<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleShortVersionString<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>URL<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://simpleapples.com/upload/url2qrcode-safari/url2qrcode.safariextz<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Access Level: 这里需要选择插件对页面访问的权限，比如我们我们要做的URL转二维码插件，需要获取当前Tab的URL，那么这里需要选择ALL</li>
+</ul>
+<p><img src="/upload/safari-extension-4.png" alt="图4"></p>
+<h2 id="添加图标"><a href="#添加图标" class="headerlink" title="添加图标"></a>添加图标</h2><p>我们的扩展到现在还没有图标，Safari会分配一个默认的指南针图标，添加图标的方式很简单，在扩展的根目录下放置一个16px * 16px的png格式图片，Safari就会自动将其置为图标。</p>
+<h2 id="添加Toolbar-Item和Popovers"><a href="#添加Toolbar-Item和Popovers" class="headerlink" title="添加Toolbar Item和Popovers"></a>添加Toolbar Item和Popovers</h2><p>首先看一下这个扩展的完成态，如图。</p>
+<p><img src="/upload/safari-extension-5.png" alt="图5"></p>
+<p>可以看到这个插件有两部分组成，一个是工具栏的按钮，在Safari中被称为Toolbar Item，一个是点击按钮后弹出的层，是一个Popover，和Chrome中的Popup类似，这个Popover也是一个html页面。</p>
+<p>接下来，需要在Safari Extension Builder中继续编辑，添加一个Toolbar Item和一个Popover，如图。</p>
+<p><img src="/upload/safari-extension-6.png" alt="图6"></p>
+<p>Toobar Item红的Image必须是一个8bit的16px * 16px透明背景的黑白png图像（繁琐的要求），而Popover需要是一个html文件。这里的路径都是相对于扩展文件夹的。到这里插件的配置工作就完成了。</p>
+<h2 id="编程"><a href="#编程" class="headerlink" title="编程"></a>编程</h2><p>可以在<a href="https://github.com/simpleapples/url2qrcode-safari" target="_blank" rel="noopener">我的Github上</a>查看这个扩展的代码，里面用到的Safari Api（获取当前页URL），可以在<a href="https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html" target="_blank" rel="noopener">Safari Developer Libray</a>中找到，里面的内容非常详细。</p>
+<h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2><p>当扩展开发完成后，就可以点击Safari Extension Builder中的<em>Build Package</em>打包了，打包出来的会是一个<em>safariextz</em>格式的文件，双击就可以安装。如果不想提交Safari Extension Gallery，可以直接把这个文件拷贝给他人安装。</p>
+<p><img src="/upload/safari-extension-7.png" alt="图7"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/" data-id="cjtpp9f47000jvk53yqddwg9u" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/10/25/launchsreen-and-launchimage/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          iOS8中LaunchImage和LaunchScreen的完美结合
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/09/19/ios8-register-notification-fail/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">iOS8注册推送失败的探究</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2014/10/23/build-a-safari-extension/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

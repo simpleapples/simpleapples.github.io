@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="simpleapples">
+<meta property="og:url" content="http://www.simpleapples.com/page/5/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="simpleapples">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-difference-between-air-sdk-and-flex-sdk" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/" class="article-date">
+  <time datetime="2014-03-27T09:10:00.000Z" itemprop="datePublished">2014-03-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Actionscript/">Actionscript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/">Air SDK和Flex SDK的区别</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近将AS开发的SDK从Flex SDK 4.9.1升级到了Air SDK 4.0，导致之前写的一个FLV播放器不能播放视频了，最后发现bug是一个方法内的变量名和类中的一个get方法重名了。类似下图中所示情况：</p>
+<p><img src="/upload/air-and-flex-sdk.png" alt="Alt text"></p>
+<p>图中变量time和get方法time重名，而编译器对这种重名的处理在Flex SDK和Air SDK下是不一样的。</p>
+<p>Flex SDK下，会根据上下文将<code>var time:int = time;</code>中的第二个time作为get方法，而Air SDK中，这行两个time会被当作同一个变量，也就是自己等于自己，而int类型定义时候会被初始化为0，所以使用Air SDK输出结果为0，使用Flex SDK输出结果为1000。</p>
+<p>看来Air SDK不如Flex SDK智能啊 :)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/03/27/difference-between-air-sdk-and-flex-sdk/" data-id="cjtpp9f4f000xvk535bnipxba" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/03/27/difference-between-air-sdk-and-flex-sdk/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-install-flash-builder-plugin-for-eclipse-kepler" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/" class="article-date">
+  <time datetime="2014-02-27T06:37:00.000Z" itemprop="datePublished">2014-02-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Actionscript/">Actionscript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/">Eclipse 4.3安装Flash Builder Plugin</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Flash Builder是一个基于Eclipse的IDE，在Flash Builder文件夹下的utilities目录下，官方已经为我们提供了插件版的安装程序，名为Adobe Flash Builder 4.7 Plug-in Utility，插件版可以将Flash Builder嵌入到已经安装好的Eclipse中，作为Eclipse的一个视图，这样就可以在Eclipse中开发AS程序。</p>
+<p>执行插件版安装程序后按提示进行，Eclipse目前的最新版是4.3，而Flash Builder 4.7的插件版只支持Eclipse 3.7或4.2版，无法安装在4.3中。</p>
+<p><img src="/upload/flashbuilder4.7plugin.png" alt="Alt text"></p>
+<p>解决办法是，下载Eclipse 4.2，现将Flash Builder插件版安装到4.2版的Eclipse中，再拷贝Eclipse文件夹下的dropins目录覆盖Eclipse 4.3的dropins。启动Eclipse 4.3，第一次启动速度会很慢，启动后，Flash Builder插件版就已经安装到Eclipse 4.3中了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/" data-id="cjtpp9f4x001tvk536yxmq01u" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-the-key-of-object-in-javascript" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/08/the-key-of-object-in-javascript/" class="article-date">
+  <time datetime="2014-01-08T05:30:00.000Z" itemprop="datePublished">2014-01-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Javascript-CSS/">Javascript&CSS</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/01/08/the-key-of-object-in-javascript/">Javscript中Object的Key</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>先来看一段代码：</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span></span><br><span class="line"><span class="xml">	var c1 = document.getElementById("e1");</span></span><br><span class="line"><span class="xml">	var c2 = document.getElementById("e2");</span></span><br><span class="line"><span class="xml">	var obj = </span><span class="template-variable">&#123;&#125;</span><span class="xml">;</span></span><br><span class="line"><span class="xml">	obj[c1] = 1;</span></span><br><span class="line"><span class="xml">	obj[c2] = 2;</span></span><br><span class="line"><span class="xml">	console.log(obj);</span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>上面这段代码会输出什么结果呢？答案是：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Object</span> &#123;[<span class="class"><span class="keyword">object</span> <span class="title">HTMLDivElement</span>]</span>: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>为什么给了obj两个元素，输出出来却变成了一个呢？难道c1和c2指向同一个元素？首先c1和c2是两个不同的dom节点，并且通过输出<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>Object {[object HTMLDivElement]: 1, [object HTMLUListElement]: 2}<br><code>`</code></p>
+<p>当使用object时，需要注意key的类型会被转换为string。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/01/08/the-key-of-object-in-javascript/" data-id="cjtpp9f5r003evk53f0jw1if0" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/01/08/the-key-of-object-in-javascript/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-do-not-name-the-project-go-in-liteide" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/10/30/do-not-name-the-project-go-in-liteide/" class="article-date">
+  <time datetime="2013-10-30T05:30:00.000Z" itemprop="datePublished">2013-10-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Golang/">Golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/10/30/do-not-name-the-project-go-in-liteide/">不要将LiteIDE的项目文件夹命名为go</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在LiteIDE中编写Go语言程序中，使用Ctrl+R编译运行，Console中每次都输出一样的内容，即使代码改了，也还是最初代码的内容，也就是说新的代码压根没有被编译。</p>
+<p>一开始怀疑是LiteIDE的问题，于是重启LiteIDE甚至是重启系统，不过重启后问题依旧。在其他位置新建项目后，能够正常编译执行，而当我把在其他地方创建的源文件拷贝到之前项目位置后，又出现了不能编译的问题。</p>
+<p>于是到项目文件夹里找问题，猛然发现编译出的可执行文件名竟然是go.exe！原来这就是问题所在。</p>
+<p><img src="/upload/liteide-go.png" alt="Alt text"></p>
+<p>解决问题之前首先需要了解一下LiteIDE在编译执行过程中做了什么。</p>
+<p>第一步：调用<figure class="highlight go"><figcaption><span>build```编译源文件，并以项目名称为可执行文件名称输出</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">第二步：执行输出的可执行文件</span><br><span class="line"></span><br><span class="line">问题主要出在LiteIDE将编译的可执行文件和项目文件夹同名，而我之前所建立的项目文件夹的名字刚好是<span class="string">``</span><span class="string">`go`</span><span class="string">``</span>，当文件第二次编译时，LiteIDE调用的<span class="keyword">go</span>程序实际上就成了刚才编译出的程序，导致即使代码改变，程序也还是根据最早的代码编译出来的。</span><br><span class="line"></span><br><span class="line">既然问题找到了，那么下面说说解决方法：</span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> LiteIDE应该通过完整路径调用<span class="string">``</span><span class="string">`go build`</span><span class="string">``</span>命令，例如<span class="string">``</span><span class="string">`C:/go/bin/go.exe build</span></span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li>LiteIDE应该在编译之前删除之前编译好的文件</li>
+<li>不要将项目文件夹命名为<code>go</code></li>
+</ol>
+<p>前面两项都是LiteIDE层面的改进方法，而最后一项是在LiteIDE改进之前避免这种问题的方法。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/10/30/do-not-name-the-project-go-in-liteide/" data-id="cjtpp9f4g000zvk53pbpiyj85" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/10/30/do-not-name-the-project-go-in-liteide/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-hack-google-doodle-game" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/09/27/hack-google-doodle-game/" class="article-date">
+  <time datetime="2013-09-26T23:30:00.000Z" itemprop="datePublished">2013-09-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/09/27/hack-google-doodle-game/">破解Google Doodle小游戏</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天貌似是Google十五周年纪念日，照例他们在首页上挂了一个JS小游戏，用棒子打一个五角星（十次机会），时机控制的好的话，会掉下糖果。各种刷分之后，最高分停留在了173分。</p>
+<p><img src="/upload/googledoodle1.jpg" alt="Alt text"></p>
+<p>本以为这是一个很高的分数了，可上微博一查竟然有不少180分以上的，并且180分以上有彩蛋，这不能忍，于是又是一通刷，不过一直没能达到173以上。<br>无奈之下，想从程序上下手。既然是JS游戏，理论上只要修改可以打的次数，就能提高分数。<br>去Google首页找JS文件，很容易发现一个<a href="https://www.google.com.hk/logos/2013/bday13/bday13.js" target="_blank" rel="noopener">https://www.google.com.hk/logos/2013/bday13/bday13.js</a>文件，在这里查找数字10，可以发现很多搜索结果，经过直觉判断，感觉<code>bd=10</code>这个赋值比较可疑，于是改之。刷新，成功！<br>下面是改为99次之后的分数：</p>
+<p><img src="/upload/googledoodle2.png" alt="Alt text"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/09/27/hack-google-doodle-game/" data-id="cjtpp9f4u001lvk53q0h9yrq8" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/09/27/hack-google-doodle-game/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/" class="article-date">
+  <time datetime="2013-08-27T04:41:00.000Z" itemprop="datePublished">2013-08-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Actionscript/">Actionscript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/">升级到Flex SDK 4.9.1后无法找到基类BitmapAsset的问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一个使用flex sdk编译的项目在升级sdk到4.9.1后出现了如下错误：</p>
+<blockquote>
+<p>errors: 1017: The definition of base class BitmapAsset was not found.</p>
+</blockquote>
+<p>google后发现也有人遇到了这样的问题，详见：<a href="http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E" target="_blank" rel="noopener">http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E</a></p>
+<p>flex sdk 4.9中的core.swc的体积比4.8中core.swc的体积小了大概1/2，估计部分基类被从core.swc中移了出来，导致找不到BitmapAsset。</p>
+<p>解决办法是，在项目上单击右键——属性——Actionscript构建路径——添加SWC，定位到sdk安装路径下的framework/libs文件夹下，选择framework.swc。</p>
+<p>如果展开framework.swc包，可以看到BitmapAsset类，所以将其添加到构建路径中，就可以解决找不到基类的问题。</p>
+<p><img src="/upload/frameworkswc.png" alt="Alt text"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/" data-id="cjtpp9f4r001gvk53dnikd4w0" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-actionscript-development-enviroment-on-linux" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/08/04/actionscript-development-enviroment-on-linux/" class="article-date">
+  <time datetime="2013-08-04T04:36:00.000Z" itemprop="datePublished">2013-08-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mac-Linux/">Mac&Linux</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/08/04/actionscript-development-enviroment-on-linux/">在Linux上搭建Actionscript开发环境</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Actionscript的开发通常使用Flash Pro和Flash Builder完成，但这两款软件都没有Linux版本，在Linux下我们可以自己手动搭建一个Actionscript的开发环境。<br>Actionscript的开发环境主要有三个方面，分别是IDE、SDK和Flash Player Debugger。  </p>
+<h3 id="IDE"><a href="#IDE" class="headerlink" title="IDE"></a>IDE</h3><p>Adobe为Actionscript的开发专门提供了Flash Builder，Flash Builder是基于Eclipse开发的，而Eclipse提供了Linux版本，所以我们只要在Eclipse上安装Actionscript插件就可以在Linux上实现Flash Builder的功能。<br>首先在Eclipse官网下载Eclipse IDE，目前的最新版为4.3。安装过程不再赘述。Eclipse的运行需要Java环境，没有预装Java的Linux发行版用户可以访问Oracle网站下载对应安装包。<br>Eclipse安装完成后，就要安装Flash Builder的插件了，官方没有为Linux提供插件，所以我们使用一个名为fb4linux的开源Flash Builder 4.5的Lniux插件，项目地址：<a href="http://code.google.com/p/fb4linux/" target="_blank" rel="noopener">http://code.google.com/p/fb4linux/</a>。访问该地址下载FB4.5ForLinuxaa和FB4.5ForLinuxab两个安装包。下载完成后使用命令<code>cat FB45ForLinux* &gt;FB45ForLinux.tar.bz2</code>将两个包和成为一个压缩包，并将其解压。<br>接下来在Eclipse中安装FB45ForLinux插件，在Eclipse中选择Help-&gt;Install New Software，点击Add，在弹出窗口中选择Local，定位到FB45Forinux.tar.bz2解压后的目录后，点击OK，此时列表中并没有出现可以安装的插件，将Group items by category选项去掉，即可显示出可安装的软件。全选所有可安装的项目，点击Next进行安装。<br>插件安装完成后，IDE部分的配置就结束了。接下来是SDK的安装。  </p>
+<h3 id="SDK"><a href="#SDK" class="headerlink" title="SDK"></a>SDK</h3><p>SDK的配置和在Windows下基本一样，首先在Adobe或Apache官网上下载Flex SDK安装包，将包解压，在Eclipse中选择Window-&gt;Preference-&gt;Flash Builder-&gt;Installed Flex SDKs，点击Add添加解压好的SDK目录。</p>
+<h3 id="Flash-Player-Debugger"><a href="#Flash-Player-Debugger" class="headerlink" title="Flash Player Debugger"></a>Flash Player Debugger</h3><p>Flash Player 的Debugger版本的安装最为复杂，Adobe已经停止对Linux平台Flash Player的开发，目前Linux平台最新版的Flash Player是11.2。所以Debug版的Flash Player最新版也是11.2，Adobe在<a href="http://www.adobe.com/support/flashplayer/downloads.html" target="_blank" rel="noopener">http://www.adobe.com/support/flashplayer/downloads.html</a>上提供了Linux版的下载。<br>这里需要注意的是，Adobe提供的Debug版Flash Player只有32位版本，而64的Linux中的Firefox是无法直接使用该插件的。<br>在64位Firefox下使用Flash Player debugger，需要通过nspluginwrapper将其转换为可在64位Firefox下使用的插件。使用apt-get或yum等安装nspluginwrapper，并将Flash Player debugger压缩包中的libflashplugin.so拷贝到<code>/usr/lib/mozilla/plugin</code>下，启动Firefox，nspluginwrapper会自动将libflashplugin.so转换为64位插件，保存在<code>/usr/lib64/mozilla/plugin-wrapped</code>下。打开Firefox在地址栏中输入<code>about:plugins</code>，查看flash player是否安装正确。<br>在Eclipse中新建一个Actionscript Project，编译运行，如果能够编译并debug，表明配置正确，如果Firefox出现播放Flash就崩溃的情况，可能由于转换后的Flash Player造成的，Firefox默认开启了插件的防崩溃机制，导致debug版本崩溃。在Firefox地址栏中输入<code>about:config</code>搜索<code>dom.ipc.plugins.enabled</code>，将其值设置为false，重启Firefox，Flash Player debugger即可正常运行。</p>
+<p><img src="/upload/linux-as-env.png" alt="Alt text"></p>
+<p>至此，Linux上Actionscript开发环境就搭建完成了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/08/04/actionscript-development-enviroment-on-linux/" data-id="cjtpp9f40000bvk53elhzbhtl" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/08/04/actionscript-development-enviroment-on-linux/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-bye-buct" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/06/27/bye-buct/" class="article-date">
+  <time datetime="2013-06-27T04:31:00.000Z" itemprop="datePublished">2013-06-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/06/27/bye-buct/">Bye,BUCT</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>从收垃圾的阿姨开始变得友善而又慈祥的那一刻起，我就感觉到，毕业，离我们不远了。<br>本以为没什么好不舍，没什么好悲伤，可学位授予仪式结束时的那首《再见》，还是让鼻子酸酸的。<br>学生证被盖上了毕业留念四个字，好像在宣告什么的终结。<br>宿舍里空荡而凌乱，收拾行李时翻出来的旧物件，把人一下子拉回到过往的岁月里。楼道里时不时响起拉行李箱的声音，不用回头就知道，又有人离开了。<br>有人选择默默地走，有人选择和每个人告别，共同之处在于，都是闪电战。这个时候，不能有半点拖泥带水，走就走，墨迹纸就不够用了。<br>昏黄路灯下弹吉他的少年，和穿着毕业衫来来往往的情侣，让所有人的目光变的温暖，如果这不是毕业季，就更好了。<br>入夜，带着最后一点行李从学校离开。</p>
+<p><img src="/upload/leave-1024x494.jpg" alt="Alt text"></p>
+<p><em>Young and beautiful</em></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/06/27/bye-buct/" data-id="cjtpp9f4b000pvk53ha0hlqbr" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/06/27/bye-buct/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-why-write-blog" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/06/02/why-write-blog/" class="article-date">
+  <time datetime="2013-06-02T04:28:00.000Z" itemprop="datePublished">2013-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/06/02/why-write-blog/">为什么写博客</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近在读刘未鹏的<a href="http://book.douban.com/subject/6709809/" target="_blank" rel="noopener">《暗时间》</a>，书中有一章说到为什么要写博客，看了很有感触。借用《暗时间》中关于这个问题讨论的思路，我也结合自己的体验，记录下自己的观点。</p>
+<p>我的博客史</p>
+<p>第一个博客是在初中三年级申请的，上计算机课时老师介绍了博客这么一个东西，于是跟风申请了一个免费博客，把自己拍的几张照片传了上去。除了刚申请时候传了几张照片，就再也没更新过，时间一长，地址都忘了。<br>后来断断续续申请过几个博客，都是一时突发奇想要说点什么，等申请好了，也就忘了要说什么了，于是也就不了了之。大学之后有一阵做acm的题，申请了一个新浪博客，把解题的答案放到上面去，没几天，也断了更新。<br>现在的这个博客，是大四实习时申请的，当时在工作中碰到了一个棘手的问题，查了很多零零碎碎的资料才得以解决，很有成就感，想把解决问题的思路记下来，于是在sae上架了一个wordpress，就是今天的博客。直到这时候，我才算正式开始写博客。</p>
+<p>博客的价值</p>
+<p>1.博客是经验的记录和分享</p>
+<p>这个博客搭建的初衷就是为了记录自己在工作中解决问题的思路，所以最初的几篇文章都是记录一些问题的解决方法的，自己也一直把博客定位成技术博客，一方面记录下这些东西，将来自己遇到相同问题可以返回来看，另一方面，也能分享给有需要的人，当然，还能满足自己的一点点虚荣心 : )</p>
+<p>2.博客是一份自己的简历</p>
+<p>找工作的时候觉得很委屈，自己在大学里做过很多技术方面的实践工作，而写到简历里，一两句话就要说一两年的工作，对于技术类职位，单独一两句话很难让人信服，面试官也不知道你到底具体做了些什么。那时候刚搭博客，文章少的可怜，一下子意识到自己没有将之前的经历记录下来是多么的遗憾。如果当时有一个经营了几年的博客，很多事情也就不那么麻烦了。</p>
+<p>3.给别人讲明白是最有效的学习方式<br>去年在sae官方微博发了一个叫《是否真的了解Javascript？》的小测试，看到以后也自测了一下，觉得理解算是比较完全，于是决定写篇博客记录下来，在写的时候才发现，有一些原理自己想当然了，虽然结果正确，可是想法却错的离谱。有些东西只有在自己想给别人讲清楚时，才会把自己的思路完整的审视一遍。<br>我想很多人和我一样，不写博客不是因为不知道这样做的好处，而是总想着写博客可能带来的问题。</p>
+<p>写博客会遇到的问题</p>
+<p>1.觉得没有价值</p>
+<p>应该说这一点是我之前很长一段时间不写博客的重要原因，说到底，做什么事情都需要有一个目的去支撑，如果写一个博客，自己不看，别人不看，还要花钱买空间买域名，是在是一件反人类的事情。后来开始写博客，并不是我的生活开始有意义，而是很多有价值被记录的事情之前被忽略了。</p>
+<p>2.担心被笑话</p>
+<p>我很少写博客，写也是写技术类的文章，最多再记录下不疼不痒的事情，不写个人观点明显的东西。之前读到好书时候想写书评，最后也不了了之了，除了怕写出的东西没价值，还有一个担心就是怕被笑话。应该说，在网络上发表自己的观点，有一部分目的就是为了获得认同感，如果发的东西被大家各种喷，会一下子兴致全无，尤其是现在很多人喜欢当公知、喜欢喷人，所以很难放心的在互联网上说话。就算没有人喷，如果不小心说了误导性的东西，对别人产生了不好的影响，自己心里也会不好受。<br>现在觉得这事情得辩证的想，写出没水平的东西是容易被笑话，但是如果不写不交流，水平也没法提高，总不能把自己藏在暗处一辈子。现在的东西被笑话，坚持个一两年，也许自己写的东西就没那么幼稚，坚持个十年八年，恐怕也成了半个大师。关键在于，要敢于迈出这一步。</p>
+<p>3.写不出来</p>
+<p>写作这件事，我也有点体会，越写越能写。有的人读书很多，但是不喜欢动笔，时间一长，脑子里惊涛骇浪，就是表达不到纸上，非常捉急。所以有些时候要拿出小学生写日记的劲头，强迫自己写，笔头子是能练出来的。<br>我说过，我基本不写除技术类文章之外的博客，之所以这次破例，很大程度上受了《暗时间》中关于这部分内容的启发。我甚至没有想到一写写了这么一大堆，所以在这里要感谢作者刘未鹏，如果不是拜读了这本大作，现在还把自己禁锢在牢笼中。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/06/02/why-write-blog/" data-id="cjtpp9f5z003uvk53y6uxttzj" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/06/02/why-write-blog/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ios6-screen-rotation" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/05/21/ios6-screen-rotation/" class="article-date">
+  <time datetime="2013-05-21T04:26:00.000Z" itemprop="datePublished">2013-05-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/05/21/ios6-screen-rotation/">iOS6屏幕旋转问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用iOS6 SDK创建xib文件时，会默认启用AutoLayout功能，AutoLayout是iOS6中新推出的自动布局功能，通过相对定位来实现适应多种屏幕分辩率的自动布局（iOS设备分辨率会朝着多样化的方向发展？）。<br>当使用AutoLayout的项目在iOS6以下的系统中运行时，程序执行会报错，于是，关闭所有xib的AutoLayout选项，再次运行，发现原本设置为横屏显示的项目变成了竖屏，所有横屏设置失效。<br>解决办法是，在需要横屏的Controller中添加如下代码，最好在将self.window设定成一个RootViewController，然后在RootViewController中添加如下代码：</p>
+<pre><code>// ios5下的旋屏
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+}
+
+// ios6下的旋屏
+-(BOOL)shouldAutorotate {
+    return YES;
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/05/21/ios6-screen-rotation/" data-id="cjtpp9f540027vk53q5nve5bk" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/05/21/ios6-screen-rotation/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/4/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/6/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

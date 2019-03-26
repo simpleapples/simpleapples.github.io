@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>关于Javascript中constructor和prototype的一点理解 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="constructor和prototype，顾名思义，是构造者（构造器）和原型的意思。   从语义的角度来看，对象A构造了对象B，则A就是B的constructor，如果对象A的形态来自对象B，则对象B是A的原型。   看一段代码：   function Person() {     Person.prototype.name = &amp;quot;myname&amp;quot;;     Person.pr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于Javascript中constructor和prototype的一点理解">
+<meta property="og:url" content="http://www.simpleapples.com/2012/10/22/about-prototype-and-constructor-in-javascript/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="constructor和prototype，顾名思义，是构造者（构造器）和原型的意思。   从语义的角度来看，对象A构造了对象B，则A就是B的constructor，如果对象A的形态来自对象B，则对象B是A的原型。   看一段代码：   function Person() {     Person.prototype.name = &amp;quot;myname&amp;quot;;     Person.pr">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于Javascript中constructor和prototype的一点理解">
+<meta name="twitter:description" content="constructor和prototype，顾名思义，是构造者（构造器）和原型的意思。   从语义的角度来看，对象A构造了对象B，则A就是B的constructor，如果对象A的形态来自对象B，则对象B是A的原型。   看一段代码：   function Person() {     Person.prototype.name = &amp;quot;myname&amp;quot;;     Person.pr">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-about-prototype-and-constructor-in-javascript" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2012/10/22/about-prototype-and-constructor-in-javascript/" class="article-date">
+  <time datetime="2012-10-22T05:15:00.000Z" itemprop="datePublished">2012-10-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Javascript-CSS/">Javascript&CSS</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      关于Javascript中constructor和prototype的一点理解
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>constructor和prototype，顾名思义，是构造者（构造器）和原型的意思。  </p>
+<p>从语义的角度来看，对象A构造了对象B，则A就是B的constructor，如果对象A的形态来自对象B，则对象B是A的原型。  </p>
+<p>看一段代码：  </p>
+<pre><code>function Person() {
+    Person.prototype.name = &quot;myname&quot;;
+    Person.prototype.age = 18;
+    Person.prototype.sayName = function () { alert(this.name); };
+}
+var person1 = new Person();
+person1.sayName();
+</code></pre><p>这里Person就是Person.prototype的constructor，为什么？因为Person构造了Person.prototype。而person1的prototype不是Person.prototype。在person1初始化时，可以理解成把Person拷贝了一份（就是new了一份）扔给person1，而Person每new一次，都会从他的原形处继承（只是称为继承，方便理解）了一份name,age,sayName。person1是copy了Person，但是prototype并没有copy，所以说person1的prototype是undefined。  </p>
+<p>这里person1很容易被理解成由Person构造，这样的话person1.constructor岂不成了Person，现在就要区别一下构造和原形，构造，我们把它理解成从一个框架里建立一个对象，而原形，则是说对象的所有东西（数据）都要从原形继承过来。  </p>
+<p>再看一个函数：  </p>
+<pre><code>function Person(name, age) {
+    this.name = name;
+    this.age = age;
+    this.sayName = function() { alert(this.name); };
+}
+var person2 = new Person( &quot;myname&quot;, 18 );
+person2.sayName();
+</code></pre><p>这里的Person和上面的Person想必相比，上面的Person不光构建了一个框架，而且填上了数据，而下面的Person只构建了框架，现在就很好区别constructor和prototype了，person1从一个对象继承了数据和框架，而person2从一个对象只获取了结构（我们把这个过程理解成Person构建了person2），那么person2的构造者自然就是Person。</p>
+<p>现在应该比较容易弄清constructor和prototype的意义了。</p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>这里还有一个非常说明问题的例子：</p>
+<pre><code>var arrayTest = new Array();
+alert(arrayTest.constructor); // 为Array
+</code></pre><h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>还有一个可能遇到的问题，先看代码：</p>
+<pre><code>var person3 = new Person();
+person3.prototype.name = &quot;name3&quot;;
+</code></pre><p>上面的错误非常明显，person3是Person的实例，不能为实例定义原型。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2012/10/22/about-prototype-and-constructor-in-javascript/" data-id="cjtpp9f3z0008vk5348qu8yn4" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2012/10/22/about-prototype-and-constructor-in-javascript/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2012/11/01/the-first-offer-and-the-first-rejection-letter/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          人生中的第一个offer和第一份拒信
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2012/10/20/solve-removeattribute-not-be-supported/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">浏览器不支持removeAttribute()的解决方法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2012/10/22/about-prototype-and-constructor-in-javascript/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。 文件上传过程 上传文件流程  上传的文件首先到达 Kubernetes 所在的宿主机。 宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress Controller，Ingress contro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路">
+<meta property="og:url" content="http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。 文件上传过程 上传文件流程  上传的文件首先到达 Kubernetes 所在的宿主机。 宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress Controller，Ingress contro">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20190228_01.jpeg">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20190228_02.jpg">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路">
+<meta name="twitter:description" content="在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。 文件上传过程 上传文件流程  上传的文件首先到达 Kubernetes 所在的宿主机。 宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress Controller，Ingress contro">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/20190228_01.jpeg">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-update-error-on-nginx-ingress-gunicorn-environment" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/" class="article-date">
+  <time datetime="2019-02-28T06:32:00.000Z" itemprop="datePublished">2019-02-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DevOps/">DevOps</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20190228_01.jpeg" alt=""></p>
+<p>在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。</p>
+<h3 id="文件上传过程"><a href="#文件上传过程" class="headerlink" title="文件上传过程"></a>文件上传过程</h3><p><img src="/upload/20190228_02.jpg" alt=""></p>
+<p>上传文件流程</p>
+<ol>
+<li>上传的文件首先到达 Kubernetes 所在的宿主机。</li>
+<li>宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress Controller，Ingress controller 也是使用 Nginx 实现的。</li>
+<li>Ingress Controller 中的 Nginx 通过 Proxy 转发给 Gunicorn。</li>
+<li>Gunicorn 会启动若干个 Worker 处理请求，所以 Gunicorn 会再转发给 Worker。</li>
+<li>Worker 就是最终的 Python Web App</li>
+</ol>
+<h3 id="错误-413-的解决"><a href="#错误-413-的解决" class="headerlink" title="错误 413 的解决"></a>错误 413 的解决</h3><p>首先碰到的是 413 Request Entity Too Large 错误，在上传过程中连接被中断（基本上每次都是相同的上传百分比被中断），请求返回 413，首先考虑到 Nginx 对于请求体的大小有限制，查看 Nginx 文档，发现 client_max_body_size 参数控制请求体的大小，默认的设置是 1mb。</p>
+<blockquote>
+<p><strong>client_max_body_size:</strong> Sets the maximum allowed size of the client request body, specified in the “Content-Length” request header field. If the size in a request exceeds the configured value, the 413 (Request Entity Too Large) error is returned to the client. Please be aware that browsers cannot correctly display this error. Setting size to 0 disables checking of client request body size.</p>
+</blockquote>
+<p>首先在 Kubernetes 宿主机上 Nginx 的 http 域中加入如下配置。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">client_max_body_size</span> <span class="number">1024m</span>;</span><br></pre></td></tr></table></figure>
+<p>需要注意，除了 Kubernetes 宿主机上跑的 Nginx，还要修改 Ingress Controller 中的 Nginx。Ingress Nginx 的修改方法在 Annotation 字段中加入如下配置。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"nginx.ingress.kubernetes.io/proxy-body-size"</span><span class="string">:</span> <span class="string">"1024m"</span></span><br></pre></td></tr></table></figure>
+<h3 id="错误-504-的解决"><a href="#错误-504-的解决" class="headerlink" title="错误 504 的解决"></a>错误 504 的解决</h3><p>再次尝试上传，发现接口依然会返回错误，这次是 504 Gateway Timeout，从 Chrome 的开发者工具中查看请求，发现上传至少要持续5分钟，接下来从 Nginx 的超时机制入手。</p>
+<p>在 Nginx 和 Ingress 中分别提高了读写的超时限制，将发送的超时设置为 600s，返回的超时设置为 30s。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_send_timeout</span> <span class="number">600s</span>;</span><br><span class="line"><span class="attribute">proxy_read_timeout</span> <span class="number">30s</span>;</span><br></pre></td></tr></table></figure>
+<p>再次尝试，发现依然报同样的错误 504，难道说还有别的超时字段需要设置？再次查看文档发现了端倪。</p>
+<blockquote>
+<p><strong>proxy_send_timeout:</strong> Sets a timeout for transmitting a request to the proxied server. The timeout is set only between two successive write operations, not for the transmission of the whole request. If the proxied server does not receive anything within this time, the connection is closed.</p>
+</blockquote>
+<blockquote>
+<p><strong>proxy_read_timeout:</strong> Defines a timeout for reading a response from the proxied server. The timeout is set only between two successive read operations, not for the transmission of the whole response. If the proxied server does not transmit anything within this time, the connection is closed.</p>
+</blockquote>
+<p>这里的 send 和 read，主语不是客户端，而是 Nginx 自己，超时的时候，是 Nginx 向 Upstream 发送了文件，而等到 Upstream 处理完返回时候，超过了 proxy_read_timeout 的限制，所以需要增加的是 read_timeout。</p>
+<p>将宿主机上的 Nginx 和 Ingress 分别做如下配置。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_send_timeout</span> <span class="number">30s</span>;</span><br><span class="line"><span class="attribute">proxy_read_timeout</span> <span class="number">600s</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">nginx.ingress.kubernetes.io/proxy-send-timeout:</span> <span class="number">30</span><span class="string">s</span></span><br><span class="line"><span class="string">nginx.ingress.kubernetes.io/proxy-read-timeout:</span> <span class="number">600</span><span class="string">s</span></span><br></pre></td></tr></table></figure>
+<h3 id="错误-502-的解决"><a href="#错误-502-的解决" class="headerlink" title="错误 502 的解决"></a>错误 502 的解决</h3><p>修改好了超时和上传文件大小的限制后，又出现了新的错误 502 Bad Gateway，这次就没有头绪了，由于是新的报错，上面的修改应该是生效了的，并且也不是上面两个限制导致的，通过查询 Nginx 和 Ingress 的日志，发现 Ingress 中有这样的报错。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2019/02/27 07:18:36 [error] 4265#4265: *19932411 upstream prematurely closed connection while reading response header from upstream, client: 172.20.0.1, server: example.com, request: &quot;POST /upload HTTP/1.0&quot;, upstream: &quot;http://172.0.0.1/upload&quot;, host: &quot;example.com&quot;, referrer: &quot;http://example.com/&quot;</span><br></pre></td></tr></table></figure>
+<p>这就比较奇怪了，刚才已经修改了超时，为什么 Ingress 还会有超时的报错呢？从日志上看，可能是 Ingress 的 Upstream 超时了，也就是 Gunicorn，Stackoverflow 上有人遇到了类似的问题，答案是给 Gunicorn 设置 -t 参数。查看 Gunicorn 的文档，timeout 参数是这么定义的。</p>
+<blockquote>
+<p><strong>timeout:</strong> Workers silent for more than this many seconds are killed and restarted.<br>Generally set to thirty seconds. Only set this noticeably higher if you’re sure of the repercussions for sync workers. For the non sync workers it just means that the worker process is still communicating and is not tied to the length of time required to handle a single request.</p>
+</blockquote>
+<p>也就是说，当某一个 Worker 处理文件上传请求时候，如果在默认的超时时间内没有响应 Master，就会被杀掉，这也不难理解为什么 Ingress 从 Upstream 获取返回值时候连接会被关闭了。修改 Gunicorn 的配置，将超时时间设置为 600s，重新上传，问题解决。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_read_timeout" target="_blank" rel="noopener">Module ngx_http_proxy_module</a></p>
+<p><a href="https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md" target="_blank" rel="noopener">Ingress-Nginx Annotations</a></p>
+<p><a href="http://docs.gunicorn.org/en/0.17.2/configure.html" target="_blank" rel="noopener">Gunicorn Configuration</a></p>
+<p><a href="http://docs.gunicorn.org/en/stable/signals.html" target="_blank" rel="noopener">Gunicorn Signals</a></p>
+<p><a href="https://stackoverflow.com/questions/48046379/nginx-gunicorn-502-bad-gateway-upstream-prematurely-closed-connection-while-rea?rq=1" target="_blank" rel="noopener">nginx gunicorn 502 bad gateway: upstream prematurely closed connection while reading response header from upstream</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/" data-id="cjtpp9f60003wvk53hu8vvd3q" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          JWT 避坑指南：nbf 验签失效问题的解决
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/01/25/practice-on-python-logging/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Python 日志库 logging 的理解和实践经验</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

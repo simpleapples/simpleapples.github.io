@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>Python参数传递，既不是传值也不是传引用 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="面试的时候，有没有被问到Python传参是传引用还是传值这种问题？有没有听到过Python传参既不是传值也不是传引用这种说法？一个小小的参数默认值也可能让代码出现难以查找的bug？ 如果你也遇到过上面的问题，不妨我们来探究下Python函数传递的种种。 万物皆对象Python中有一个非常重要的概念——万物皆对象，无论是一个数字、字符串，还是数组、字典，在Python中都会以一个对象的形式存在。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python参数传递，既不是传值也不是传引用">
+<meta property="og:url" content="http://www.simpleapples.com/2018/04/22/python-parameter-passing/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="面试的时候，有没有被问到Python传参是传引用还是传值这种问题？有没有听到过Python传参既不是传值也不是传引用这种说法？一个小小的参数默认值也可能让代码出现难以查找的bug？ 如果你也遇到过上面的问题，不妨我们来探究下Python函数传递的种种。 万物皆对象Python中有一个非常重要的概念——万物皆对象，无论是一个数字、字符串，还是数组、字典，在Python中都会以一个对象的形式存在。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180422_01.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180422_02.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180422_03.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/wechat-qrcode.jpg">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python参数传递，既不是传值也不是传引用">
+<meta name="twitter:description" content="面试的时候，有没有被问到Python传参是传引用还是传值这种问题？有没有听到过Python传参既不是传值也不是传引用这种说法？一个小小的参数默认值也可能让代码出现难以查找的bug？ 如果你也遇到过上面的问题，不妨我们来探究下Python函数传递的种种。 万物皆对象Python中有一个非常重要的概念——万物皆对象，无论是一个数字、字符串，还是数组、字典，在Python中都会以一个对象的形式存在。">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/20180422_01.png">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-python-parameter-passing" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/22/python-parameter-passing/" class="article-date">
+  <time datetime="2018-04-22T06:38:00.000Z" itemprop="datePublished">2018-04-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Python参数传递，既不是传值也不是传引用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20180422_01.png" alt=""></p>
+<p>面试的时候，有没有被问到Python传参是传引用还是传值这种问题？有没有听到过Python传参既不是传值也不是传引用这种说法？一个小小的参数默认值也可能让代码出现难以查找的bug？</p>
+<p>如果你也遇到过上面的问题，不妨我们来探究下Python函数传递的种种。</p>
+<h1 id="万物皆对象"><a href="#万物皆对象" class="headerlink" title="万物皆对象"></a>万物皆对象</h1><p>Python中有一个非常重要的概念——万物皆对象，无论是一个数字、字符串，还是数组、字典，在Python中都会以一个对象的形式存在。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">123</span></span><br></pre></td></tr></table></figure>
+<p>对于上面这行代码，在Python看来就是创建一个PyObject对象，值为123，然后定义一个指针a，a指向这个PyObject对象。</p>
+<h1 id="可变对象和不可变对象"><a href="#可变对象和不可变对象" class="headerlink" title="可变对象和不可变对象"></a>可变对象和不可变对象</h1><p>Python中的对象分为两种类型，可变对象和不可变对象，不可变对象指tuple、str、int等类型的对象，可变对象指的是dict、list、自定义对象等类型的对象，我们用一段代码说明他们的区别。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">print(id(a))  <span class="comment"># 2587116690248</span></span><br><span class="line">a += [<span class="number">4</span>]</span><br><span class="line">print(id(a)) <span class="comment"># 2587116690248</span></span><br><span class="line"></span><br><span class="line">b = <span class="number">1</span></span><br><span class="line">print(id(b)) <span class="comment"># 2006430784</span></span><br><span class="line">b += <span class="number">1</span></span><br><span class="line">print(id(b)) <span class="comment"># 2006430816</span></span><br></pre></td></tr></table></figure>
+<p>上面代码中我们分别定义了一个可变对象和一个不可变对象，并且对他们进行修改，打印修改前后的对象标识可以发现，对可变对象进行修改，变量对其引用不会发生变化，对不可变对象进行修改，变量引用发生了变化。</p>
+<p><img src="/upload/20180422_02.png" alt="可变对象的引用"></p>
+<p>上图是一个可变对象，当修改对象时，例如删除数组中的一个元素，实际上把其中一个元素从对象中移除，对象本身的标识是不发生变化的。</p>
+<p><img src="/upload/20180422_03.png" alt="不可变对象的引用"></p>
+<p>改变一个不可变对象时，例如给一个int型加2，语法上看上去是直接修改了i这个对象，但是如前面所说，i只是一个指向对象73的一个变量，Python会将这个变量指向的对象加2后，生成一个新的对象，然后再让i指向这个新的对象。</p>
+<h1 id="参数传递时的表现"><a href="#参数传递时的表现" class="headerlink" title="参数传递时的表现"></a>参数传递时的表现</h1><p>了解了对象的原理后，我们就可以来尝试理解一下参数传递时他们的不同表现了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">print(id(a))  <span class="comment"># 1437494204232</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mutable</span><span class="params">(a)</span>:</span></span><br><span class="line">	print(id(a))  <span class="comment"># 1437494204232</span></span><br><span class="line">	a += [<span class="number">4</span>]</span><br><span class="line">	print(id(a))  <span class="comment"># 1437494204232</span></span><br><span class="line">mutable(a)</span><br><span class="line"></span><br><span class="line">b = <span class="number">1</span></span><br><span class="line">print(id(b))  <span class="comment"># 2006430784</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">immutable</span><span class="params">(b)</span>:</span></span><br><span class="line">	print(id(b))  <span class="comment"># 2006430784</span></span><br><span class="line">	b += <span class="number">1</span></span><br><span class="line">	print(id(b))  <span class="comment"># 2006430816</span></span><br><span class="line">immutable(b)</span><br></pre></td></tr></table></figure>
+<p>通过上面的代码可以看出，修改传进的可变参数时，会对外部对象产生影响，修改不可变参数时则不会影响。</p>
+<p><strong>概括地说，Python参数传递时，既不是传对象也不是传引用，之所以会有上述的区别，跟Python的对象机制有关，参数传递只是给对象绑定了一个新的变量（实际上是传递C中的指针）。</strong></p>
+<h1 id="参数传递时的坑"><a href="#参数传递时的坑" class="headerlink" title="参数传递时的坑"></a>参数传递时的坑</h1><p>理解了参数传递的逻辑，我们需要注意一下这种逻辑可能引发的问题。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(b=[])</span>:</span></span><br><span class="line">	b += [<span class="number">1</span>]</span><br><span class="line">	print(b)</span><br><span class="line"></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1, 1]</span></span><br><span class="line">test()  <span class="comment"># [1, 1, 1]</span></span><br></pre></td></tr></table></figure>
+<p>上面的代码的输出，按照可变对象传参的逻辑，应该每次调用都输出[1]才对，而实际输出看上去好像默认参数好像只生效了一次。原因在于Python的函数也是对象（万物皆对象），这个对象只初始化一次，加上参数又是不可变对象，所以每次调用实际上都修改的是一个对象。</p>
+<p>解决这个问题，推荐再参数传递可变对象时，默认值设置为None，在函数内部对None进行判断后再赋予默认值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(b=None)</span>:</span></span><br><span class="line">	b = b <span class="keyword">or</span> []</span><br><span class="line">	b += [<span class="number">1</span>]</span><br><span class="line">	print(b)</span><br><span class="line"></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br></pre></td></tr></table></figure>
+<p>再看一段代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">i = <span class="number">1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(a=i)</span>:</span></span><br><span class="line">	print(a)</span><br><span class="line"></span><br><span class="line">i = <span class="number">2</span></span><br><span class="line">test()  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
+<p>由于参数默认值是在函数定义时而不是函数执行时确定的，所以这段代码test方法的参数默认值时1而不是2。</p>
+<h1 id="关注Python私房菜"><a href="#关注Python私房菜" class="headerlink" title="关注Python私房菜"></a>关注Python私房菜</h1><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/04/22/python-parameter-passing/" data-id="cjtpp9f5g002wvk53142z51y2" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/04/22/python-parameter-passing/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/04/26/using-decorators-to-validate-form/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          用装饰器封装Flask-WTF表单验证逻辑
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">实战 | 用aiohttp和uvloop实现一个高性能爬虫</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2018/04/22/python-parameter-passing/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>go json 实践中遇到的坑 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。 整数变浮点数问题假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。 123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go json 实践中遇到的坑">
+<meta property="og:url" content="http://www.simpleapples.com/2018/12/24/practice-in-json-with-go/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。 整数变浮点数问题假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。 123">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20181224_01.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20181224_02.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20181224_03.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20181224_04.png">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="go json 实践中遇到的坑">
+<meta name="twitter:description" content="在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。 整数变浮点数问题假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。 123">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/20181224_01.png">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-practice-in-json-with-go" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/24/practice-in-json-with-go/" class="article-date">
+  <time datetime="2018-12-24T02:43:00.000Z" itemprop="datePublished">2018-12-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Golang/">Golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      go json 实践中遇到的坑
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20181224_01.png" alt=""></p>
+<p>在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。</p>
+<h3 id="整数变浮点数问题"><a href="#整数变浮点数问题" class="headerlink" title="整数变浮点数问题"></a>整数变浮点数问题</h3><p>假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span></span><br><span class="line">	Age <span class="keyword">int64</span></span><br><span class="line">	Weight <span class="keyword">float64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    person := Person&#123;</span><br><span class="line">        Name: <span class="string">"Wang Wu"</span>,</span><br><span class="line">        Age: <span class="number">30</span>,</span><br><span class="line">        Weight: <span class="number">150.07</span>,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    jsonBytes, _ := json.Marshal(person)</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(jsonBytes))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> personFromJSON <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">    json.Unmarshal(jsonBytes, &amp;personFromJSON)</span><br><span class="line"></span><br><span class="line">    r := personFromJSON.(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码执行到这里看上去一切正常，但是打印一下 map[string]interface{} 就会发现不太对了。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(reflect.TypeOf(r[<span class="string">"Age"</span>]).Name())  <span class="comment">// float64</span></span><br><span class="line">fmt.Println(reflect.TypeOf(r[<span class="string">"Weight"</span>]).Name())  <span class="comment">// float64</span></span><br></pre></td></tr></table></figure>
+<p>转换成 map[string]interface{} 之后，原先的 uint64 和 float64 类型都被转换成了 float64 类型，这显然是不符合我们的预期的。</p>
+<p><img src="/upload/20181224_02.png" alt=""></p>
+<p>查看 json 的规范可以看到，在 json 中是没有整型和浮点型之分的，所以现在可以理解 json 包中的 Unmarshal 方法转出的数字类型为什么都是 float64 了，因为根据 json 规范，数字都是同一种类型，那么对应到 go 的类型中最接近的就是 float64 了。</p>
+<p>json 包还针对这个问题提供了更好的解决方案，不过需要使用 json.Decoder 来代替 json.Unmarshal 方法，将 json.Unmarhsal 替换如下。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> personFromJSON <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">decoder := json.NewDecoder(bytes.NewReader(jsonBytes))</span><br><span class="line">decoder.UseNumber()</span><br><span class="line">decoder.Decode(&amp;personFromJSON)</span><br><span class="line"></span><br><span class="line">r := personFromJSON.(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br></pre></td></tr></table></figure>
+<p>这种方法首先创建了一个 jsonDecoder，然后调用了 UseNumber 方法，从文档中可以知道，使用 UseNumber 方法后，json 包会将数字转换成一个内置的 Number 类型（而不是 float64），这个 Number 类型提供了转换为 int64、float64 等多个方法。</p>
+<p><img src="/upload/20181224_03.png" alt=""></p>
+<h3 id="时间格式"><a href="#时间格式" class="headerlink" title="时间格式"></a>时间格式</h3><p>对于 json 格式，是没有时间类型的，日期和时间以 json 格式存储时，需要转换为字符串类型。这就带来了一个问题，日期时间的字符串表示有多种多样，go 的 json 包支持的是哪一种呢？</p>
+<p>使用下面的代码来输出 json.Marshal 方法将 Time 类型转换为字符串后的格式。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span></span><br><span class="line">	Birth time.Time</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	person := Person&#123;</span><br><span class="line">		Name: <span class="string">"Wang Wu"</span>,</span><br><span class="line">		Birth: time.Now(),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;"Name":"Wang Wu","Birth":"2018-12-20T16:22:02.00287617+08:00"&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据输出可以判断，go 的 json 包使用的是 RFC3339 标准中定义的格式。接下来测试一下 json.Unmarshal 方法所支持的日期时间格式。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">dateStr := <span class="string">"2018-10-12"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> person Person</span><br><span class="line">jsonStr := fmt.Sprintf(<span class="string">"&#123;\"name\":\"Wang Wu\", \"Birth\": \"%s\"&#125;"</span>, dateStr)</span><br><span class="line">json.Unmarshal([]<span class="keyword">byte</span>(jsonStr), &amp;person)</span><br><span class="line"></span><br><span class="line">fmt.Println(person.Birth)  <span class="comment">// 0001-01-01 00:00:00 +0000 UTC</span></span><br></pre></td></tr></table></figure>
+<p>对于形如 2018-10-12 的字符串，json 包并没有成功将其解析，接下来我们把 time 包中支持的所有格式都试一下。</p>
+<p><img src="/upload/20181224_04.png" alt=""></p>
+<p>经过试验，发现 json.Unmarshal 方法只支持 RFC3339 和 RFC3339Nano 两种格式的转换。还有一个需要注意的地方，使用 time.Now() 生成的时间是带有一个 Monotonic Time 的，经过 json.Marshal 转换时候，由于 RFC3339 规范里没有存放 Monotonic Time 的位置，会丢掉这一部分。</p>
+<h3 id="对于字段为空的处理"><a href="#对于字段为空的处理" class="headerlink" title="对于字段为空的处理"></a>对于字段为空的处理</h3><p>json 包对于空值的处理是一个非常容易出错的地方，看下面代码。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name     <span class="keyword">string</span></span><br><span class="line">	Age      <span class="keyword">int64</span></span><br><span class="line">	Birth    time.Time</span><br><span class="line">	Children []Person</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	person := Person&#123;&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;"Name":"","Age":0,"Birth":"0001-01-01T00:00:00Z","Children":null&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当 struct 中的字段没有值时，使用 json.Marshal 方法并不会自动忽略这些字段，而是根据字段的类型输出了他们的默认空值，这往往和我们的预期不一致，json 包提供了对字段的控制手段，我们可以为字段增加 omitempty tag，这个 tag 会在字段值为零值（int 和 float 类型零值是 0，string 类型零值是 “”，对象类型零值是 nil）时，忽略该字段。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> PersonAllowEmpty <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name     <span class="keyword">string</span>             <span class="string">`json:",omitempty"`</span></span><br><span class="line">	Age      <span class="keyword">int64</span>              <span class="string">`json:",omitempty"`</span></span><br><span class="line">	Birth    time.Time          <span class="string">`json:",omitempty"`</span></span><br><span class="line">	Children []PersonAllowEmpty <span class="string">`json:",omitempty"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	person := PersonAllowEmpty&#123;&#125;</span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;"Birth":"0001-01-01T00:00:00Z"&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，这次输出的 json 中只有 Birth 字段了，string、int、对象类型的字段，都因为没有赋值，默认是零值，所以被忽略，对于日期时间类型，由于不可以设置为零值，也就是 0000-00-00 00:00:00，不会被忽略。</p>
+<p>需要注意这样的情况：如果一个人的年龄是 0 （对于刚出生的婴儿，这个值是合理的），刚好是 int 字段的零值，在添加 omitempty tag 的情况下，年龄字段会被忽略。</p>
+<p>如果想要某一个字段在任何情况下都被 json 包忽略，需要使用如下的写法。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name     <span class="keyword">string</span> <span class="string">`json:"-"`</span></span><br><span class="line">	Age      <span class="keyword">int64</span> <span class="string">`json:"-"`</span></span><br><span class="line">	Birth    time.Time <span class="string">`json:"-"`</span></span><br><span class="line">	Children []<span class="keyword">string</span> <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    birth, _ := time.Parse(time.RFC3339, <span class="string">"1988-12-02T15:04:27+08:00"</span>)</span><br><span class="line">	person := Person&#123;</span><br><span class="line">		Name: <span class="string">"Wang Wu"</span>,</span><br><span class="line">		Age: <span class="number">30</span>,</span><br><span class="line">		Birth: birth,</span><br><span class="line">		Children: []<span class="keyword">string</span>&#123;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，使用 json:”-“ 标签的字段都被忽略了。</p>
+<h3 id="关注知乎专栏Golang私房菜"><a href="#关注知乎专栏Golang私房菜" class="headerlink" title="关注知乎专栏Golang私房菜"></a>关注知乎专栏<a href="https://zhuanlan.zhihu.com/golang-fans" target="_blank" rel="noopener">Golang私房菜</a></h3>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/12/24/practice-in-json-with-go/" data-id="cjtpp9f5a002mvk5357unzfo7" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/12/24/practice-in-json-with-go/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/01/25/practice-on-python-logging/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Python 日志库 logging 的理解和实践经验
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/13/combining-jwt-with-refresh-token/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">基于 JWT + Refresh Token 的用户认证实践</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2018/12/24/practice-in-json-with-go/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

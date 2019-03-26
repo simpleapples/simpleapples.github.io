@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>Javascript中new操作符的探究 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Javascript中有一个很有意思的new操作符，在《Javascript语言精粹》（Javascript:The Good Parts）中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。先来一段代码：    function test() {        var foo1 = new function () {            this.i = 1;        }">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Javascript中new操作符的探究">
+<meta property="og:url" content="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="Javascript中有一个很有意思的new操作符，在《Javascript语言精粹》（Javascript:The Good Parts）中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。先来一段代码：    function test() {        var foo1 = new function () {            this.i = 1;        }">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Javascript中new操作符的探究">
+<meta name="twitter:description" content="Javascript中有一个很有意思的new操作符，在《Javascript语言精粹》（Javascript:The Good Parts）中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。先来一段代码：    function test() {        var foo1 = new function () {            this.i = 1;        }">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-some-research-about-new-operator-in-javascript" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2012/12/02/some-research-about-new-operator-in-javascript/" class="article-date">
+  <time datetime="2012-12-02T05:59:00.000Z" itemprop="datePublished">2012-12-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Javascript-CSS/">Javascript&CSS</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Javascript中new操作符的探究
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Javascript中有一个很有意思的new操作符，在<a href="http://book.douban.com/subject/3590768/" target="_blank" rel="noopener">《Javascript语言精粹》（Javascript:The Good Parts）</a>中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。<br>先来一段代码：<br>    function test() {<br>        var foo1 = new function () {<br>            this.i = 1;<br>        }<br>        var foo2 = function () {<br>            this.i = 2;<br>        }<br>        M.dis(foo1.i);        //1<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //undefined<br>        foo2();<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //2<br>        M.dis(foo1.prototype);    //undefined<br>        M.dis(foo2.prototype);    //[object Object]<br>    }<br>*代码中的<code>M.dis() = document.writeln()</code><br>上面代码很能说明使用new操作符和不使用new操作符的区别。<br>以下是本人根据以上结果对使用new操作符和不使用new操作符的一些理解。    </p>
+<ol>
+<li><p>使用new操作符函数会被立刻执行。不使用new操作符，函数会在被调用时执行。<br>foo1在定义的时候就被执行了，所以输出<code>foo1.i = 1</code>，而<code>foo2</code>在定义时未被执行，所以输出<code>foo2</code>的结果为<code>undefined</code>，<br><code>foo2</code>中<code>var foo2 = function () {}</code>的定义形式和<code>function foo2 () {}</code>的效果是一样的。</p>
+</li>
+<li><p>使用new操作符后<code>this</code>会被绑定到函数本身。  </p>
+</li>
+</ol>
+<p>这一点很好理解，首先<code>foo1</code>的定义方式中，<code>foo1</code>是立刻执行的，那么为了方便理解可以看成<code>foo1</code>是function的执行空间，<code>this</code>自然就会绑定到<code>foo1</code>上，也就是绑定到function自身上。于是输出<code>foo1.i</code>可以得到结果。而不使用new操作符时，函数没有立即执行，当调用该函数（即<code>foo2</code>）时，执行空间是<code>test()</code>函数，所以在<code>test()</code>中输出this.i才能得到结果。至于<code>foo2.i</code>为    <code>undefined</code>的情况也好理解，这样的执行方式相当于执行<code>foo2().i</code>，显然，没有这种用法。</p>
+<p>3.使用new操作符和不使用new操作符的原型差异。</p>
+<p>使用new操作符时，相当于讲一个构造函数实例化了，那么它的prototype自然是<code>undefined</code>的。<br>而不使用new操作符时，<code>foo2</code>就是一个function，<code>foo2</code>的prototype就是function的prototype。<br>关于使用new和不使用new的原型问题，请参考淘宝UED团队的一篇文章：</p>
+<p><a href="http://ued.taobao.com/blog/2007/05/15/" target="_blank" rel="noopener">http://ued.taobao.com/blog/2007/05/15/</a>你真的会写javascript吗？</p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>对于new操作符的探究目前仅限于new function，而对于new Array()和[] 的区别以及new Object()和{}的区别，本人认为并没有new function和function的区别这么大，但也有人说new Array()和[]是有区别的（见《你真的会写javascript吗？》评论）。</p>
+<h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>new Array()和字面量定义Array还有一个很重要的区别，比如想定义一个只有一个元素3的数组，看代码：  </p>
+<pre><code>var a = new Array(3); //这样只能定义一个长度为3的数组
+var b = [3]; //正确！
+</code></pre><p>可见，只有字面量可以定义一个元素的数组。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/" data-id="cjtpp9f5k0034vk53y1mz0qh1" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2012/12/03/a-test-about-javascript/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          一个关于Javascript的小测试
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2012/12/01/magic-search/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">MagicSearch</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="simpleapples">
+<meta property="og:url" content="http://www.simpleapples.com/page/4/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="simpleapples">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-understanding-blockchain" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/14/understanding-blockchain/" class="article-date">
+  <time datetime="2018-03-14T13:00:00.000Z" itemprop="datePublished">2018-03-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/14/understanding-blockchain/">最爱你的人，会让你不费脑细胞的理解区块链原理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20180314_01.png" alt=""></p>
+<p>区块链是一个近期非常火的概念，随便走进一个写字楼的电梯，都会听到有人谈论区块链，或者炒币: ) 希望通过这篇文章，能让你对区块链的概念有一个整体的认识，在理解概念后，<strong>下一篇文章将用大约300行Python代码，实现一个区块链网络。</strong></p>
+<h1 id="区块-和-链"><a href="#区块-和-链" class="headerlink" title="区块 和 链"></a>区块 和 链</h1><p>所谓区块，就是一个块咯（要不然还是什么？），把这些块一个一个连在一起，像链条一样，就称为区块链（别急着打我，先往下看）。</p>
+<p><img src="/upload/20180314_02.jpg" alt="区块和区块链"></p>
+<p>这是一些链条，链条的价值更多的体现在锁楼下小电动车的时候，不过我们再仔细看一下这个链条是不是有点像那什么？⛓</p>
+<p><img src="/upload/20180314_03.gif" alt="脱氧核糖核酸"></p>
+<p>很聪明，高中生物老师在冲你微笑！这就是传说中的脱氧核糖核酸（DNA），DNA也是一种链式结构，<strong>携带了遗传信息</strong>。区块链中的“区块”，就好比DNA分子中的脱氧核糖核苷酸（我也不知道自己在说什么），而区块链中的“链”，就好比DNA分子的链式结构。</p>
+<p>DNA和链条的价值差异，关键在于DNA携带了大量遗传<strong>信息</strong>，而链条什么都没有携带。对于区块链来说，携带信息也是它的一个重要特点（不携带信息连锁电动车的作用都没有）。</p>
+<p>当区块链携带的是账务信息的时候，它就变成了一个特别厉害的东西——账本（我们给他起了个00后的名字——比特币）。</p>
+<h1 id="Peer-to-Peer"><a href="#Peer-to-Peer" class="headerlink" title="Peer-to-Peer"></a>Peer-to-Peer</h1><p>为了显得专业一些，我们祭出比特币的创造者，中本聪的论文<a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">《Bitcoin: A Peer-to-Peer Electronic Cash System》</a>，从这篇论文的题目我们可以看到，区块链是基于<strong>Peer-to-Peer</strong>的，下面就来了解一下什么是Peer-to-Peer。</p>
+<p>Peer-to-Peer，简称P2P（不是互联网借贷的那个P2P），它是一种点对点网络，看图（我也不知道该怎么讲）。</p>
+<p><img src="/upload/20180314_04.jpg" alt="P2P网络"></p>
+<p>图中每一个方脑袋就是一个Peer（节点），注意一下，这些方脑袋有一个共同点，他们都一毛一样（不仅长得一样，每一个脑袋都跟其它脑袋相连）。这也是P2P网络的最大特点——<strong>去中心化</strong>，P2P网络中不存在中心节点，所有节点都是平等的，任何一个节点，想跟谁说话就跟谁说话，并且谁（节点）都不能说了算。</p>
+<h1 id="共识机制"><a href="#共识机制" class="headerlink" title="共识机制"></a>共识机制</h1><p>你和好基友老王，还有你们共同喜欢的一个姑娘阿圆（对，就是圆滚滚的圆），组成了一个三节点的P2P网络，根据P2P网络定义你们三个人谁都不能说了算。这一天，阿圆生日，你和老王同时给阿圆送了一个大蛋糕，那么问题来了，阿圆先吃哪个呢？</p>
+<p>既然没有人能说了算，也不能让你和老王决斗（计算机这么做恐怕人类会毁灭），那么就需要采用一个文明的办法决定——商量。既然商量，就要有规矩，这个规矩叫<strong>共识机制</strong>。</p>
+<p><img src="/upload/20180314_05.png" alt=""></p>
+<h1 id="Proof-of-work"><a href="#Proof-of-work" class="headerlink" title="Proof-of-work"></a>Proof-of-work</h1><p>区块链共识机制有很多种，Proof-of-work（POW，工作量证明）是其中一种，所谓工作量证明，有点像是比武招亲。你和老王对阿圆都很好，阿圆也很难抉择到底先吃谁的蛋糕，于是她请了两位武力相当的武林高手，让你和老王分别与高手过招，谁赢了高手，就先吃谁的蛋糕，如果你们都赢了高手，那么谁先赢算数。</p>
+<p><img src="/upload/20180314_06.jpg" alt=""></p>
+<h1 id="把这些捏在一起"><a href="#把这些捏在一起" class="headerlink" title="把这些捏在一起"></a>把这些捏在一起</h1><p>了解了POW、共识机制、P2P、区块、链的概念，我们就可以把他们拼在一起，看看会发生什么了。</p>
+<p><img src="/upload/20180314_07.jpeg" alt="区块链诞生了！"></p>
+<p>我们把P2P网络中的每一个节点，赋予一条链，这样网络中所有的链都是平等的了，接下来在其中一条链上增加一个带有信息的区块，P2P网络会将这个区块同步到所有的链上，也就是这条信息会被存储在所有节点。</p>
+<p>把上面的一段话缩成一句（会显得比较厉害）：</p>
+<p><strong>区块链是用分布式数据库识别、传播和记载信息的智能化对等网络, 也称为价值互联网。</strong></p>
+<p>看到这里是不是对区块链略知一二了？</p>
+<h1 id="关注Python私房菜"><a href="#关注Python私房菜" class="headerlink" title="关注Python私房菜"></a>关注Python私房菜</h1><p><img src="/upload/wechat-qrcode.jpg" alt="下一篇文章会用300行Python代码实现一个区块链，不要错过哟"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/03/14/understanding-blockchain/" data-id="cjtpp9f5v003ovk53j9vew2g0" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/03/14/understanding-blockchain/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-lru-algorithm-implemented-in-python" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/06/lru-algorithm-implemented-in-python/" class="article-date">
+  <time datetime="2018-03-06T12:00:00.000Z" itemprop="datePublished">2018-03-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/06/lru-algorithm-implemented-in-python/">面试不再怕，20行Python代码帮你搞懂LRU算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20180306_01.png" alt=""></p>
+<p>LRU算法在后端工程师面试中，是一个比较常出现的题目，这篇文章带大家一起，理解LRU算法，并最终用Python轻松实现一个基于LRU算法的缓存。</p>
+<h2 id="缓存是什么"><a href="#缓存是什么" class="headerlink" title="缓存是什么"></a>缓存是什么</h2><p><img src="/upload/20180306_02.jpg" alt=""></p>
+<p>先看一张图，当我们访问网页，浏览器会给服务器发请求，服务器会经过一系列的运算，把页面返回给浏览器。</p>
+<p><img src="/upload/20180306_03.jpg" alt=""></p>
+<p>当有多个浏览器同时访问的时候，就会在短时间内发起多个请求，而服务器对每一个请求都要进行一系列相同的操作。重复工作不仅浪费资源，还可能导致响应速度变慢。</p>
+<p><img src="/upload/20180306_04.jpg" alt=""></p>
+<p>而缓存则可以把服务器返回的页面保存下来，当有其他的浏览器再访问时候，就不必劳服务器大驾，直接由缓存返回页面。为了保证响应速度，缓存通常是基于比较昂贵的硬件，比如RAM，这就决定了我们很难用大量的缓存把所有的页面都存下来，当恰好没有缓存浏览器请求的页面时，依然需要请求服务器。由于缓存容量有限，而数据量无限（互联网每天新产生的页面数无法估计），就需要把好刚用在刀刃上，缓存那些最有用的信息。</p>
+<h2 id="LRU是什么"><a href="#LRU是什么" class="headerlink" title="LRU是什么"></a>LRU是什么</h2><p>LRU是一种缓存淘汰算法（在OS中也叫内存换页算法），由于缓存空间是有限的，所以要淘汰缓存中不常用的数据，留下常用的数据，达到缓存效率的最大化。LRU就是这样一种决定“淘汰谁留下谁”的算法，LRU是Least recently used的缩写，从字面意思“最近最少使用”，我们就可以理解LRU的淘汰规则。</p>
+<h2 id="LRU的淘汰逻辑"><a href="#LRU的淘汰逻辑" class="headerlink" title="LRU的淘汰逻辑"></a>LRU的淘汰逻辑</h2><p><img src="/upload/20180306_05.png" alt=""></p>
+<p>我们用一张图来描述LRU的淘汰逻辑，图中的缓存是一个列表结构，上面是头结点下面是尾节点，缓存容量为8（8个小格子）：</p>
+<ul>
+<li>有新数据（意味着数据之前没有被缓存过）时，加入到列表头</li>
+<li>缓存到达最大容量时，需要淘汰数据多出来的数据，此时淘汰列表尾部的数据</li>
+<li>当缓存中有数据被命中，则将数据移动到列表头部（相当于新加入缓存）</li>
+</ul>
+<p>按上面的逻辑我们可以看到，一个数据如果经常被访问就会不断地被移动到列表头部，不会被淘汰出缓存，而越不经常访问的数据，越容易被挤出缓存。</p>
+<h2 id="20行Python代码实践LRU"><a href="#20行Python代码实践LRU" class="headerlink" title="20行Python代码实践LRU"></a>20行Python代码实践LRU</h2><p>接下来我们用Python来实现一个采用LRU算法的缓存。</p>
+<p>从前面的文章中我们可以知道，缓存简化下来就两个功能，一个是往里装数据（缓存数据），一个是往外吐数据（命中缓存），所以我们的缓存对外只需要put和get两个接口就可以了。</p>
+<p>按照前面的示意图，缓存内部我们只需要有一个列表（list）就可以实现LRU逻辑，不过用列表虽然能实现逻辑，但是在判断是否命中缓存时，速度可能非常慢（列表需要遍历才能知道数据有没有在里面）。在Python中，我们可以用基于hash的结构，比如字典（dict）或集合（set），来快速判断数据是否存在，解决列表实现的性能问题。但是字典和集合又是没有顺序的，如果能有一种既能排序，又是基于hash存储的数据结构，就好了。</p>
+<p>在Python的collections包中，已经内置了这种实用的结构OrderedDict，OrderedDict是dict的子类，但是存储在内部的元素是有序的（列表的特点）。</p>
+<p>解决了数据结构的问题，我们可以直接上手写逻辑了，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, capacity)</span>:</span></span><br><span class="line">        self.capacity = capacity</span><br><span class="line">        self.queue = collections.OrderedDict()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.queue:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span> // 要找的数据不在缓存中返回<span class="number">-1</span></span><br><span class="line">        value = self.queue.pop(key) // 将命中缓存的数据移除</span><br><span class="line">        self.queue[key] = value // 将命中缓存的数据重新添加到头部</span><br><span class="line">        <span class="keyword">return</span> self.queue[key]</span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, key, value)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.queue: // 如果已经在缓存中，则先移除老的数据</span><br><span class="line">            self.queue.pop(key)</span><br><span class="line">        <span class="keyword">elif</span> len(self.queue.items()) == self.capacity:</span><br><span class="line">            self.queue.popitem(last=<span class="keyword">False</span>) // 如果不在缓存中并且到达最大容量，则把最后的数据淘汰</span><br><span class="line">        self.queue[key] = value // 将新数据添加到头部</span><br></pre></td></tr></table></figure>
+<p>下次面试在遇到LRU的题目，是不是就胸有成竹了？</p>
+<h2 id="扫码关注Python私房菜"><a href="#扫码关注Python私房菜" class="headerlink" title="扫码关注Python私房菜"></a>扫码关注Python私房菜</h2><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/03/06/lru-algorithm-implemented-in-python/" data-id="cjtpp9f58002ivk539qg6cjhv" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/03/06/lru-algorithm-implemented-in-python/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-60-lines-code-to-convert-pdf-to-word" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/03/60-lines-code-to-convert-pdf-to-word/" class="article-date">
+  <time datetime="2018-03-03T11:30:00.000Z" itemprop="datePublished">2018-03-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/03/60-lines-code-to-convert-pdf-to-word/">60行Python代码，实现多线程PDF转Word</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>工作中经常会遇到需要提取PDF文件中文字的情况，一个PDF还好，复制粘贴一下也花不了太多时间，如果需要把大量PDF转为Word，怎么办呢？</p>
+<p><img src="/upload/cant-do-it.jpg" alt=""></p>
+<p>今天教大家用60行代码实现，多线程批量PDF转Word。没兴趣看具体过程可以直接拉到最后，有代码。</p>
+<h2 id="分解任务"><a href="#分解任务" class="headerlink" title="分解任务"></a>分解任务</h2><p>把PDF转为Word，分几步？两步，第一步读取PDF文件，第二步写入Word文件。</p>
+<p><img src="/upload/two-steps.jpg" alt=""></p>
+<p>是的，就是这么简单，借助Python第三方包，可以轻松实现上面两个过程，我们要用到pdfminer3k和python-docx这两个包。</p>
+<h2 id="读取PDF"><a href="#读取PDF" class="headerlink" title="读取PDF"></a>读取PDF</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> PDFResourceManager</span><br><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> process_pdf</span><br><span class="line"><span class="keyword">from</span> pdfminer.converter <span class="keyword">import</span> TextConverter</span><br><span class="line"><span class="keyword">from</span> pdfminer.layout <span class="keyword">import</span> LAParams</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">resource_manager = PDFResourceManager()</span><br><span class="line">return_str = StringIO()</span><br><span class="line">lap_params = LAParams()</span><br><span class="line"></span><br><span class="line">device = TextConverter(resource_manager, return_str, laparams=lap_params)</span><br><span class="line">process_pdf(resource_manager, device, file) // file是使用open方法打开的PDF文件句柄</span><br><span class="line">device.close()</span><br><span class="line"></span><br><span class="line">// 此处content就是转换为文字的PDF内容</span><br><span class="line">content = return_str.getvalue()</span><br></pre></td></tr></table></figure>
+<p>content变量存储的就是我们从PDF文件中读取出的文字内容，可以看到，使用pdfminer3k可以轻松完成这个任务。接下来我们需要把文字内容写入成一个word文件。</p>
+<h2 id="写入Word"><a href="#写入Word" class="headerlink" title="写入Word"></a>写入Word</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> docx <span class="keyword">import</span> Document</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">doc = Document()</span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> content.split(<span class="string">'\n'</span>):</span><br><span class="line">    paragraph = doc.add_paragraph()</span><br><span class="line">    paragraph.add_run(remove_control_characters(line))</span><br><span class="line">doc.save(file_path)</span><br><span class="line">content是我们前面读取出的文字内容，由于是讲整个PDF读成一个字符串，所以需要使用split方法将每一行分隔开，然后按行写入word，否则所有的文字会在同一行。同时这段代码使用了一个remove_control_characters函数，这个函数是需要自己实现的，目的是移除控制字符（换行符、制表符、转义符等），因为python-docx是不支持控制字符写入的。</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_control_characters</span><span class="params">(content)</span>:</span></span><br><span class="line">    mpa = dict.fromkeys(range(<span class="number">32</span>))</span><br><span class="line">    <span class="keyword">return</span> content.translate(mpa)</span><br></pre></td></tr></table></figure>
+<p>控制字符就是ASCII码在32以下的，所以我们使用str的translate方法，把32以下的字符移除就可以。</p>
+<h2 id="用是能用，但是太慢了！"><a href="#用是能用，但是太慢了！" class="headerlink" title="用是能用，但是太慢了！"></a>用是能用，但是太慢了！</h2><p><img src="/upload/too-slow.jpg" alt=""></p>
+<p>如果我们用上面代码去转换100个PDF文件，就会发现速度慢到难以接受，每个PDF都需要花很长时间才能转换好，怎么办？别急，接下来我们引入多线程，同时转换多个PDF，可以有效加快转换速度。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ProcessPoolExecutor</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> ProcessPoolExecutor(max_workers=int(config[<span class="string">'max_worker'</span>])) <span class="keyword">as</span> executor:</span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> os.listdir(config[<span class="string">'pdf_folder'</span>]):</span><br><span class="line">        extension_name = os.path.splitext(file)[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> extension_name != <span class="string">'.pdf'</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        file_name = os.path.splitext(file)[<span class="number">0</span>]</span><br><span class="line">        pdf_file = config[<span class="string">'pdf_folder'</span>] + <span class="string">'/'</span> + file</span><br><span class="line">        word_file = config[<span class="string">'word_folder'</span>] + <span class="string">'/'</span> + file_name + <span class="string">'.docx'</span></span><br><span class="line">        print(<span class="string">'正在处理: '</span>, file)</span><br><span class="line">        result = executor.submit(pdf_to_word, pdf_file, word_file)</span><br><span class="line">        tasks.append(result)</span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    exit_flag = <span class="keyword">True</span></span><br><span class="line">    <span class="keyword">for</span> task <span class="keyword">in</span> tasks:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> task.done():</span><br><span class="line">            exit_flag = <span class="keyword">False</span></span><br><span class="line">    <span class="keyword">if</span> exit_flag:</span><br><span class="line">        print(<span class="string">'完成'</span>)</span><br><span class="line">        exit(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>代码中config是包含存储PDF文件夹地址和word文件夹地址的字典，使用Python标准库中的concurrent包，实现多进程，pdf_to_word方法是对上面读取PDF和写入word逻辑的封装。后面的while循环是查询任务是否进行完成。</p>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><p>到这里，我们已经实现了多线程批量转换PDF为word文档。拿谋篇著名文章来试验一下，效果如图（左侧是转换后的word，右侧是PDF）：</p>
+<p><img src="/upload/pdf-and-word.jpg" alt=""></p>
+<h2 id="不想写代码？"><a href="#不想写代码？" class="headerlink" title="不想写代码？"></a>不想写代码？</h2><p>本文介绍的所有代码，已经打包成了一个独立可运行的项目，存放在github，如果不想自己写代码，可以直接clone或下载github项目运行。项目地址如下（记得点star）：</p>
+<p><a href="https://github.com/simpleapples/pdf2word" target="_blank" rel="noopener">https://github.com/simpleapples/pdf2word</a></p>
+<h2 id="欢迎关注Python私房菜"><a href="#欢迎关注Python私房菜" class="headerlink" title="欢迎关注Python私房菜"></a>欢迎关注Python私房菜</h2><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/03/03/60-lines-code-to-convert-pdf-to-word/" data-id="cjtpp9f3i0000vk536pb4mdeq" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/03/03/60-lines-code-to-convert-pdf-to-word/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-snake-crack" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/08/28/snake-crack/" class="article-date">
+  <time datetime="2016-08-28T15:30:00.000Z" itemprop="datePublished">2016-08-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/08/28/snake-crack/">「贪吃蛇大作战」的刷分尝试</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>昨天同学推荐了一个最近比较火的游戏「贪吃蛇大作战」，今天已经到了AppStore总榜第二的位置。这两天一有空就会掏出手机玩几盘，不过无尽模式玩到3000分左右就遇到了瓶颈，于是怀着单纯的目的想研究下这个游戏的接口…</p>
+<p><img src="/upload/snake-1.png" alt="图1"></p>
+<h2 id="使用Charles抓取请求"><a href="#使用Charles抓取请求" class="headerlink" title="使用Charles抓取请求"></a>使用Charles抓取请求</h2><p>既然是研究接口，第一步就是看看接口的URL和参数返回都是什么了，请出神器Charles。</p>
+<p><img src="/upload/snake-2.png" alt="图2"></p>
+<p>通过Charles可以清楚地看到，游戏提交分数的接口和参数，至于返回，貌似没什么用。接下来仔细研究下请求，有几个参数能比较容易的判断他们的含义和作用。</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">device_id:</span> 设备ID</span><br><span class="line"><span class="symbol">game_mode:</span> <span class="number">1</span>是无尽模式 <span class="number">2</span>是限时模式</span><br><span class="line"><span class="symbol">kill:</span> 击杀次数</span><br><span class="line"><span class="symbol">length:</span> 蛇的长度</span><br><span class="line"><span class="symbol">market:</span> 我抓的是iOS设备发的请求，所以这里是apple</span><br><span class="line"><span class="symbol">platform:</span> 抓到的请求里是<span class="number">1</span>，还不太明白具体的意思</span><br><span class="line"><span class="symbol">push_channel:</span> 也是<span class="number">1</span>，不明白意思</span><br><span class="line"><span class="symbol">push_id:</span> 固定值<span class="number">111111111222222223333333344444444</span>，后面逆向apk也证明了这一点</span><br><span class="line"><span class="symbol">sid:</span> 每次登录都会更新</span><br><span class="line"><span class="symbol">snake_sign:</span> 签名</span><br><span class="line"><span class="symbol">uid:</span> 用户ID</span><br><span class="line"><span class="symbol">version:</span> 我使用的版本是固定值<span class="number">2.1</span></span><br></pre></td></tr></table></figure>
+<h2 id="通过逆向APK获取签名算法"><a href="#通过逆向APK获取签名算法" class="headerlink" title="通过逆向APK获取签名算法"></a>通过逆向APK获取签名算法</h2><p>明确了参数的意思，接下来就可以伪造请求了，不过在伪造请求之前，还有一个参数比较麻烦，那就是snake_sign，请求签名，从图中snake_sign的内容看，似乎有点像是一个base64过的东西，不过base64decode发现，根本不可读。与其猜签名算法，不如考虑一下其他办法。</p>
+<p>「贪吃蛇大作战」还有安卓版本，并且引导下载的页面提供了apk，于是下载apk，使用<a href="https://github.com/skylot/jadx" target="_blank" rel="noopener">jadx-gui</a>进行逆向，使用jadx-gui打开apk后，代码一览无余。</p>
+<p>通过查看代码，可以清楚的看到snake_sign字段的签名逻辑，首先将请求中所有参数按ASCII码顺序排列拼接成字符串，然后在字符串前添加<code>POST&amp; + [URL Path]</code>，添加后使用Key进行SHA1加密，key也可以在代码中获取到。对加密生成的结果，需要做一次base64，才是最终snake_sign字段的结果。</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST<span class="variable">&amp;top_list_v2</span>/update_score<span class="variable">&amp;device_id</span>=XXX<span class="variable">&amp;game_mode</span>=<span class="number">1</span><span class="variable">&amp;kill</span>=<span class="number">1</span><span class="variable">&amp;length</span>=<span class="number">35</span><span class="variable">&amp;market</span>=apple<span class="variable">&amp;platform</span>=<span class="number">1</span><span class="variable">&amp;push_channel</span>=<span class="number">1</span><span class="variable">&amp;push_id</span>=<span class="number">111111111222222223333333344444444</span><span class="variable">&amp;sid</span>=XXX<span class="variable">&amp;uid</span>=XXX<span class="variable">&amp;version</span>=<span class="number">2.1</span></span><br></pre></td></tr></table></figure>
+<p><img src="/upload/snake-3.png" alt="图3"></p>
+<h2 id="关于「贪吃蛇大作战」的一些猜测"><a href="#关于「贪吃蛇大作战」的一些猜测" class="headerlink" title="关于「贪吃蛇大作战」的一些猜测"></a>关于「贪吃蛇大作战」的一些猜测</h2><p>签名方法已经获取到，本以为可以安心刷分了，但是只成功刷了一次4000分160击杀。猜测可能进入排行版需要人工审核，一个理由是刷完后过了几分钟才显示到排行版，另一个理由是，刷完4000分169击杀后，很快刷了一个高的离谱的分，但是并没有显示在排行榜，后面无论刷多少分都再也没有显示出来过，怀疑可能被人工屏蔽。</p>
+<p>另外整个游戏和API的交互只有登录、获取用户信息、获取排行版最高分、提交分数等几种，所以游戏也不是真正的实时。</p>
+<p><img src="/upload/snake-4.png" alt="图4"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2016/08/28/snake-crack/" data-id="cjtpp9f5j0032vk53qfn0k4rm" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2016/08/28/snake-crack/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-configure-nginx-supervisor-gunicorn-flask" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/" class="article-date">
+  <time datetime="2015-06-11T03:00:00.000Z" itemprop="datePublished">2015-06-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。</p>
+<h2 id="配置Centos7"><a href="#配置Centos7" class="headerlink" title="配置Centos7"></a>配置Centos7</h2><p>root登录后，首先新建一个普通用户并设置密码</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser user</span><br><span class="line">passwd user</span><br></pre></td></tr></table></figure>
+<p>接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">Port</span> <span class="number">65535</span></span><br><span class="line"><span class="string">PasswordAuthentication</span> <span class="literal">no</span></span><br><span class="line"><span class="string">PermitRootLogin</span> <span class="literal">no</span></span><br></pre></td></tr></table></figure>
+<p>配置完成后重启ssh服务</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">systemctl</span> <span class="selector-tag">restart</span> <span class="selector-tag">sshd</span><span class="selector-class">.service</span></span><br></pre></td></tr></table></figure>
+<p>CentOS7中用firewalld替换了iptables，需要手动将80端口和修改后的ssh端口添加到firewalld中</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">firewalld --<span class="keyword">add</span><span class="bash">-port 80/tcp --permanent</span></span><br><span class="line"><span class="bash">firewalld --add-port 65535/tcp --permanent</span></span><br><span class="line"><span class="bash">firewalld --reload</span></span><br></pre></td></tr></table></figure>
+<h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><p>yum中可以直接安装nginx</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> nginx</span><br></pre></td></tr></table></figure>
+<p>安装好后在/etc/nginx/default.d中添加location的配置，并指向8001端口，以后Flask会监听8001端口</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">location</span> <span class="title">/ &#123;</span></span><br><span class="line"><span class="title">	proxy_pass</span> http://<span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">8001</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置好后重新载入nginx配置</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">systemctl</span> <span class="selector-tag">reload</span> <span class="selector-tag">nginx</span><span class="selector-class">.service</span></span><br></pre></td></tr></table></figure>
+<h2 id="安装Python"><a href="#安装Python" class="headerlink" title="安装Python"></a>安装Python</h2><p>CentOS自带Python2.7，如果使用Python3，需要单独安装。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget http<span class="variable">s:</span>//www.<span class="keyword">python</span>.org/ftp/<span class="keyword">python</span>/<span class="number">3.4</span>.<span class="number">3</span>/Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line">tar xf Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line"><span class="keyword">cd</span> Python-<span class="number">3.4</span>.<span class="number">3</span></span><br><span class="line">./configure --prefix=/usr/local --enable-shared</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> altinstall</span><br></pre></td></tr></table></figure>
+<p>接下来在项目中搭建虚拟环境，Python2虚拟环境使用virtualenv安装（使用pip install virtualenv命令安装），Python3环境使用pyvenv安装（Python3自带pyvenv），以Python3环境为例，在Web项目中，建立虚拟环境文件夹venv</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pyvenv venv</span></span><br></pre></td></tr></table></figure>
+<p>接下来在项目路径下启用虚拟环境</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">source</span> venv<span class="regexp">/bin/</span>active</span><br></pre></td></tr></table></figure>
+<p>退出虚拟环境使用Ctrl+C或deactive命令</p>
+<h2 id="安装配置Gunicorn"><a href="#安装配置Gunicorn" class="headerlink" title="安装配置Gunicorn"></a>安装配置Gunicorn</h2><p>Gunicorn使用pip install gunicorn安装，注意需要在虚拟环境中使用pip安装，这样才对应虚拟环境中的Python版本。安装好后，新建一个Gunicorn的配置文件，比如deploy_config.py，加入内容如下</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">bind='127.0.0.1:8001' <span class="comment">#绑定的端口</span></span><br><span class="line">workers=4	<span class="comment">#worker数量</span></span><br><span class="line">backlog=2048</span><br><span class="line">debug=True</span><br><span class="line">proc_name='gunicorn.pid'</span><br><span class="line">pidfile='/var/log/gunicorn/debug.log'</span><br><span class="line">loglevel='debug'</span><br></pre></td></tr></table></figure>
+<p>保存文件后在虚拟环境中使用Gunicorn尝试启动</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">gunicorn</span> <span class="selector-tag">-c</span> <span class="selector-tag">deploy_config</span><span class="selector-class">.py</span> <span class="selector-tag">myapp</span><span class="selector-pseudo">:app</span></span><br></pre></td></tr></table></figure>
+<p>myapp是入口Python文件名，app是函数名。如果输出worker相关信息，表明启动成功。</p>
+<h2 id="安装配置Supervisor"><a href="#安装配置Supervisor" class="headerlink" title="安装配置Supervisor"></a>安装配置Supervisor</h2><p>yum可以直接安装Supervisor，需要注意的是Supervisor只支持Python2，所以不要在虚拟环境中使用pip安装supervisor。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> supervisor</span><br></pre></td></tr></table></figure>
+<p>安装后，在/etc/supervisord.d中建立配置文件xxx.ini，内容如下</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[program:xxx]</span></span><br><span class="line"><span class="attr">command</span>=/var/proj/xxx/venv/bin/python /usr/bin/gunicorn -c /var/proj/xxx/deploy_config.py myapp:app</span><br><span class="line"><span class="attr">autorstart</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">directory</span>=/var/proj/xxx</span><br><span class="line"><span class="attr">autorestart</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">startsecs</span>=<span class="number">10</span></span><br><span class="line"><span class="attr">startretries</span>=<span class="number">20</span></span><br></pre></td></tr></table></figure>
+<p>xxx是项目名称，注意command中最好都写全路径，以区别系统环境和项目虚拟环境。完成后启动supervisord，使配置生效</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisord -c <span class="regexp">/etc/</span>supervisord.conf</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/" data-id="cjtpp9f4n0019vk53q4v7836i" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-pushing-whitin-viewdidappear-does-not-work" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/" class="article-date">
+  <time datetime="2015-03-13T03:03:00.000Z" itemprop="datePublished">2015-03-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/">在viewDidAppear中PushViewController失败的问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+{
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    [self.navigationController pushViewController:secondViewController animated:YES];
+}
+</code></pre><p>在iOS8中，这段代码工作良好，当FirstViewController出现时，由于立刻Push了SecondViewController，即使animated参数是YES，Push的动画都没有显示出来。但是在iOS7中却出现了不一样的情况，pushViewController方法似乎没有执行，SecondViewController也没有被推出。打断点可以发现pushViewController方法是被执行了的，但是界面上没有任何效果。</p>
+<p>由于pushViewController方法是在viewDidAppear中被调用的，会不会是因为viewDidAppear时FirstViewController还有什么UI上的动作没有处理完，导致立即调用pushViewController失败？那么将pushViewController放入dispatch_async中应该就能解决这个问题。使用如下代码实现：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+{
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.navigationController pushViewController:secondViewController animated:YES];
+       });
+}
+</code></pre><p>使用GCD后，SecondViewController被成功的Push了出来。虽然不能确定，但是也在一定程度上印证了上面的猜测。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/" data-id="cjtpp9f5d002qvk53w7fbi56d" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-beta-testing-with-testflight" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/10/30/beta-testing-with-testflight/" class="article-date">
+  <time datetime="2014-10-30T07:43:00.000Z" itemprop="datePublished">2014-10-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/10/30/beta-testing-with-testflight/">使用TestFlight进行应用的Beta测试</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>TestFlight已经被Apple集成到iTunes Connect中，现在使用TestFlight可以很方便的进行应用的Beta测试。下面就来介绍一下如何使用TestFlight进行测试，已经其中的一些小问题。</p>
+<p>首先需要在iTunes Connect中启用TestFlight，可以针对每个App的某一版本，决定是否启用TestFlight。进入iTunes Connect -&gt; My Apps -&gt; 某个App -&gt; Prerelease，在上传的Build右上角，打开TestFlight的开关，接下来就针对这个版本启动了TestFlight。</p>
+<p><img src="/upload/testflight-1.png" alt="图1"></p>
+<p>有了可以测试的应用，接下来还要有测试用户，TestFlight测试用户有两种，一种是内测用户InternalTester，最多25个，一种是公测用户ExternalTester，最多1000个，内测用户需要首先成为iTunes Connect User，而公测用户只需要知道他的Apple Id就可。要进行公测需要先经过Apple Review团队的审核。我们以添加一个内测用户为例，进入iTunes Connect -&gt; Users and Roles -&gt; iTunes Connect Users，首先添加一个iTunes Connect User，之所以要添加iTunes Connect User，是因为TestFlight的测试用户必须是一个iTunes Connect User，并且这个用户的角色必须是Admin或者Technical。添加后，用户的邮箱里会收到一封邀请邮件，点击邮件中的链接可以激活成为iTunes Connect User。进入iTunes Connect -&gt; Users and Roles -&gt; TestFlight Beta Testers，激活的iTunes Connect User会出现在这里，选中点击右上角的保存，这个用户就成为一个内测用户了。</p>
+<p><img src="/upload/testflight-2.png" alt="图2"></p>
+<p>有了内测用户和测试App，下一步就要将两者关联了，进入iTunes Connect -&gt; My Apps -&gt; 某个App -&gt; Prerelease -&gt; Internal Testers中，这里会显示可用的内测用户，勾选用户并点击右上角的Invite，Apple就会给这个邮箱发送一封邀请邮件。接下来需要在要测试的手机上安装TestFlight，安装好后，TestFlight会自动绑定当前手机的Apple Id登录，这里你会发现TestFlight里并没有出现测试App，经过测试，<em>必须要在iOS的自带邮件客户端上点击邀请邮件中的链接，才会跳转到TestFlight中安装应用。</em>这是TestFlight让人非常不爽的一点。你可以将收到的邀请邮件转发到自带的邮件客户端所绑定的邮箱上，让后在自带邮件客户端中点击邀请链接打开TestFlight。</p>
+<p><img src="/upload/testflight-3.png" alt="图3"></p>
+<p>点击链接后会自动跳转到TestFlight中，点击Install安装应用，再次进入TestFlight中就可以看到已安装的测试应用了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/10/30/beta-testing-with-testflight/" data-id="cjtpp9f46000gvk53isg6p7e9" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/10/30/beta-testing-with-testflight/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-launchsreen-and-launchimage" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/10/25/launchsreen-and-launchimage/" class="article-date">
+  <time datetime="2014-10-25T05:20:00.000Z" itemprop="datePublished">2014-10-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/10/25/launchsreen-and-launchimage/">iOS8中LaunchImage和LaunchScreen的完美结合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Apple在iOS8中推出了LaunchScreen.xib来代替之前的LaunchImage作为程序的启动界面，相比与LaunchImage，在iOS设备屏幕尺寸越来越多样的情况下，LaunchScreen.xib依托AutoLayout无疑更方便，否则，对于一个兼容iPhone5-iPhone6Plus的应用，就需要有4长不同尺寸的LaunchImage。</p>
+<p>但是LaunchScreen只有在iOS8中才能被支持，所以一些开发者还是选择用传统的LaunchImage方式。不过，还有一种方式是将LaunchImage和LaunchScreen结合，在大尺寸iPhone中使用LaunchScreen（iPhone6和iPhone6Plus都是iOS8系统），在iOS7中使用LaunchImage（使用iOS7的手机只有4寸和5.5寸的iPhone，所以只需要两张图）。</p>
+<p>首先进入Target配置，找到App Icons and Launch Images，Xcode6中默认使用了LaunchScreen.xib，而LaunchImage则没有使用。</p>
+<p><img src="/upload/launch-screen-1.png" alt="图1"></p>
+<p>接下来点击Use Assets Catelog，这时Xcode会在Images.xcassets中生成LaunchImage，这里我们只需要给4寸Retina屏和3.5寸2x屏放两张LaunchImage就好了。</p>
+<p>在iOS8中系统会优先调用LaunchScreen作为启动界面，而iOS7不支持LaunchScreen则会使用LaunchImage中的图片作为启动界面。</p>
+<p><img src="/upload/launch-screen-2.png" alt="图2"></p>
+<p>项目在iOS7模拟器中运行效果（使用LaunchImage）</p>
+<p><img src="/upload/launch-screen-3.png" alt="图3"></p>
+<p>项目在iOS8模拟器中运行效果（使用默认的LaunchScreen.xib）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/10/25/launchsreen-and-launchimage/" data-id="cjtpp9f57002evk53sldabnwx" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/10/25/launchsreen-and-launchimage/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-build-a-safari-extension" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/10/23/build-a-safari-extension/" class="article-date">
+  <time datetime="2014-10-23T09:40:00.000Z" itemprop="datePublished">2014-10-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Idea-Demo/">Idea&Demo</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/10/23/build-a-safari-extension/">创建一个简单的Safari扩展</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前做过一个把网址转为二维码的<a href="https://chrome.google.com/webstore/detail/url2qrcode/dohkaoejmhididdilnijehaeegkgchfl?utm_source=chrome-ntp-icon" target="_blank" rel="noopener">Chrome扩展</a>，想在Safari中也使用这样的扩展，搜索了一下貌似没有同类型的，所以自己打造了一个Safari扩展，并且把过程记录下来。</p>
+<h2 id="获得开发者证书"><a href="#获得开发者证书" class="headerlink" title="获得开发者证书"></a>获得开发者证书</h2><p>要建立一个Safari扩展，首先需要生成一个开发者证书。访问<a href="https://developer.apple.com/account/overview.action" target="_blank" rel="noopener">Apple开发者中心</a>，加入Safari Developer Program，加入开发者计划是免费的。加入开发者计划后就可以生成证书了，访问<a href="https://developer.apple.com/account/safari/certificate/certificateList.action" target="_blank" rel="noopener">Certificates, Identifiers &amp; Profiles</a>，点击右上角的加号，生成一个开发者证书。成功后将证书下载到本地并导入Keychain Access中。</p>
+<h2 id="在Safari中创建扩展"><a href="#在Safari中创建扩展" class="headerlink" title="在Safari中创建扩展"></a>在Safari中创建扩展</h2><p>打开Safari，在菜单中选择<em>Safari—Preferences-Advanced</em>，勾选最下方的<em>Show Develop menu in menu bar</em>，如图。</p>
+<p><img src="/upload/safari-extension-1.png" alt="图1"></p>
+<p>这时在菜单栏中会出现<em>Develop</em>菜单，选择<em>Develope-Show Extension Builder</em>，打开扩展编辑器，点击左下角的<em>+</em>，选择<em>New Extension</em>，保存到一个位置（例如Desktop）。</p>
+<p><img src="/upload/safari-extension-2.png" alt="图2"></p>
+<p>这时，Desktop文件夹中会出现一个<em>demo.safariextension</em>文件夹，这个文件夹里的内容就是我们生成的Safari扩展的根目录。如果前面的开发者证书已经正确导入，扩展的介绍里会出现Safari开发者的Id。</p>
+<p><img src="/upload/safari-extension-3.png" alt="图3"></p>
+<h2 id="编辑扩展基本信息"><a href="#编辑扩展基本信息" class="headerlink" title="编辑扩展基本信息"></a>编辑扩展基本信息</h2><p>扩展建立后，下面会有一票东西需要填写，首先填写扩展的基本信息。</p>
+<ul>
+<li>Display Name: 扩展的显示名称</li>
+<li>Author: 作者名字</li>
+<li>Description: 插件介绍</li>
+<li>Website: 插件网站</li>
+<li>Bundle Identifier: 这里需要填写唯一id</li>
+<li>Update Manifest: 这里需要填写一个plist格式文件的地址，Apple会定期检查这个地址中的Version，如果有升级，就会访问插件的下载地址更新插件，当然，如果插件只是自用而不提交Safari Extensions Gallery的话，这一栏可以不填，plist文件格式如下：</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">key</span>&gt;</span>Extension Updates<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.zangzhiya.url2qrcode<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>Developer Identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>开发者ID<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleVersion<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleShortVersionString<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>URL<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://simpleapples.com/upload/url2qrcode-safari/url2qrcode.safariextz<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Access Level: 这里需要选择插件对页面访问的权限，比如我们我们要做的URL转二维码插件，需要获取当前Tab的URL，那么这里需要选择ALL</li>
+</ul>
+<p><img src="/upload/safari-extension-4.png" alt="图4"></p>
+<h2 id="添加图标"><a href="#添加图标" class="headerlink" title="添加图标"></a>添加图标</h2><p>我们的扩展到现在还没有图标，Safari会分配一个默认的指南针图标，添加图标的方式很简单，在扩展的根目录下放置一个16px * 16px的png格式图片，Safari就会自动将其置为图标。</p>
+<h2 id="添加Toolbar-Item和Popovers"><a href="#添加Toolbar-Item和Popovers" class="headerlink" title="添加Toolbar Item和Popovers"></a>添加Toolbar Item和Popovers</h2><p>首先看一下这个扩展的完成态，如图。</p>
+<p><img src="/upload/safari-extension-5.png" alt="图5"></p>
+<p>可以看到这个插件有两部分组成，一个是工具栏的按钮，在Safari中被称为Toolbar Item，一个是点击按钮后弹出的层，是一个Popover，和Chrome中的Popup类似，这个Popover也是一个html页面。</p>
+<p>接下来，需要在Safari Extension Builder中继续编辑，添加一个Toolbar Item和一个Popover，如图。</p>
+<p><img src="/upload/safari-extension-6.png" alt="图6"></p>
+<p>Toobar Item红的Image必须是一个8bit的16px * 16px透明背景的黑白png图像（繁琐的要求），而Popover需要是一个html文件。这里的路径都是相对于扩展文件夹的。到这里插件的配置工作就完成了。</p>
+<h2 id="编程"><a href="#编程" class="headerlink" title="编程"></a>编程</h2><p>可以在<a href="https://github.com/simpleapples/url2qrcode-safari" target="_blank" rel="noopener">我的Github上</a>查看这个扩展的代码，里面用到的Safari Api（获取当前页URL），可以在<a href="https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html" target="_blank" rel="noopener">Safari Developer Libray</a>中找到，里面的内容非常详细。</p>
+<h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2><p>当扩展开发完成后，就可以点击Safari Extension Builder中的<em>Build Package</em>打包了，打包出来的会是一个<em>safariextz</em>格式的文件，双击就可以安装。如果不想提交Safari Extension Gallery，可以直接把这个文件拷贝给他人安装。</p>
+<p><img src="/upload/safari-extension-7.png" alt="图7"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/" data-id="cjtpp9f47000jvk53yqddwg9u" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ios8-register-notification-fail" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/09/19/ios8-register-notification-fail/" class="article-date">
+  <time datetime="2014-09-19T08:40:00.000Z" itemprop="datePublished">2014-09-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/09/19/ios8-register-notification-fail/">iOS8注册推送失败的探究</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Apple在9月18日正式发布了iOS8，在收到更新的同时，也发现自己的应用在iOS8下无法启动。<br>并且在Console中收到如下提示：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2014</span>-<span class="number">09</span>-<span class="number">19</span> <span class="number">16</span>:<span class="number">26</span>:<span class="number">20.369</span> demo[<span class="number">379</span>:<span class="number">30506</span>] registerFor<span class="comment">RemoteNotificationTypes: is not supported in iOS 8.0 and later.</span></span><br></pre></td></tr></table></figure>
+<p>查询文档可以知道，在iOS8中注册推送的方法<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">![Alt text](/upload/ios8-registerForRemoteNotificationTypes.png)</span><br><span class="line"></span><br><span class="line">按照文档中的提示，使用```registerForRemoteNotifications```方法代替，这个方法不接受参数。紧接着问题就来了，**程序在安装过这个应用的iOS8机器上可以成功注册，而在新安装的iOS8机器上则无法注册**，```application:didRegisterForRemoteNotificationsWithDeviceToken:```和```application:didFailToRegisterForRemoteNotificationsWithError:```都无法响应，并且在成功注册的机器上，收到的推送消息也没有声音提示。再次查看文档后发现这么一段话：</span><br></pre></td></tr></table></figure></p>
+<p>If you want your app’s push notifications to display alerts, play sounds, or perform other user-facing actions, you must call the registerUserNotificationSettings: method to request the types of notifications you want to use.<br><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">换句话说，如果要使用推送服务，还需要再调用```registerUserNotificationSettings```方法，而这个方法是和iOS7上的```registerForRemoteNotificationTypes```方法一样接受参数的。为什么iOS8下要把一个方法变成两个方法呢？```registerForRemoteNotifications```方法的文档中有这么一句话：</span><br></pre></td></tr></table></figure></p>
+<p>Call this method to initiate the registration process with Apple Push Service. If registration succeeds, the app calls your app delegate object’s application:didRegisterForRemoteNotificationsWithDeviceToken: method and passes it a device token.<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">苹果可能考虑到一些应用注册提醒可能只是为了获取deviceToken，所以将获取deviceToken单独提成一个方法，而要接收推送还需要单独调用别的方法，这样就细化了逻辑，方便不用的开发需求。不过在真机调试中，一台刚重置过的搭载iOS8系统的iPhone5c，调用registerForRemoteNotifications方法后，并没有收到任何失败或成功的回调，和Apple文档中描述的不符，怀疑是SDK在这部分也有<span class="keyword">bug。</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">下面贴一下兼容iOS7和iOS8的注册推送代码：</span></span><br></pre></td></tr></table></figure></p>
+<p>#define IS_OS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0)<br>if (IS_OS_8_OR_LATER) {<br>    [[UIApplication sharedApplication] registerForRemoteNotifications];<br>    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes: (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound) categories:nil];<br>    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];<br>} else {<br>    [application registerForRemoteNotificationTypes:<br>     UIRemoteNotificationTypeBadge |<br>     UIRemoteNotificationTypeAlert |<br>     UIRemoteNotificationTypeSound];<br>}<br><code>`</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/" data-id="cjtpp9f55002avk537gnwf7k9" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/5/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

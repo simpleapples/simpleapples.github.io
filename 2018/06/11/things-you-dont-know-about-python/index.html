@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>你所不知道的Python | 字符串格式化的演进之路 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="字符串格式化对于每个语言来说都是一个非常基础和常用的功能，学习Python的同学大概都知道可以用%语法来格式化字符串。然而为了让我们更方便的使用这个常用功能，语言本身也在对字符串格式化方法进行迭代。 Python 2.6以前：%操作符在Python 2.6出现之前，字符串迭代只有一种方法，就是%（也是取模）操作符，%操作符支持unicode和str类型的Python字符串，效果和C语言中的spr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你所不知道的Python | 字符串格式化的演进之路">
+<meta property="og:url" content="http://www.simpleapples.com/2018/06/11/things-you-dont-know-about-python/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="字符串格式化对于每个语言来说都是一个非常基础和常用的功能，学习Python的同学大概都知道可以用%语法来格式化字符串。然而为了让我们更方便的使用这个常用功能，语言本身也在对字符串格式化方法进行迭代。 Python 2.6以前：%操作符在Python 2.6出现之前，字符串迭代只有一种方法，就是%（也是取模）操作符，%操作符支持unicode和str类型的Python字符串，效果和C语言中的spr">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180611_01.jpg">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180611_02.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/wechat-qrcode.jpg">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="你所不知道的Python | 字符串格式化的演进之路">
+<meta name="twitter:description" content="字符串格式化对于每个语言来说都是一个非常基础和常用的功能，学习Python的同学大概都知道可以用%语法来格式化字符串。然而为了让我们更方便的使用这个常用功能，语言本身也在对字符串格式化方法进行迭代。 Python 2.6以前：%操作符在Python 2.6出现之前，字符串迭代只有一种方法，就是%（也是取模）操作符，%操作符支持unicode和str类型的Python字符串，效果和C语言中的spr">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/20180611_01.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-things-you-dont-know-about-python" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/11/things-you-dont-know-about-python/" class="article-date">
+  <time datetime="2018-06-11T03:50:00.000Z" itemprop="datePublished">2018-06-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      你所不知道的Python | 字符串格式化的演进之路
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20180611_01.jpg" alt=""></p>
+<p>字符串格式化对于每个语言来说都是一个非常基础和常用的功能，学习Python的同学大概都知道可以用%语法来格式化字符串。然而为了让我们更方便的使用这个常用功能，语言本身也在对字符串格式化方法进行迭代。</p>
+<h1 id="Python-2-6以前：-操作符"><a href="#Python-2-6以前：-操作符" class="headerlink" title="Python 2.6以前：%操作符"></a>Python 2.6以前：%操作符</h1><p>在Python 2.6出现之前，字符串迭代只有一种方法，就是%（也是取模）操作符，%操作符支持unicode和str类型的Python字符串，效果和C语言中的sprintf()方法相似，下面是一个使用%格式化字符串的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">"I'm %s. I'm %d year old"</span> % (<span class="string">'Tom'</span>, <span class="number">27</span>))</span><br></pre></td></tr></table></figure>
+<p>%符号前面使用一个字符串作为模板，模板中有标记格式的占位符号，%后面是一个tuple或者dict，用来传递需要格式化的值。占位符控制着显示的格式，下面列表展示了占位符的种类：</p>
+<table>
+<thead>
+<tr>
+<th>占位符</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%d</td>
+<td>十进制整数</td>
+</tr>
+<tr>
+<td>%i</td>
+<td>十进制整数</td>
+</tr>
+<tr>
+<td>%o</td>
+<td>八进制整数</td>
+</tr>
+<tr>
+<td>%u</td>
+<td>无符号整数</td>
+</tr>
+<tr>
+<td>%x</td>
+<td>无符号十六进制（小写）</td>
+</tr>
+<tr>
+<td>%X</td>
+<td>无符号十六进制（大写）</td>
+</tr>
+<tr>
+<td>%e</td>
+<td>浮点型（科学记数法，小写）</td>
+</tr>
+<tr>
+<td>%E</td>
+<td>浮点型（科学记数法，大写）</td>
+</tr>
+<tr>
+<td>%f</td>
+<td>浮点数</td>
+</tr>
+<tr>
+<td>%F</td>
+<td>浮点数</td>
+</tr>
+<tr>
+<td>%g</td>
+<td>浮点型，如果小数位数超过4位，使用科学记数法表示（小写）</td>
+</tr>
+<tr>
+<td>%G</td>
+<td>浮点型，如果小数位数超过4位，使用科学记数法表示（大写）</td>
+</tr>
+<tr>
+<td>%c</td>
+<td>单个字符</td>
+</tr>
+<tr>
+<td>%r</td>
+<td>字符串（调用repr()方法生成）</td>
+</tr>
+<tr>
+<td>%s</td>
+<td>字符串（调用str()方法生成）</td>
+</tr>
+</tbody>
+</table>
+<p>除了对数据类型的指定，%操作符还支持更复杂的格式控制：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%[<span class="string">数据名称</span>][<span class="symbol">对齐标志</span>][<span class="string">宽度</span>].[精度]类型</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据名称</td>
+<td>数据名称用于字典赋值，如果%符号后面传递的数组就不需要填写了</td>
+</tr>
+<tr>
+<td>对齐标志</td>
+<td>有+、-、0、‘ ’四种，+表示显示正负数符号，-表示左对齐，空格表示在左侧填充一个空格，0表示用0填充</td>
+</tr>
+<tr>
+<td>宽度</td>
+<td>表示格式化后的字符串长度，位数不足用0或空格补齐</td>
+</tr>
+<tr>
+<td>精度</td>
+<td>小数点后的位数</td>
+</tr>
+<tr>
+<td>类型</td>
+<td>数据类型（参考占位符种类）</td>
+</tr>
+</tbody>
+</table>
+<p>例如print(‘%053f’ % ‘12.34’)会输出0012.340</p>
+<h1 id="Python-2-6：format函数"><a href="#Python-2-6：format函数" class="headerlink" title="Python 2.6：format函数"></a>Python 2.6：format函数</h1><p>到Python2.6时，出现了一种新的字符串格式化方式，str.format()函数，相比于%操作符，format函数使用{}和:代替了%，威力更加强大，在映射关系方面，format函数支持位置映射、关键字映射、对象属性映射、下标映射等多种方式，不仅参数可以不按顺序，也可以不用参数或者一个参数使用多次，下面通过几个例子来说明。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'&#123;1&#125; &#123;0&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 可以不按顺序进行位置映射，输出'123 abc'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;&#125; &#123;&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 可以不指定参数名称，输出'abc 123'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;1&#125; &#123;0&#125; &#123;1&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 参数可以使用多次，输出'123 abc 123'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;name&#125; &#123;age&#125;'</span>.format(name=<span class="string">'tom'</span>, age=<span class="number">27</span>)  <span class="comment"># 可以按关键字映射，输出'tom 27'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;person.name&#125; &#123;person.age&#125;'</span>.format(person=person)  <span class="comment"># 可以按对象属性映射，输出'tom 27'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;0[1]&#125; &#123;0[0]&#125;'</span>.format(lst)  <span class="comment"># 通过下标映射</span></span><br></pre></td></tr></table></figure>
+<p>可以看到，format函数比%操作符使用起来更加方便，不需要记住太多各种占位符代表的意义，代码可读性也更高。在复杂格式控制方面，format函数也提供了更加强大的控制方式：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">[填充字符</span>]对齐方式][<span class="string">符号标志</span>][<span class="symbol">#</span>][<span class="string">宽度</span>][<span class="symbol">,</span>][<span class="string">.精度</span>][<span class="symbol">类型</span>]</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'&#123;:S^+#016,.2f&#125;'</span>.format(<span class="number">1234</span>)  <span class="meta"># 输出<span class="string">'SSS+1,234.00SSSS'</span></span></span><br></pre></td></tr></table></figure>
+<p>我们以上面的代码为例，通过表格说明一下format格式控制参数：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型</th>
+<th>说明</th>
+<th>示例说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">填充字符</td>
+<td>不填时默认用空格填充</td>
+<td>S表示用S填充</td>
+</tr>
+<tr>
+<td style="text-align:left">对齐方式</td>
+<td>^表示居中对齐、&lt;表示左对齐、&gt;表示右对齐</td>
+<td>^表示居中对齐，左右位数不足部分会用填充字符填充</td>
+</tr>
+<tr>
+<td style="text-align:left">符号标志</td>
+<td>+表示有符号（正数前显示+，负数前显示-），空格表示整数前加一个空格以和负数对齐</td>
+<td>+表示正数前显示空格</td>
+</tr>
+<tr>
+<td style="text-align:left">#</td>
+<td>表示是否在二进制、八进制、十六进制前显示0b、0o、0x等符号</td>
+<td>#表示显示进制符号，由于是十进制，所以不显示</td>
+</tr>
+<tr>
+<td style="text-align:left">宽度</td>
+<td>表示输出字符串的宽度</td>
+<td>16表示字符串宽度为16，不足部分会补齐</td>
+</tr>
+<tr>
+<td style="text-align:left">,</td>
+<td>表示使用,作为千位分隔符</td>
+<td>,表示使用千位分隔符</td>
+</tr>
+<tr>
+<td style="text-align:left">精度</td>
+<td>表示小数点后数字位数</td>
+<td>.2表示精度为2为</td>
+</tr>
+<tr>
+<td style="text-align:left">类型</td>
+<td>s表示字符串类型，c表示字符类型，b\o\d分别表示二八十进制，x\X表示小写和大写十六进制，e\E表示小写和大写的科学记数法，f表示浮点型</td>
+<td>f表示浮点型数字</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到format函数在%基础上丰富了格式控制种类，并且使输出更容易。</p>
+<h1 id="Python-3-6：f-string"><a href="#Python-3-6：f-string" class="headerlink" title="Python 3.6：f-string"></a>Python 3.6：f-string</h1><p>不少使用过ES6的小伙伴会知道其中的模板字符串，采用直接在字符串中内嵌变量的方式进行字符串格式化操作，Python在3.6版本中也为我们带来了类似的功能：Formatted String Literals（字面量格式化字符串），简称f-string。</p>
+<p>f-string就是以f’’开头的字符串，类似u’’和b’’，字符串内容和format方法中的格式一样，但是可以直接将变量带入到字符串中，可读性进一步增加，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">amount = <span class="number">1234</span></span><br><span class="line"><span class="string">f'请转账给我<span class="subst">&#123;amount:,<span class="number">.2</span>f&#125;</span>元'</span>  <span class="comment"># '请转账给我1,234.00元'</span></span><br></pre></td></tr></table></figure>
+<p>同时，f-string的性能是比%和format都有提升的，我们做一个简单的测试，分别使用%操作符、format和f-string将下面语句执行10000次：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'My name is %s and i'</span>m %s years old.<span class="string">' % (name, age)</span></span><br><span class="line"><span class="string">'</span>My name <span class="keyword">is</span> &#123;&#125; <span class="keyword">and</span> i<span class="string">'m &#123;&#125; years old.'</span>.format(name, age)</span><br><span class="line"><span class="string">f'My name is <span class="subst">&#123;name&#125;</span> and i'</span>m &#123;age&#125; years old.<span class="string">'</span></span><br></pre></td></tr></table></figure>
+<p>用时结果如下：</p>
+<p><img src="/upload/20180611_02.png" alt=""></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>如果你的项目使用的Python版本已经提升到3.6，f-string格式化是首选方式，不仅在保持功能强大的同时语义上更容易理解，而且性能也有较大的提升。如果项目还没有提升到3.6或者使用的2.7，更建议使用format，虽然性能上没有优势，但是语义上还是比%操作符更加便于理解的，功能也更加强大。</p>
+<h1 id="欢迎关注我的公众号【Python私房菜】"><a href="#欢迎关注我的公众号【Python私房菜】" class="headerlink" title="欢迎关注我的公众号【Python私房菜】"></a>欢迎关注我的公众号【Python私房菜】</h1><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/06/11/things-you-dont-know-about-python/" data-id="cjtpp9f5s003ivk534q5pzo7k" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/06/11/things-you-dont-know-about-python/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/06/20/wegame-causing-bsod-on-xps-15-9560/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          大毒瘤！卸载WeGame解决XPS 15蓝屏问题
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/31/python-cheat-sheet/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">初学者必备 | Python Cheat Sheet 中文版</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2018/06/11/things-you-dont-know-about-python/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>你所不知道的Python | 字符串连接的秘密 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="字符串连接，就是将2个或以上的字符串合并成一个，看上去连接字符串是一个非常基础的小问题，但是在Python中，我们可以用多种方式实现字符串的连接，稍有不慎就有可能因为选择不当而给程序带来性能损失。 方法1：加号连接很多语言都支持使用加号连接字符串，Python也不例外，只需要简单的将2个或多个字符串相加就可以完成拼接。 123a = &apos;Python&apos;b = &apos;私房菜&apos;r = a + b  # 输">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你所不知道的Python | 字符串连接的秘密">
+<meta property="og:url" content="http://www.simpleapples.com/2018/06/28/the-secret-of-string-concatenation/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="字符串连接，就是将2个或以上的字符串合并成一个，看上去连接字符串是一个非常基础的小问题，但是在Python中，我们可以用多种方式实现字符串的连接，稍有不慎就有可能因为选择不当而给程序带来性能损失。 方法1：加号连接很多语言都支持使用加号连接字符串，Python也不例外，只需要简单的将2个或多个字符串相加就可以完成拼接。 123a = &apos;Python&apos;b = &apos;私房菜&apos;r = a + b  # 输">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180628_04.jpg">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180628_05.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180628_06.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/wechat-qrcode.jpg">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="你所不知道的Python | 字符串连接的秘密">
+<meta name="twitter:description" content="字符串连接，就是将2个或以上的字符串合并成一个，看上去连接字符串是一个非常基础的小问题，但是在Python中，我们可以用多种方式实现字符串的连接，稍有不慎就有可能因为选择不当而给程序带来性能损失。 方法1：加号连接很多语言都支持使用加号连接字符串，Python也不例外，只需要简单的将2个或多个字符串相加就可以完成拼接。 123a = &apos;Python&apos;b = &apos;私房菜&apos;r = a + b  # 输">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/20180628_04.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-the-secret-of-string-concatenation" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/28/the-secret-of-string-concatenation/" class="article-date">
+  <time datetime="2018-06-28T15:51:00.000Z" itemprop="datePublished">2018-06-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      你所不知道的Python | 字符串连接的秘密
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20180628_04.jpg" alt=""></p>
+<p>字符串连接，就是将2个或以上的字符串合并成一个，看上去连接字符串是一个非常基础的小问题，但是在Python中，我们可以用多种方式实现字符串的连接，稍有不慎就有可能因为选择不当而给程序带来性能损失。</p>
+<h1 id="方法1：加号连接"><a href="#方法1：加号连接" class="headerlink" title="方法1：加号连接"></a>方法1：加号连接</h1><p>很多语言都支持使用加号连接字符串，Python也不例外，只需要简单的将2个或多个字符串相加就可以完成拼接。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'Python'</span></span><br><span class="line">b = <span class="string">'私房菜'</span></span><br><span class="line">r = a + b  <span class="comment"># 输出'Python私房菜'</span></span><br></pre></td></tr></table></figure>
+<h1 id="方法2：使用-操作符"><a href="#方法2：使用-操作符" class="headerlink" title="方法2：使用%操作符"></a>方法2：使用%操作符</h1><p>在Python 2.6以前，%操作符是唯一一种格式化字符串的方法，它也可以用于连接字符串。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'Python'</span></span><br><span class="line">b = <span class="string">'私房菜'</span></span><br><span class="line">r = <span class="string">'%s%s'</span> % (a, b)  <span class="comment"># 输出'Python私房菜'</span></span><br></pre></td></tr></table></figure>
+<h1 id="方法3：使用format方法"><a href="#方法3：使用format方法" class="headerlink" title="方法3：使用format方法"></a>方法3：使用format方法</h1><p>format方法是Python 2.6中出现的一种代替%操作符的字符串格式化方法，同样可以用来连接字符串。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'Python'</span></span><br><span class="line">b = <span class="string">'私房菜'</span></span><br><span class="line">r = <span class="string">'&#123;&#125;&#123;&#125;'</span>.format(a, b)</span><br></pre></td></tr></table></figure>
+<h1 id="方法4：使用f-string"><a href="#方法4：使用f-string" class="headerlink" title="方法4：使用f-string"></a>方法4：使用f-string</h1><p>Python 3.6中引入了Formatted String Literals（字面量格式化字符串），简称f-string，f-string是%操作符和format方法的进化版，使用f-string连接字符串的方法和使用%操作符、format方法类似。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'Python'</span></span><br><span class="line">b = <span class="string">'私房菜'</span></span><br><span class="line">r = <span class="string">f'<span class="subst">&#123;a&#125;</span><span class="subst">&#123;b&#125;</span>'</span></span><br></pre></td></tr></table></figure>
+<h1 id="方法5：使用str-join-方法"><a href="#方法5：使用str-join-方法" class="headerlink" title="方法5：使用str.join()方法"></a>方法5：使用str.join()方法</h1><p>字符串有一个内置方法join，其参数是一个序列类型，例如数组或者元组等。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'Python'</span></span><br><span class="line">b = <span class="string">'私房菜'</span></span><br><span class="line">r = <span class="string">''</span>.join([a, b])</span><br></pre></td></tr></table></figure>
+<h1 id="对比测试"><a href="#对比测试" class="headerlink" title="对比测试"></a>对比测试</h1><p>既然连接字符串有这么多方法，那么使用时到底选择哪种呢？我们从代码可读性和性能两个层面来评估一下上面5种方法。</p>
+<p>使用timeit模块，分别执行上述5种方法的示例代码100000次，执行时间如图。</p>
+<p><img src="/upload/20180628_05.png" alt=""></p>
+<p>可以看到，%操作符、format和f-string都是字符串格式化方法，性能依次递增，加号连接的性能和f-string不相上下。</p>
+<p>有一点需要注意的是，字符串类型是不可变的，所以每一次应用加号连接字符串都会生成一个新的字符串，连接多个字符串时，效率低下就是必然的了，我们将一次连接的字符串提升到10个和20个，再来进行2轮测试，下面是连接20个字符串时的耗时情况。</p>
+<p><img src="/upload/20180628_06.png" alt=""></p>
+<p>和连接两个字符串时的结果出现了一些不同，首先使用加号连接的方式在字符串数量较多时（大于10个），性能会急剧下降，str.join()方法在连接大量字符串时性能最好。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>连接少量字符串时</strong><br>使用<strong>加号</strong>连接符在性能和可读性上都是明智的，如果对可读性有更高的要求，并且使用的Python 3.6以上版本，<strong>f-string</strong>也是一个非常好的选择，例如下面这种情况，f-string的可读性显然比加号连接好得多。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">f'姓名：<span class="subst">&#123;name&#125;</span> 年龄：<span class="subst">&#123;age&#125;</span> 性别：<span class="subst">&#123;gender&#125;</span>'</span></span><br><span class="line">b = <span class="string">'姓名：'</span> + name + <span class="string">'年龄：'</span> + age + <span class="string">'性别：'</span> + gender</span><br></pre></td></tr></table></figure>
+<p><strong>连接大量字符串时</strong><br><strong>join</strong>和<strong>f-string</strong>都是性能最好的选择，选择时依然取决于你使用的Python版本以及对可读性的要求，f-string在连接大量字符串时可读性并不一定好。切记不要使用加号连接，尤其是在for循环中。</p>
+<h1 id="欢迎关注我的公众号【Python私房菜】"><a href="#欢迎关注我的公众号【Python私房菜】" class="headerlink" title="欢迎关注我的公众号【Python私房菜】"></a>欢迎关注我的公众号【Python私房菜】</h1><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/06/28/the-secret-of-string-concatenation/" data-id="cjtpp9f5r003gvk53js5wyfkd" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/06/28/the-secret-of-string-concatenation/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/07/10/transition-of-parameters-of-functions-in-python/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          你所不知道的Python | 函数参数的演进之路
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/06/28/install-kvm-on-ubuntu-18.04-lts/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Ubuntu 18.04 LTS安装KVM虚拟机</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2018/06/28/the-secret-of-string-concatenation/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

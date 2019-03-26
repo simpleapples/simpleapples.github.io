@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>实战 | 用aiohttp和uvloop实现一个高性能爬虫 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。 准备工作Earth View from Google Earth是一款Chrome插件，会在打开新标签页时自动加载一张来自Google Earth的背景图片。  使用Chrome开发者工具观察插件的网络请求，我们发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实战 | 用aiohttp和uvloop实现一个高性能爬虫">
+<meta property="og:url" content="http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。 准备工作Earth View from Google Earth是一款Chrome插件，会在打开新标签页时自动加载一张来自Google Earth的背景图片。  使用Chrome开发者工具观察插件的网络请求，我们发">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180410_01.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180410_02.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180410_03.png">
+<meta property="og:image" content="http://www.simpleapples.com/upload/wechat-qrcode.jpg">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实战 | 用aiohttp和uvloop实现一个高性能爬虫">
+<meta name="twitter:description" content="asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。 准备工作Earth View from Google Earth是一款Chrome插件，会在打开新标签页时自动加载一张来自Google Earth的背景图片。  使用Chrome开发者工具观察插件的网络请求，我们发">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/20180410_01.png">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-a-crawler-based-on-aiohttp-and-uvloop" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/" class="article-date">
+  <time datetime="2018-04-10T11:26:00.000Z" itemprop="datePublished">2018-04-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      实战 | 用aiohttp和uvloop实现一个高性能爬虫
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。</p>
+<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p><a href="https://chrome.google.com/webstore/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh" target="_blank" rel="noopener">Earth View from Google Earth</a>是一款Chrome插件，会在打开新标签页时自动加载一张来自Google Earth的背景图片。</p>
+<p><img src="/upload/20180410_01.png" alt="Earth View from Google Earth"></p>
+<p>使用Chrome开发者工具观察插件的网络请求，我们发现插件会请求一个地址如<a href="https://www.gstatic.com/prettyearth/assets/data/v2/1234.json" target="_blank" rel="noopener">https://www.gstatic.com/prettyearth/assets/data/v2/1234.json</a>的JSON文件，文件中包含了经过Base64的图片内容，观察发现，图片的ID范围大致在1000-8000之间，我们的爬虫就要来爬取这些精美的背景图片。</p>
+<h1 id="实现主要逻辑"><a href="#实现主要逻辑" class="headerlink" title="实现主要逻辑"></a>实现主要逻辑</h1><p>由于爬取目标是JSON文件，爬虫的主要逻辑就变成了<strong>爬取JSON–&gt;提取图片–&gt;保存图片</strong>。</p>
+<p>requests是一个常用的http请求库，但是由于requests的请求都是同步的，我们使用<a href="https://aiohttp.readthedocs.io/en/stable/" target="_blank" rel="noopener">aiohttp</a>这个异步http请求库来代替。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">fetch_image_by_id</span><span class="params">(item_id)</span>:</span></span><br><span class="line">	url = <span class="string">f'https://www.gstatic.com/prettyearth/assets/data/v2/<span class="subst">&#123;item_id&#125;</span>.json'</span></span><br><span class="line">        <span class="comment"># 由于URL是https的，所以选择不验证SSL</span></span><br><span class="line">	<span class="keyword">async</span> <span class="keyword">with</span> aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=<span class="keyword">False</span>)) <span class="keyword">as</span> session:</span><br><span class="line">		<span class="keyword">async</span> <span class="keyword">with</span> session.get(url) <span class="keyword">as</span> response:</span><br><span class="line">            <span class="comment"># 获取后需要将JSON字符串转为对象</span></span><br><span class="line">			<span class="keyword">try</span>:</span><br><span class="line">				json_obj = json.loads(<span class="keyword">await</span> response.text())</span><br><span class="line">			<span class="keyword">except</span> json.decoder.JSONDecodeError <span class="keyword">as</span> e:</span><br><span class="line">				print(<span class="string">f'Download failed - <span class="subst">&#123;item_id&#125;</span>.jpg'</span>)</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">            <span class="comment"># 获取JSON中的图片内容字段，经过Base64解码成二进制内容</span></span><br><span class="line">			image_str = json_obj[<span class="string">'dataUri'</span>].replace(<span class="string">'data:image/jpeg;base64,'</span>, <span class="string">''</span>)</span><br><span class="line">			image_data = base64.b64decode(image_str)</span><br><span class="line">			save_folder = dir_path = os.path.dirname(</span><br><span class="line">				os.path.realpath(__file__)) + <span class="string">'/google_earth/'</span></span><br><span class="line">			<span class="keyword">with</span> open(<span class="string">f'<span class="subst">&#123;save_folder&#125;</span><span class="subst">&#123;item_id&#125;</span>.jpg'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">				f.write(image_data)</span><br><span class="line">			print(<span class="string">f'Download complete - <span class="subst">&#123;item_id&#125;</span>.jpg'</span>)</span><br></pre></td></tr></table></figure>
+<p>aiohttp基于asyncio，所以在调用时需要使用async/await语法糖，可以看到，由于aiohttp中提供了一个ClientSession上下文，代码中使用了async with的语法糖。</p>
+<h1 id="加入并行逻辑"><a href="#加入并行逻辑" class="headerlink" title="加入并行逻辑"></a>加入并行逻辑</h1><p>上面的代码是抓取单张图片的逻辑，批量抓取图片，需要再嵌套一层方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">fetch_all_images</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 使用Semaphore限制最大并发数</span></span><br><span class="line">	sem = asyncio.Semaphore(<span class="number">10</span>)</span><br><span class="line">	ids = [id <span class="keyword">for</span> id <span class="keyword">in</span> range(<span class="number">1000</span>, <span class="number">8000</span>)]</span><br><span class="line">	<span class="keyword">for</span> current_id <span class="keyword">in</span> ids:</span><br><span class="line">		<span class="keyword">async</span> <span class="keyword">with</span> sem:</span><br><span class="line">			<span class="keyword">await</span> fetch_image_by_id(current_id)</span><br></pre></td></tr></table></figure>
+<p>接下来，将这个方法加入到asyncio的事件循环中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">event_loop = asyncio.get_event_loop()</span><br><span class="line">future = asyncio.ensure_future(fetch_all_images())</span><br><span class="line">results = event_loop.run_until_complete(future)</span><br></pre></td></tr></table></figure>
+<h1 id="使用uvloop加速"><a href="#使用uvloop加速" class="headerlink" title="使用uvloop加速"></a>使用uvloop加速</h1><p>uvloop基于libuv，libuv是一个使用C语言实现的高性能异步I/O库，uvloop用来代替asyncio默认事件循环，可以进一步加快异步I/O操作的速度。</p>
+<p>uvloop的使用非常简单，只要在获取事件循环前，调用如下方法，将asyncio的事件循环策略设置为uvloop的事件循环策略。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())</span><br></pre></td></tr></table></figure>
+<p>使用上面的代码，我们可以快速将大约1500张的图片爬取下来。</p>
+<p><img src="/upload/20180410_02.png" alt="爬取下来的Google Earth图片"></p>
+<h1 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h1><p>为了验证aiohttp和uvloop的性能，笔者使用requests+concurrent库实现了一个多进程版的爬虫，分别爬取20个id，消耗的时间如图。</p>
+<p><img src="/upload/20180410_03.png" alt=""></p>
+<p>可以看到，耗时相差了大概7倍，aiohttp+uvloop的组合在爬虫这种I/O密集型的场景下，可以说具有压倒性优势。相信在不远的将来，基于asyncio的库会将无数爬虫工程师从加班中拯救出来。</p>
+<h1 id="扫码关注Python私房菜"><a href="#扫码关注Python私房菜" class="headerlink" title="扫码关注Python私房菜"></a>扫码关注Python私房菜</h1><p><img src="/upload/wechat-qrcode.jpg" alt="拯救加班的你"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/" data-id="cjtpp9f3p0001vk53sshhq1r3" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/04/22/python-parameter-passing/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Python参数传递，既不是传值也不是传引用
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/30/python-access-control/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">与面试官谈笑风生 | Python面向对象之访问控制</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

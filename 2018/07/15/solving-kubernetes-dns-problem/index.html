@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-116134610-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>搭建Kubernetes集群时DNS无法解析问题的处理过程 | simpleapples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="问题描述在搭建Kubernetes集群过程中，安装了kube-dns插件后，运行一个ubuntu容器，发现容器内无法解析集群外域名，一开始可以解析集群内域名，一段时间后也无法解析集群内域名。 12345$ nslookup kubernetes.defaultServer:    10.99.0.2Address 1: 10.99.0.2 kube-dns.kube-system.svc.clu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搭建Kubernetes集群时DNS无法解析问题的处理过程">
+<meta property="og:url" content="http://www.simpleapples.com/2018/07/15/solving-kubernetes-dns-problem/index.html">
+<meta property="og:site_name" content="simpleapples">
+<meta property="og:description" content="问题描述在搭建Kubernetes集群过程中，安装了kube-dns插件后，运行一个ubuntu容器，发现容器内无法解析集群外域名，一开始可以解析集群内域名，一段时间后也无法解析集群内域名。 12345$ nslookup kubernetes.defaultServer:    10.99.0.2Address 1: 10.99.0.2 kube-dns.kube-system.svc.clu">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180715_01.jpg">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180715_02.jpg">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180715_03.jpg">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180715_04.jpg">
+<meta property="og:image" content="http://www.simpleapples.com/upload/20180715_05.jpg">
+<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="搭建Kubernetes集群时DNS无法解析问题的处理过程">
+<meta name="twitter:description" content="问题描述在搭建Kubernetes集群过程中，安装了kube-dns插件后，运行一个ubuntu容器，发现容器内无法解析集群外域名，一开始可以解析集群内域名，一段时间后也无法解析集群内域名。 12345$ nslookup kubernetes.defaultServer:    10.99.0.2Address 1: 10.99.0.2 kube-dns.kube-system.svc.clu">
+<meta name="twitter:image" content="http://www.simpleapples.com/upload/20180715_01.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">simpleapples</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-solving-kubernetes-dns-problem" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/07/15/solving-kubernetes-dns-problem/" class="article-date">
+  <time datetime="2018-07-14T16:00:00.000Z" itemprop="datePublished">2018-07-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DevOps/">DevOps</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      搭建Kubernetes集群时DNS无法解析问题的处理过程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20180715_01.jpg" alt=""></p>
+<h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>在搭建Kubernetes集群过程中，安装了kube-dns插件后，运行一个ubuntu容器，发现容器内无法解析集群外域名，一开始可以解析集群内域名，一段时间后也无法解析集群内域名。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ nslookup kubernetes.default</span><br><span class="line">Server:    10.99.0.2</span><br><span class="line">Address 1: 10.99.0.2 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">nslookup: can<span class="string">'t resolve '</span>kubernetes.default<span class="string">'</span></span><br></pre></td></tr></table></figure>
+<h1 id="排查过程"><a href="#排查过程" class="headerlink" title="排查过程"></a>排查过程</h1><p>在排查问题前，先思考一下Kubernetes集群中的DNS解析过程，在安装好kube-dns的集群中，普通Pod的dnsPolicy属性是默认值ClusterFirst，也就是会指向集群内部的DNS服务器，kube-dns负责解析集群内部的域名，kube-dns Pod的dnsPolicy值是Default，意思是从所在Node继承DNS服务器，对于无法解析的外部域名，kube-dns会继续向集群外部的dns进行查询，过程如图。</p>
+<p><img src="/upload/20180715_02.jpg" alt=""></p>
+<p>Ubuntu容器是一个普通的Pod，在Linux系统中，/etc/resolv.conf是存储DNS服务器的文件，普通Pod的/etc/resolv.conf文件应该存储的是kube-dns的Service IP。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nameserver 10.99.0.2  <span class="comment"># 这里存储的是kube-dns的Service IP</span></span><br><span class="line">search default.svc.cluster.local. svc.cluster.local. cluster.local.</span><br><span class="line">options ndots:5</span><br></pre></td></tr></table></figure>
+<p>查看后发现/etc/resolv.conf文件中存储的是kube-dns的Service IP，证明这一步没有问题，接下来查看一下kube-dns的Pod，先进入kube-dns的Pod中检查一下/etc/resolv.conf文件，这里存储的应该是集群外部的DNS服务器地址，查看后发现，这里存储的地址是127.0.0.53，进一步查看kube-dns Pod的log，发现出现了非常多的i/o timeout错误。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> 2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:38019-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:57567-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:52599-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:42539-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:46885-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:44189-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:56505-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:47320-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:42464-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:49203-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:58103-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:47148-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:36883-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:40968-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:55672-&gt;127.0.0.53:53: i/o timeout</span><br></pre></td></tr></table></figure>
+<p>现在基本上可以发现问题的原因了，kube-dns只能解析集群内部地址，而集群外部地址应该发给外部DNS服务器进行解析，由于kube-dns Pod中的/etc/resolv.conf文件存储的DNS服务器地址是127.0.0.53，127.<em>.</em>.*都是回环地址，也就是集群外域名的DNS解析请求会再次发送回kube-dns，导致形成一个循环，这也是一秒钟会出现几十次i/o timeout日志的原因，请求会不断的在kube-dns中循环，kube-dns就像一个黑洞一样，吃掉了所有dns解析请求，不断累积的请求最终会导致整个集群的网络出现卡顿。</p>
+<p><img src="/upload/20180715_03.jpg" alt=""></p>
+<h1 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h1><p>虽然问题的原因找到了，但是为什么kube-dns Pod中/etc/resolv.conf文件存储的DNS服务器是127.0.0.53？</p>
+<p>kube-dns Pod的dnsPolicy值是Default，查看一下Kubernetes文档。</p>
+<blockquote>
+<p>“<code>Default</code>“: The Pod inherits the name resolution configuration from the node that the pods run on. See <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#inheriting-dns-from-the-node" target="_blank" rel="noopener">related discussion</a> for more details.</p>
+</blockquote>
+<p>所以kube-dns的/etc/resolv.conf文件是从Node中继承来的，查看Node中的/etc/resolv.conf文件，存储的DNS服务器地址确实是127.0.0.53，那么下一个问题出现了，在Node中发送DNS解析请求为什么不会产生回环的问题呢？</p>
+<p>Node使用的是Ubuntu 18.04 Server，在这个版本的系统中，DNS解析请求并不是直接发给所在网络的DNS服务器的，Ubuntu 18.04中有一个systemd-resolved服务，为本地应用程序提供了DNS解析服务，例如nslookup localhost，解析程序从/etc/resolv.conf文件中找到DNS服务器127.0.0.53，发送解析请求，systemd-resolved会监听在53端口上，捕获到解析请求后，如果是自己可以解析的，例如localhost，会直接返回127.0.0.1，如果不能解析，才会发送给外部服务器，而外部服务器的地址存储在/run/systemd/resolve/resolv.conf文件中，这个文件是systemd-resolved服务器的配置文件，过程如图。</p>
+<p><img src="/upload/20180715_04.jpg" alt=""></p>
+<h1 id="怎么破"><a href="#怎么破" class="headerlink" title="怎么破"></a>怎么破</h1><p>理解了问题的来龙去脉，解决问题的办法也就应运而生。在Kubernetes集群中，kubelet是worker组建，负责管理Pod，根据kubernetes文档，kubelet默认会从Node的/etc/resolv.conf文件读取DNS服务器地址，使得dnsPolicy是Default的Pod得以继承，kubelet中的–resolv-conf参数可以指定这个配置文件的地址。在Ubuntu 18.04中，将这个参数设置为systemd-resolved的DNS服务器配置文件/run/systemd/resolve/resolv.conf，Pod就会继承真正的外部DNS服务器。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过对问题的探究，也理解了Kubernetes集群中DNS解析的完整过程，如图。</p>
+<p><img src="/upload/20180715_05.jpg" alt=""></p>
+<p><em>\</em> 在Ubuntu 16.04中也是类似的逻辑，只不过systemd-resolved换成了dnsmasq，监听地址是127.0.1.1<em>
+</em>* 在具体实践过程中，也顺便探究了CoreDNS和KubeDNS架构和解析逻辑上的区别，不过不在此问题的讨论范围，有兴趣的朋友可以自己看一下。<em>
+</em>* 如果Kubernetes集群是安装在NAT网络下的虚拟机上，虚拟机（也就是Kubernetes集群中的Node）中/etc/resolv.conf文件可能被修改为NAT的地址，也就不会出现上面这个问题。*</p>
+<h1 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h1><p> <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/" target="_blank" rel="noopener">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/</a><br><a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/" target="_blank" rel="noopener">https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/</a><br><a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank" rel="noopener">https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/</a><br><a href="https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html" target="_blank" rel="noopener">https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html</a><br><a href="https://github.com/kubernetes/kubernetes/issues/49411" target="_blank" rel="noopener">https://github.com/kubernetes/kubernetes/issues/49411</a><br><a href="https://github.com/kubernetes/kubernetes/issues/45828" target="_blank" rel="noopener">https://github.com/kubernetes/kubernetes/issues/45828</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/07/15/solving-kubernetes-dns-problem/" data-id="cjtpp9f6d004cvk53lhvfe67v" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/07/15/solving-kubernetes-dns-problem/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/07/17/gofmt-formating-your-code/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          使用gofmt格式化代码
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/07/10/build-golang-environment/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Golang环境安装和依赖管理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 simpleapples<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'simpleapples';
+  
+  var disqus_url = 'http://www.simpleapples.com/2018/07/15/solving-kubernetes-dns-problem/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
