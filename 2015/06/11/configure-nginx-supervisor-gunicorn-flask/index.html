@@ -1,113 +1,97 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
-<!-- Google Analytics -->
-<script type="text/javascript">
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-ga('create', 'UA-116134610-1', 'auto');
-ga('send', 'pageview');
 
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目"/><link rel="alternate" href="/default" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
+<link rel="canonical" href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/"/>
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
 </script>
-<!-- End Google Analytics -->
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
 
+    <title>在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目 - simpleapples</title>
+  </head>
 
-  
-  <title>在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目 | simpleapples</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。 配置Centos7root登录后，首先新建一个普通用户并设置密码 12adduser userpasswd user 接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容 123Po">
-<meta property="og:type" content="article">
-<meta property="og:title" content="在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目">
-<meta property="og:url" content="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/index.html">
-<meta property="og:site_name" content="simpleapples">
-<meta property="og:description" content="需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。 配置Centos7root登录后，首先新建一个普通用户并设置密码 12adduser userpasswd user 接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容 123Po">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-03-26T10:13:10.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目">
-<meta name="twitter:description" content="需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。 配置Centos7root登录后，首先新建一个普通用户并设置密码 12adduser userpasswd user 接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容 123Po">
-  
-    <link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">simpleapples</a>
-      </h1>
-      
-        <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">打过十年红警，重装过100次XP</a>
-        </h2>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.simpleapples.com"></form>
-      </div>
-    </div>
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
   </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">首页
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            首页
+            </a>
+        </li>
+      </ul></nav>
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-configure-nginx-supervisor-gunicorn-flask" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/" class="article-date">
-  <time datetime="2015-06-11T03:00:00.000Z" itemprop="datePublished">2015-06-11</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Python/">Python</a>
-  </div>
 
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目
-    </h1>
-  
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目
+        </h1>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。</p>
+      <div class="post-meta">
+        <span class="post-time">
+          2015-06-11
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#配置Centos7"><span class="toc-text">配置Centos7</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置Nginx"><span class="toc-text">配置Nginx</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装Python"><span class="toc-text">安装Python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装配置Gunicorn"><span class="toc-text">安装配置Gunicorn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装配置Supervisor"><span class="toc-text">安装配置Supervisor</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><p>需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。</p>
 <h2 id="配置Centos7"><a href="#配置Centos7" class="headerlink" title="配置Centos7"></a>配置Centos7</h2><p>root登录后，首先新建一个普通用户并设置密码</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser user</span><br><span class="line">passwd user</span><br></pre></td></tr></table></figure>
 <p>接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容</p>
@@ -141,153 +125,65 @@ ga('send', 'pageview');
 <p>xxx是项目名称，注意command中最好都写全路径，以区别系统环境和项目虚拟环境。完成后启动supervisord，使配置生效</p>
 <figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisord -c <span class="regexp">/etc/</span>supervisord.conf</span><br></pre></td></tr></table></figure>
 
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/" data-id="cjuj831xt0015w853r3swdvp6" class="article-share-link">Share</a>
-      
-        <a href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/#disqus_thread" class="article-comment-link">留言</a>
-      
-      
-    </footer>
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2016/08/28/snake-crack/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          「贪吃蛇大作战」的刷分尝试
-        
       </div>
-    </a>
-  
-  
-    <a href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">在viewDidAppear中PushViewController失败的问题</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-
-<section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://www.simpleapples.com">simpleapples</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/">http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
   </div>
-</section>
-</section>
+      <footer class="post-footer">
         
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Actionscript/">Actionscript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DevOps/">DevOps</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Golang/">Golang</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Idea-Demo/">Idea&Demo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Javascript-CSS/">Javascript&CSS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac-Linux/">Mac&Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mobile/">Mobile</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tech/">Tech</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li></ul>
-    </div>
-  </div>
+        <nav class="post-nav"><a class="prev" href="/2016/08/28/snake-crack/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">「贪吃蛇大作战」的刷分尝试</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/">
+        <span class="next-text nav-default">在viewDidAppear中PushViewController失败的问题</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
 
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/ahonn" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
 
-  
-    
-
-  
-    
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
-          </li>
-        
-          <li>
-            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
-          </li>
-        
-          <li>
-            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
-          </li>
-        
-          <li>
-            <a href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 simpleapples<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
-    
-<script>
-  var disqus_shortname = 'simpleapples';
-  
-  var disqus_url = 'http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/';
-  
-  (function(){
-    var dsq = document.createElement('script');
-    dsq.type = 'text/javascript';
-    dsq.async = true;
-    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  })();
-</script>
 
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-
-
-
-  </div>
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
 </body>
 </html>
