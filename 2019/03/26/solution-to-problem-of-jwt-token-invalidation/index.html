@@ -94,6 +94,7 @@
   </div><div class="post-content"><h3 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h3><p>刚签发的 JWT，在下一个请求使用时候会失效，请求会报 422 错误。</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"msg"</span>: <span class="string">"The token is not yet valid (nbf)"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>如果隔几秒再请求（例如使用 Chrome 开发者工具中的 Replay XHR），就会成功。</p>
+<a id="more"></a> 
 <p><img src="/upload/20190326_01.png" alt=""></p>
 <h3 id="nbf-字段的原理"><a href="#nbf-字段的原理" class="headerlink" title="nbf 字段的原理"></a>nbf 字段的原理</h3><p>查看上面的报错信息，会发现有一个 nbf，nbf 是 JWT 协议中的一个字段，是 Not Before 的缩写，表示 JWT Token 在这个时间之前是无效的，一般来讲会设置成签发的时间。这里产生了一个猜想，多服务器环境时候，服务器之间时间如果不一致，一台服务器签发的 token 如果立刻被发往另一台服务器验证，就很容易产生 nbf 字段验证不通过的问题。其实 JWT 协议已经考虑到了这类问题，所以协议中在 nbf 这一节专门提到了可以使用一个 small leeway 来解决这个问题。</p>
 <blockquote>
