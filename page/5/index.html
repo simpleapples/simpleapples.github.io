@@ -79,6 +79,54 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-ios8-register-notification-fail" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/09/19/ios8-register-notification-fail/" class="article-date">
+  <time datetime="2014-09-19T08:40:00.000Z" itemprop="datePublished">2014-09-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/09/19/ios8-register-notification-fail/">iOS8注册推送失败的探究</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Apple在9月18日正式发布了iOS8，在收到更新的同时，也发现自己的应用在iOS8下无法启动。<br>并且在Console中收到如下提示：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2014</span>-<span class="number">09</span>-<span class="number">19</span> <span class="number">16</span>:<span class="number">26</span>:<span class="number">20.369</span> demo[<span class="number">379</span>:<span class="number">30506</span>] registerFor<span class="comment">RemoteNotificationTypes: is not supported in iOS 8.0 and later.</span></span><br></pre></td></tr></table></figure>
+<p>查询文档可以知道，在iOS8中注册推送的方法<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">![Alt text](/upload/ios8-registerForRemoteNotificationTypes.png)</span><br><span class="line"></span><br><span class="line">按照文档中的提示，使用```registerForRemoteNotifications```方法代替，这个方法不接受参数。紧接着问题就来了，**程序在安装过这个应用的iOS8机器上可以成功注册，而在新安装的iOS8机器上则无法注册**，```application:didRegisterForRemoteNotificationsWithDeviceToken:```和```application:didFailToRegisterForRemoteNotificationsWithError:```都无法响应，并且在成功注册的机器上，收到的推送消息也没有声音提示。再次查看文档后发现这么一段话：</span><br></pre></td></tr></table></figure></p>
+<p>If you want your app’s push notifications to display alerts, play sounds, or perform other user-facing actions, you must call the registerUserNotificationSettings: method to request the types of notifications you want to use.<br><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">换句话说，如果要使用推送服务，还需要再调用```registerUserNotificationSettings```方法，而这个方法是和iOS7上的```registerForRemoteNotificationTypes```方法一样接受参数的。为什么iOS8下要把一个方法变成两个方法呢？```registerForRemoteNotifications```方法的文档中有这么一句话：</span><br></pre></td></tr></table></figure></p>
+<p>Call this method to initiate the registration process with Apple Push Service. If registration succeeds, the app calls your app delegate object’s application:didRegisterForRemoteNotificationsWithDeviceToken: method and passes it a device token.<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">苹果可能考虑到一些应用注册提醒可能只是为了获取deviceToken，所以将获取deviceToken单独提成一个方法，而要接收推送还需要单独调用别的方法，这样就细化了逻辑，方便不用的开发需求。不过在真机调试中，一台刚重置过的搭载iOS8系统的iPhone5c，调用registerForRemoteNotifications方法后，并没有收到任何失败或成功的回调，和Apple文档中描述的不符，怀疑是SDK在这部分也有<span class="keyword">bug。</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">下面贴一下兼容iOS7和iOS8的注册推送代码：</span></span><br></pre></td></tr></table></figure></p>
+<p>#define IS_OS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0)<br>if (IS_OS_8_OR_LATER) {<br>    [[UIApplication sharedApplication] registerForRemoteNotifications];<br>    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes: (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound) categories:nil];<br>    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];<br>} else {<br>    [application registerForRemoteNotificationTypes:<br>     UIRemoteNotificationTypeBadge |<br>     UIRemoteNotificationTypeAlert |<br>     UIRemoteNotificationTypeSound];<br>}<br><code>`</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/" data-id="cjuj81ofd0028um53fyhna7ii" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-difference-between-air-sdk-and-flex-sdk" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/" class="article-date">
@@ -114,7 +162,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2014/03/27/difference-between-air-sdk-and-flex-sdk/" data-id="cjtpp9f4f000xvk535bnipxba" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2014/03/27/difference-between-air-sdk-and-flex-sdk/" data-id="cjuj81oes0013um53i4o02vak" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2014/03/27/difference-between-air-sdk-and-flex-sdk/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -160,7 +208,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/" data-id="cjtpp9f4x001tvk536yxmq01u" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/" data-id="cjuj81of8001wum53dgmntdo5" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -209,7 +257,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2014/01/08/the-key-of-object-in-javascript/" data-id="cjtpp9f5r003evk53f0jw1if0" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2014/01/08/the-key-of-object-in-javascript/" data-id="cjuj81ofy003eum532wza3p3l" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2014/01/08/the-key-of-object-in-javascript/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -262,7 +310,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/10/30/do-not-name-the-project-go-in-liteide/" data-id="cjtpp9f4g000zvk53pbpiyj85" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/10/30/do-not-name-the-project-go-in-liteide/" data-id="cjuj81oeu0015um537bp4zmhy" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/10/30/do-not-name-the-project-go-in-liteide/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -308,7 +356,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/09/27/hack-google-doodle-game/" data-id="cjtpp9f4u001lvk53q0h9yrq8" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/09/27/hack-google-doodle-game/" data-id="cjuj81of4001pum53bfkdyjgn" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/09/27/hack-google-doodle-game/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -359,7 +407,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/" data-id="cjtpp9f4r001gvk53dnikd4w0" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/" data-id="cjuj81of0001fum53hiqzk1l6" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -407,7 +455,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/08/04/actionscript-development-enviroment-on-linux/" data-id="cjtpp9f40000bvk53elhzbhtl" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/08/04/actionscript-development-enviroment-on-linux/" data-id="cjuj81oeb000bum530mx0q1s3" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/08/04/actionscript-development-enviroment-on-linux/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -452,7 +500,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/06/27/bye-buct/" data-id="cjtpp9f4b000pvk53ha0hlqbr" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/06/27/bye-buct/" data-id="cjuj81oem000qum5398n68s05" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/06/27/bye-buct/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -510,61 +558,9 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/06/02/why-write-blog/" data-id="cjtpp9f5z003uvk53y6uxttzj" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/06/02/why-write-blog/" data-id="cjuj81ogb0040um531xtq2fqm" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/06/02/why-write-blog/#disqus_thread" class="article-comment-link">留言</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-ios6-screen-rotation" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2013/05/21/ios6-screen-rotation/" class="article-date">
-  <time datetime="2013-05-21T04:26:00.000Z" itemprop="datePublished">2013-05-21</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2013/05/21/ios6-screen-rotation/">iOS6屏幕旋转问题</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>使用iOS6 SDK创建xib文件时，会默认启用AutoLayout功能，AutoLayout是iOS6中新推出的自动布局功能，通过相对定位来实现适应多种屏幕分辩率的自动布局（iOS设备分辨率会朝着多样化的方向发展？）。<br>当使用AutoLayout的项目在iOS6以下的系统中运行时，程序执行会报错，于是，关闭所有xib的AutoLayout选项，再次运行，发现原本设置为横屏显示的项目变成了竖屏，所有横屏设置失效。<br>解决办法是，在需要横屏的Controller中添加如下代码，最好在将self.window设定成一个RootViewController，然后在RootViewController中添加如下代码：</p>
-<pre><code>// ios5下的旋屏
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
-}
-
-// ios6下的旋屏
--(BOOL)shouldAutorotate {
-    return YES;
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/05/21/ios6-screen-rotation/" data-id="cjtpp9f540027vk53q5nve5bk" class="article-share-link">Share</a>
-      
-        <a href="http://www.simpleapples.com/2013/05/21/ios6-screen-rotation/#disqus_thread" class="article-comment-link">留言</a>
       
       
     </footer>
@@ -604,7 +600,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
     </div>
   </div>
 
@@ -615,6 +611,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
+          </li>
         
           <li>
             <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
@@ -630,10 +630,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
           </li>
         
       </ul>

@@ -79,6 +79,62 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-implementation-of-the-token-bucket-algorithm-in-python" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/" class="article-date">
+  <time datetime="2018-03-20T04:50:00.000Z" itemprop="datePublished">2018-03-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/">15行Python代码，帮你理解令牌桶算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/upload/20180320_01.jpg" alt=""></p>
+<p>在网络中传输数据时，为了防止网络拥塞，需限制流出网络的流量，使流量以比较均匀的速度向外发送，令牌桶算法就实现了这个功能，<strong>可控制发送到网络上数据的数目，并允许突发数据的发送。</strong></p>
+<h1 id="什么是令牌"><a href="#什么是令牌" class="headerlink" title="什么是令牌"></a>什么是令牌</h1><p>从名字上看令牌桶，大概就是一个装有令牌的桶吧，那么什么是令牌呢？</p>
+<p>紫薇格格拿的令箭，可以发号施令，令行禁止。在计算机的世界中，令牌也有令行禁止的意思，有令牌，则相当于得到了进行操作的授权，没有令牌，就什么都不能做。</p>
+<h1 id="用令牌实现限速器"><a href="#用令牌实现限速器" class="headerlink" title="用令牌实现限速器"></a>用令牌实现限速器</h1><p>我们用1块令牌来代表发送1字节数据的资格，假设我们源源不断的发放令牌给程序，程序就有资格源源不断的发送数据，当我们不发放令牌给程序，程序就相当于被限流，无法发送数据了。接下来我们说说限速器，所谓限速器，就是让程序在单位时间内，最多只能发送一定大小的数据。假设在1秒发放10块令牌，那么程序发送数据的速度就会被限制在10bytes/s。如果1秒内有大于10bytes的数据需要发送，就会因为没有令牌而被丢弃。</p>
+<h1 id="改进限速器——加个桶"><a href="#改进限速器——加个桶" class="headerlink" title="改进限速器——加个桶"></a>改进限速器——加个桶</h1><p><img src="/upload/20180320_02.jpg" alt=""></p>
+<p>我们实现的限速器，速度是恒定的，但是在实际的应用中，往往会有突发的传输需求（需要更快速的发送，但是不会持续太久，也不会引起网络拥塞），这种数据碰上我们的限速器，就因为拿不到令牌而无法发送。</p>
+<p>对限速器进行一下改动，依然1秒产生10块令牌，但是我们把产生出来的令牌先放到一个桶里，当程序需要发送的时候，从桶里取令牌，不需要的时候，令牌就会在桶里沉淀下来，假设桶里沉淀了10块令牌，程序最多就可以在1秒内发送20bytes的数据，满足了突发数据传输的要求，并且由于桶里的令牌被用完，下一秒最多依然只能发10bytes的数据，不会因为持续发送大量数据，对网络造成压力。</p>
+<p><img src="/upload/20180320_03.jpg" alt=""></p>
+<h1 id="15行Python代码实践令牌桶"><a href="#15行Python代码实践令牌桶" class="headerlink" title="15行Python代码实践令牌桶"></a>15行Python代码实践令牌桶</h1><p>令牌桶需要以一定的速度生成令牌放入桶中，当程序要发送数据时，再从桶中取出令牌。这里似乎有点问题，如果我们使用一个死循环，来不停地发放令牌，程序就被阻塞住了，有没有更好的办法？</p>
+<p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
+<p>接下来看代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenBucket</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, rate, capacity)</span>:</span></span><br><span class="line">        self._rate = rate</span><br><span class="line">        self._capacity = capacity</span><br><span class="line">        self._current_amount = <span class="number">0</span></span><br><span class="line">        self._last_consume_time = int(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">consume</span><span class="params">(self, token_amount)</span>:</span></span><br><span class="line">        increment = (int(time.time()) - self._last_consume_time) * self._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        self._current_amount = min(</span><br><span class="line">            increment + self._current_amount, self._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; self._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">False</span></span><br><span class="line">        self._last_consume_time = int(time.time())</span><br><span class="line">        self._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">True</span></span><br></pre></td></tr></table></figure>
+<h1 id="扫码关注Python私房菜"><a href="#扫码关注Python私房菜" class="headerlink" title="扫码关注Python私房菜"></a>扫码关注Python私房菜</h1><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/" data-id="cjuj81of5001rum53izhbfnb8" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-understanding-blockchain" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/14/understanding-blockchain/" class="article-date">
@@ -134,7 +190,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/03/14/understanding-blockchain/" data-id="cjtpp9f5v003ovk53j9vew2g0" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/03/14/understanding-blockchain/" data-id="cjuj81og5003qum53nwghbl6c" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/03/14/understanding-blockchain/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -201,7 +257,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/03/06/lru-algorithm-implemented-in-python/" data-id="cjtpp9f58002ivk539qg6cjhv" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/03/06/lru-algorithm-implemented-in-python/" data-id="cjuj81ofi002kum5396t7ha2d" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/03/06/lru-algorithm-implemented-in-python/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -262,7 +318,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/03/03/60-lines-code-to-convert-pdf-to-word/" data-id="cjtpp9f3i0000vk536pb4mdeq" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/03/03/60-lines-code-to-convert-pdf-to-word/" data-id="cjuj81odp0000um531ucjiovv" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/03/03/60-lines-code-to-convert-pdf-to-word/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -318,7 +374,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2016/08/28/snake-crack/" data-id="cjtpp9f5j0032vk53qfn0k4rm" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2016/08/28/snake-crack/" data-id="cjuj81ofq0030um5385vy259w" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2016/08/28/snake-crack/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -393,7 +449,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/" data-id="cjtpp9f4n0019vk53q4v7836i" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/" data-id="cjuj81oeq0010um538ztg4ssg" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -455,7 +511,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/" data-id="cjtpp9f5d002qvk53w7fbi56d" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/" data-id="cjuj81ofl002qum53p6sdbdh7" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -505,7 +561,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2014/10/30/beta-testing-with-testflight/" data-id="cjtpp9f46000gvk53isg6p7e9" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2014/10/30/beta-testing-with-testflight/" data-id="cjuj81oeg000gum53qxm4s2gc" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2014/10/30/beta-testing-with-testflight/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -557,7 +613,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2014/10/25/launchsreen-and-launchimage/" data-id="cjtpp9f57002evk53sldabnwx" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2014/10/25/launchsreen-and-launchimage/" data-id="cjuj81off002cum537x79xx80" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2014/10/25/launchsreen-and-launchimage/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -631,57 +687,9 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/" data-id="cjtpp9f47000jvk53yqddwg9u" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/" data-id="cjuj81oej000lum53v9xmyuxn" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2014/10/23/build-a-safari-extension/#disqus_thread" class="article-comment-link">留言</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-ios8-register-notification-fail" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/09/19/ios8-register-notification-fail/" class="article-date">
-  <time datetime="2014-09-19T08:40:00.000Z" itemprop="datePublished">2014-09-19</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/09/19/ios8-register-notification-fail/">iOS8注册推送失败的探究</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Apple在9月18日正式发布了iOS8，在收到更新的同时，也发现自己的应用在iOS8下无法启动。<br>并且在Console中收到如下提示：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2014</span>-<span class="number">09</span>-<span class="number">19</span> <span class="number">16</span>:<span class="number">26</span>:<span class="number">20.369</span> demo[<span class="number">379</span>:<span class="number">30506</span>] registerFor<span class="comment">RemoteNotificationTypes: is not supported in iOS 8.0 and later.</span></span><br></pre></td></tr></table></figure>
-<p>查询文档可以知道，在iOS8中注册推送的方法<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">![Alt text](/upload/ios8-registerForRemoteNotificationTypes.png)</span><br><span class="line"></span><br><span class="line">按照文档中的提示，使用```registerForRemoteNotifications```方法代替，这个方法不接受参数。紧接着问题就来了，**程序在安装过这个应用的iOS8机器上可以成功注册，而在新安装的iOS8机器上则无法注册**，```application:didRegisterForRemoteNotificationsWithDeviceToken:```和```application:didFailToRegisterForRemoteNotificationsWithError:```都无法响应，并且在成功注册的机器上，收到的推送消息也没有声音提示。再次查看文档后发现这么一段话：</span><br></pre></td></tr></table></figure></p>
-<p>If you want your app’s push notifications to display alerts, play sounds, or perform other user-facing actions, you must call the registerUserNotificationSettings: method to request the types of notifications you want to use.<br><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">换句话说，如果要使用推送服务，还需要再调用```registerUserNotificationSettings```方法，而这个方法是和iOS7上的```registerForRemoteNotificationTypes```方法一样接受参数的。为什么iOS8下要把一个方法变成两个方法呢？```registerForRemoteNotifications```方法的文档中有这么一句话：</span><br></pre></td></tr></table></figure></p>
-<p>Call this method to initiate the registration process with Apple Push Service. If registration succeeds, the app calls your app delegate object’s application:didRegisterForRemoteNotificationsWithDeviceToken: method and passes it a device token.<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">苹果可能考虑到一些应用注册提醒可能只是为了获取deviceToken，所以将获取deviceToken单独提成一个方法，而要接收推送还需要单独调用别的方法，这样就细化了逻辑，方便不用的开发需求。不过在真机调试中，一台刚重置过的搭载iOS8系统的iPhone5c，调用registerForRemoteNotifications方法后，并没有收到任何失败或成功的回调，和Apple文档中描述的不符，怀疑是SDK在这部分也有<span class="keyword">bug。</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">下面贴一下兼容iOS7和iOS8的注册推送代码：</span></span><br></pre></td></tr></table></figure></p>
-<p>#define IS_OS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0)<br>if (IS_OS_8_OR_LATER) {<br>    [[UIApplication sharedApplication] registerForRemoteNotifications];<br>    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes: (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound) categories:nil];<br>    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];<br>} else {<br>    [application registerForRemoteNotificationTypes:<br>     UIRemoteNotificationTypeBadge |<br>     UIRemoteNotificationTypeAlert |<br>     UIRemoteNotificationTypeSound];<br>}<br><code>`</code></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/" data-id="cjtpp9f55002avk537gnwf7k9" class="article-share-link">Share</a>
-      
-        <a href="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/#disqus_thread" class="article-comment-link">留言</a>
       
       
     </footer>
@@ -721,7 +729,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
     </div>
   </div>
 
@@ -732,6 +740,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
+          </li>
         
           <li>
             <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
@@ -747,10 +759,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
           </li>
         
       </ul>

@@ -79,6 +79,149 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-understanding-postgres-count-function" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/04/19/understanding-postgres-count-function/" class="article-date">
+  <time datetime="2019-04-19T03:25:00.000Z" itemprop="datePublished">2019-04-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Tech/">Tech</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>关于 count 函数的使用一直存在争议，尤其是在 MySQL 中，作为流行度越来越高的 PostgreSQL 是否也有类似的问题呢，我们通过实践来理解一下 PostgreSQL 中 count 函数的行为。</p>
+<h3 id="构建测试数据库"><a href="#构建测试数据库" class="headerlink" title="构建测试数据库"></a>构建测试数据库</h3><p>创建测试数据库，并创建测试表。测试表中有自增 ID、创建时间、内容三个字段，自增 ID 字段是主键。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">database</span> performance_test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test_tbl (<span class="keyword">id</span> <span class="built_in">serial</span> primary <span class="keyword">key</span>, created_at <span class="keyword">timestamp</span>, <span class="keyword">content</span> <span class="built_in">varchar</span>(<span class="number">512</span>));</span><br></pre></td></tr></table></figure>
+<h3 id="生成测试数据"><a href="#生成测试数据" class="headerlink" title="生成测试数据"></a>生成测试数据</h3><p>使用 generate_series 函数生成自增 ID，使用 now() 函数生成 created_at 列，对于 content 列，使用了 repeat(md5(random()::text), 10) 生成 10 个 32 位长度的 md5 字符串。使用下列语句，插入 1000w 条记录用于测试。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">performance_test=# insert into test_tbl select generate_series(1,10000000),now(),repeat(md5(random()::text),10);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="number">0</span> <span class="number">10000000</span></span><br><span class="line"><span class="keyword">Time</span>: <span class="number">212184.223</span> ms (<span class="number">03</span>:<span class="number">32.184</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="由-count-语句引发的思考"><a href="#由-count-语句引发的思考" class="headerlink" title="由 count 语句引发的思考"></a>由 count 语句引发的思考</h3><p>默认情况下 PostgreSQL 不开启 SQL 执行时间的显示，所以需要手动开启一下，方便后面的测试对比。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\timing on</span><br></pre></td></tr></table></figure>
+<p>count(*) 和 count(1) 的性能区别是经常被讨论的问题，分别使用 count(*) 和 count(1) 执行一次查询。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">performance_test=# select count(*) from test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> 10000000</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">Time: 115090.380 ms (01:55.090)</span><br><span class="line"></span><br><span class="line">performance_test=# select count(1) from test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> 10000000</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">Time: 738.502 ms</span><br></pre></td></tr></table></figure>
+<p>可以看到两次查询的速度差别非常大，count(1) 真的有这么大的性能提升？接下来再次运行查询语句。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">performance_test=# select count(*) from test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> 10000000</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">Time: 657.831 ms</span><br><span class="line"></span><br><span class="line">performance_test=# select count(1) from test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> 10000000</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">Time: 682.157 ms</span><br></pre></td></tr></table></figure>
+<p>可以看到第一次查询时候会非常的慢，后面三次速度非常快并且时间相近，这里就有两个问题出现了：</p>
+<ul>
+<li>为什么第一次查询速度这么慢？</li>
+<li>count(*) 和 count(1) 到底存不存在性能差别？</li>
+</ul>
+<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><p>使用 explain 语句重新执行查询语句</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">explain</span> (<span class="keyword">analyze</span>,buffers,verbose) <span class="keyword">select</span> <span class="keyword">count</span>(*) <span class="keyword">from</span> test_tbl;</span><br></pre></td></tr></table></figure>
+<p>可以看到如下输出：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (<span class="attribute">cost</span>=529273.69..529273.70 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=882.569..882.570 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1)</span><br><span class="line">  Output: count(*)</span><br><span class="line">  Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">  -&gt;  Gather  (<span class="attribute">cost</span>=529273.48..529273.69 <span class="attribute">rows</span>=2 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=882.492..884.170 <span class="attribute">rows</span>=3 <span class="attribute">loops</span>=1)</span><br><span class="line">        Output: (PARTIAL count(*))</span><br><span class="line">        Workers Planned: 2</span><br><span class="line">        Workers Launched: 2</span><br><span class="line">        Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">        -&gt;  Partial Aggregate  (<span class="attribute">cost</span>=528273.48..528273.49 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=881.014..881.014 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=3)</span><br><span class="line">              Output: PARTIAL count(*)</span><br><span class="line">              Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">              Worker 0: actual <span class="attribute">time</span>=880.319..880.319 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">hit</span>=34 <span class="attribute">read</span>=158206</span><br><span class="line">              Worker 1: actual <span class="attribute">time</span>=880.369..880.369 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">hit</span>=29 <span class="attribute">read</span>=156424</span><br><span class="line">              -&gt;  Parallel Seq Scan on public.test_tbl  (<span class="attribute">cost</span>=0.00..517856.98 <span class="attribute">rows</span>=4166598 <span class="attribute">width</span>=0) (actual <span class="attribute">time</span>=0.029..662.165 <span class="attribute">rows</span>=3333333 <span class="attribute">loops</span>=3)</span><br><span class="line">                    Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">                    Worker 0: actual <span class="attribute">time</span>=0.026..661.807 <span class="attribute">rows</span>=3323029 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">hit</span>=34 <span class="attribute">read</span>=158206</span><br><span class="line">                    Worker 1: actual <span class="attribute">time</span>=0.030..660.197 <span class="attribute">rows</span>=3285513 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">hit</span>=29 <span class="attribute">read</span>=156424</span><br><span class="line">Planning time: 0.043 ms</span><br><span class="line">Execution time: 884.207 ms</span><br></pre></td></tr></table></figure>
+<p>注意里面的 shared hit，表示命中了内存中缓存的数据，这就可以解释为什么后面的查询会比第一次快很多。接下来去掉缓存，并重启 PostgreSQL。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service postgresql stop</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; /proc/sys/vm/drop_caches</span><br><span class="line">service postgresql start</span><br></pre></td></tr></table></figure>
+<p>重新执行 SQL 语句，速度慢了很多。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (<span class="attribute">cost</span>=529273.69..529273.70 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=50604.564..50604.564 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1)</span><br><span class="line">  Output: count(*)</span><br><span class="line">  Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">  -&gt;  Gather  (<span class="attribute">cost</span>=529273.48..529273.69 <span class="attribute">rows</span>=2 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=50604.508..50606.141 <span class="attribute">rows</span>=3 <span class="attribute">loops</span>=1)</span><br><span class="line">        Output: (PARTIAL count(*))</span><br><span class="line">        Workers Planned: 2</span><br><span class="line">        Workers Launched: 2</span><br><span class="line">        Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">        -&gt;  Partial Aggregate  (<span class="attribute">cost</span>=528273.48..528273.49 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=50591.550..50591.551 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=3)</span><br><span class="line">              Output: PARTIAL count(*)</span><br><span class="line">              Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">              Worker 0: actual <span class="attribute">time</span>=50585.182..50585.182 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">read</span>=158122</span><br><span class="line">              Worker 1: actual <span class="attribute">time</span>=50585.181..50585.181 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">read</span>=161123</span><br><span class="line">              -&gt;  Parallel Seq Scan on public.test_tbl  (<span class="attribute">cost</span>=0.00..517856.98 <span class="attribute">rows</span>=4166598 <span class="attribute">width</span>=0) (actual <span class="attribute">time</span>=92.491..50369.691 <span class="attribute">rows</span>=3333333 <span class="attribute">loops</span>=3)</span><br><span class="line">                    Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">                    Worker 0: actual <span class="attribute">time</span>=122.170..50362.271 <span class="attribute">rows</span>=3320562 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">read</span>=158122</span><br><span class="line">                    Worker 1: actual <span class="attribute">time</span>=14.020..50359.733 <span class="attribute">rows</span>=3383583 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">read</span>=161123</span><br><span class="line">Planning time: 11.537 ms</span><br><span class="line">Execution time: 50606.215 ms</span><br></pre></td></tr></table></figure>
+<p>shared read 表示没有命中缓存，通过这个现象可以推断出，上一小节的四次查询中，第一次查询没有命中缓存，剩下三次查询都命中了缓存。</p>
+<h4 id="count-1-和-count-的区别"><a href="#count-1-和-count-的区别" class="headerlink" title="count(1) 和 count(*) 的区别"></a>count(1) 和 count(*) 的区别</h4><p>接下来探究 count(1) 和 count(*) 的区别是什么，继续思考最开始的四次查询，第一次查询使用了 count(*)，第二次查询使用了 count(1) ，却依然命中了缓存，不正是说明 count(1) 和 count(*) 是一样的吗？</p>
+<p>事实上，PostgreSQL 官方对于 is there a difference performance-wise between select count(1) and select count(*)? 问题的回复也证实了这一点：</p>
+<blockquote>
+<p>Nope. In fact, the latter is converted to the former during parsing.[2]</p>
+</blockquote>
+<p>既然 count(1) 在性能上没有比 count(*) 更好，那么使用 count(*) 就是更好的选择。</p>
+<h3 id="sequence-scan-和-index-scan"><a href="#sequence-scan-和-index-scan" class="headerlink" title="sequence scan 和 index scan"></a>sequence scan 和 index scan</h3><p>接下来测试一下，在不同数据量大小的情况下 count(*) 的速度，将查询语句写在 count.sql 文件中，使用 pgbench 进行测试。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pgbench -c 5 -t 20 performance_test -r -f count.sql</span><br></pre></td></tr></table></figure>
+<p>分别测试 200w - 1000w 数据量下的 count 语句耗时</p>
+<table>
+<thead>
+<tr>
+<th>数据大小</th>
+<th>count耗时(ms)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200w</td>
+<td>738.758</td>
+</tr>
+<tr>
+<td>300w</td>
+<td>1035.846</td>
+</tr>
+<tr>
+<td>400w</td>
+<td>1426.183</td>
+</tr>
+<tr>
+<td>500w</td>
+<td>1799.866</td>
+</tr>
+<tr>
+<td>600w</td>
+<td>2117.247</td>
+</tr>
+<tr>
+<td>700w</td>
+<td>2514.691</td>
+</tr>
+<tr>
+<td>800w</td>
+<td>2526.441</td>
+</tr>
+<tr>
+<td>900w</td>
+<td>2568.240</td>
+</tr>
+<tr>
+<td>1000w</td>
+<td>2650.434</td>
+</tr>
+</tbody>
+</table>
+<p>绘制成耗时曲线</p>
+<p><img src="/upload/20190416_01.png" alt=""></p>
+<p>曲线的趋势在 600w - 700w 数据量之间出现了转折，200w - 600w 是线性增长，600w 之后 count 的耗时就基本相同了。使用 explain 语句分别查看 600w 和 700w 数据时的 count 语句执行。</p>
+<p>700w：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (cost=502185.93..502185.94 rows=1 width=8) (actual time=894.361..894.361 rows=1 loops=1)</span><br><span class="line">  Output: count(*)</span><br><span class="line">  Buffers: shared hit=16344 read=352463</span><br><span class="line">  -&gt;  Gather  (cost=502185.72..502185.93 rows=2 width=8) (actual time=894.232..899.763 rows=3 loops=1)</span><br><span class="line">        Output: (PARTIAL count(*))</span><br><span class="line">        Workers Planned: 2</span><br><span class="line">        Workers Launched: 2</span><br><span class="line">        Buffers: shared hit=16344 read=352463</span><br><span class="line">        -&gt;  Partial Aggregate  (cost=501185.72..501185.73 rows=1 width=8) (actual time=889.371..889.371 rows=1 loops=3)</span><br><span class="line">              Output: PARTIAL count(*)</span><br><span class="line">              Buffers: shared hit=16344 read=352463</span><br><span class="line">              Worker 0: actual time=887.112..887.112 rows=1 loops=1</span><br><span class="line">                Buffers: shared hit=5459 read=118070</span><br><span class="line">              Worker 1: actual time=887.120..887.120 rows=1 loops=1</span><br><span class="line">                Buffers: shared hit=5601 read=117051</span><br><span class="line">              -&gt;  Parallel Index Only Scan using test_tbl_pkey on public.test_tbl  (cost=0.43..493863.32 rows=2928960 width=0) (actual time=0.112..736.376 rows=2333333 loops=3)</span><br><span class="line">                    Index Cond: (test_tbl.id &lt; 7000000)</span><br><span class="line">                    Heap Fetches: 2328492</span><br><span class="line">                    Buffers: shared hit=16344 read=352463</span><br><span class="line">                    Worker 0: actual time=0.107..737.180 rows=2344479 loops=1</span><br><span class="line">                      Buffers: shared hit=5459 read=118070</span><br><span class="line">                    Worker 1: actual time=0.133..737.960 rows=2327028 loops=1</span><br><span class="line">                      Buffers: shared hit=5601 read=117051</span><br><span class="line">Planning time: 0.165 ms</span><br><span class="line">Execution time: 899.857 ms</span><br></pre></td></tr></table></figure>
+<p>600w：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (cost=429990.94..429990.95 rows=1 width=8) (actual time=765.575..765.575 rows=1 loops=1)</span><br><span class="line">  Output: count(*)</span><br><span class="line">  Buffers: shared hit=13999 read=302112</span><br><span class="line">  -&gt;  Gather  (cost=429990.72..429990.93 rows=2 width=8) (actual time=765.557..770.889 rows=3 loops=1)</span><br><span class="line">        Output: (PARTIAL count(*))</span><br><span class="line">        Workers Planned: 2</span><br><span class="line">        Workers Launched: 2</span><br><span class="line">        Buffers: shared hit=13999 read=302112</span><br><span class="line">        -&gt;  Partial Aggregate  (cost=428990.72..428990.73 rows=1 width=8) (actual time=763.821..763.821 rows=1 loops=3)</span><br><span class="line">              Output: PARTIAL count(*)</span><br><span class="line">              Buffers: shared hit=13999 read=302112</span><br><span class="line">              Worker 0: actual time=762.742..762.742 rows=1 loops=1</span><br><span class="line">                Buffers: shared hit=4638 read=98875</span><br><span class="line">              Worker 1: actual time=763.308..763.308 rows=1 loops=1</span><br><span class="line">                Buffers: shared hit=4696 read=101570</span><br><span class="line">              -&gt;  Parallel Index Only Scan using test_tbl_pkey on public.test_tbl  (cost=0.43..422723.16 rows=2507026 width=0) (actual time=0.053..632.199 rows=2000000 loops=3)</span><br><span class="line">                    Index Cond: (test_tbl.id &lt; 6000000)</span><br><span class="line">                    Heap Fetches: 2018490</span><br><span class="line">                    Buffers: shared hit=13999 read=302112</span><br><span class="line">                    Worker 0: actual time=0.059..633.156 rows=1964483 loops=1</span><br><span class="line">                      Buffers: shared hit=4638 read=98875</span><br><span class="line">                    Worker 1: actual time=0.038..634.271 rows=2017026 loops=1</span><br><span class="line">                      Buffers: shared hit=4696 read=101570</span><br><span class="line">Planning time: 0.055 ms</span><br><span class="line">Execution time: 770.921 ms</span><br></pre></td></tr></table></figure>
+<p>根据以上现象推断，PostgreSQL 似乎在 count 的数据量小于数据表长度的某一比例时，才使用 index scan，通过查看官方 wiki 也可以看到相关描述：</p>
+<blockquote>
+<p>It is important to realise that the planner is concerned with minimising the total cost of the query. With databases, the cost of I/O typically dominates. For that reason, “count(*) without any predicate” queries will only use an index-only scan if the index is significantly smaller than its table. This typically only happens when the table’s row width is much wider than some indexes’.[3]</p>
+</blockquote>
+<p>根据 Stackoverflow 上的回答，count 语句查询的数量大于表大小的 3/4 时候就会用使用全表扫描代替索引扫描[4]。</p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><ol>
+<li>不要用 count(1) 或 count(列名) 代替 count(*)</li>
+<li>count 本身是非常耗时的</li>
+<li>count 可能是 index scan 也可能是 sequence scan，取决于 count 数量占表大小的比例</li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1] <a href="https://www.cnblogs.com/flying-tiger/p/7885478.html" target="_blank" rel="noopener">深入理解Postgres中的cache</a></p>
+<p>[2] <a href="https://www.postgresql.org/message-id/11471.1027875769%40sss.pgh.pa.us" target="_blank" rel="noopener">Re: performance difference in count(1) vs. count(*)?</a></p>
+<p>[3] <a href="https://wiki.postgresql.org/wiki/Index-only_scans#Is_.22count.28.2A.29.22_much_faster_now.3F" target="_blank" rel="noopener">Is “count(*)” much faster now?</a></p>
+<p>[4] <a href="https://dba.stackexchange.com/questions/126997/postgresql-not-using-index-during-count" target="_blank" rel="noopener">PostgreSQL not using index during count(*)</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2019/04/19/understanding-postgres-count-function/" data-id="cjuj81ogp004cum53fk3g95o2" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2019/04/19/understanding-postgres-count-function/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-solution-to-problem-of-jwt-token-invalidation" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/" class="article-date">
@@ -144,7 +287,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2019/03/26/solution-to-problem-of-jwt-token-invalidation/" data-id="cjtpp9f5h002yvk53274byaar" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2019/03/26/solution-to-problem-of-jwt-token-invalidation/" data-id="cjuj81ofr0032um53x6ap26s1" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2019/03/26/solution-to-problem-of-jwt-token-invalidation/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -231,7 +374,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/" data-id="cjtpp9f60003wvk53hu8vvd3q" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/" data-id="cjuj81og6003sum53ffy5baty" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -421,7 +564,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2019/01/25/practice-on-python-logging/" data-id="cjtpp9f6a004bvk53ulwofcff" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2019/01/25/practice-on-python-logging/" data-id="cjuj81ogm004aum53pwt1ufhg" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2019/01/25/practice-on-python-logging/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -493,7 +636,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/12/24/practice-in-json-with-go/" data-id="cjtpp9f5a002mvk5357unzfo7" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/12/24/practice-in-json-with-go/" data-id="cjuj81ofk002oum537j0dvqqc" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/12/24/practice-in-json-with-go/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -596,7 +739,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/12/13/combining-jwt-with-refresh-token/" data-id="cjtpp9f4j0012vk53wfpwcidg" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/12/13/combining-jwt-with-refresh-token/" data-id="cjuj81oen000tum53u6pyaf5l" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/12/13/combining-jwt-with-refresh-token/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -655,7 +798,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/12/10/ssh-via-ngrok/" data-id="cjtpp9f5l0036vk53xtp0ex53" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/12/10/ssh-via-ngrok/" data-id="cjuj81ofu0038um53t2lpzlup" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/12/10/ssh-via-ngrok/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -710,7 +853,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/12/07/unicode-and-utf-8/" data-id="cjtpp9f5y003svk53cuoym5ux" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/12/07/unicode-and-utf-8/" data-id="cjuj81og7003uum53oncppxrc" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/12/07/unicode-and-utf-8/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -778,7 +921,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/10/26/understand-time-struct-in-go/" data-id="cjtpp9f5x003qvk53qfg4rbw0" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/10/26/understand-time-struct-in-go/" data-id="cjuj81og4003oum53172k2dgx" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/10/26/understand-time-struct-in-go/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -886,62 +1029,9 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/10/25/faster-python-part-2/" data-id="cjtpp9f4o001bvk534vsy3eby" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/10/25/faster-python-part-2/" data-id="cjuj81of2001kum530cnb3x0j" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/10/25/faster-python-part-2/#disqus_thread" class="article-comment-link">留言</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-stacks-in-go" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/11/stacks-in-go/" class="article-date">
-  <time datetime="2018-10-11T10:41:00.000Z" itemprop="datePublished">2018-10-11</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Golang/">Golang</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/10/11/stacks-in-go/">Go的栈空间管理</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/upload/20181011_01.jpg" alt=""></p>
-<h3 id="栈空间管理的基本逻辑"><a href="#栈空间管理的基本逻辑" class="headerlink" title="栈空间管理的基本逻辑"></a>栈空间管理的基本逻辑</h3><p>go语言通过goroutine提供了并发编程支持，goroutine是go运行库的功能，而不是操作系统线程实现的，goroutine可以被理解成一个用户态的线程。</p>
-<p>既然goroutine是由go运行库管理的，那么go运行库也需要为每个goroutine创建并管理相应的栈空间，为每个goroutine分配的栈空间不能太大，goroutine开多时会浪费大量空间，也不能太小，会导致栈溢出。go语言选择栈的栈空间管理的方式是，一开始给一个比较小的空间，随着需要自动增长。当goroutine不需要那么大的空间时，栈空间也要自动缩小。</p>
-<h3 id="分段栈-Segment-Stacks"><a href="#分段栈-Segment-Stacks" class="headerlink" title="分段栈 Segment Stacks"></a>分段栈 Segment Stacks</h3><p>在go 1.3之前，go使用分段栈。</p>
-<p>分段栈实现了一种不连续但是可以持续增长的栈，开始时，栈只有一个段，当需要更多的栈空间时，会分配一个新的段，和上一个栈双向链接。这样，一个栈就是由多个双向链接的段所组成的。当新分配的段使用完毕后，新段会被释放掉。</p>
-<p><img src="/upload/20181011_02.png" alt=""></p>
-<p>分段栈实现了栈的按需收缩，在增加新分段时也不需要对原有分段中的数据进行拷贝，使得goroutine的使用代价非常低廉。</p>
-<p>分段栈的好处是可以按需增长，空间利用率比较高，然而分段栈在某些情况下也存在一定的瑕疵。当一个段即将用尽，这时使用for循环执行一个比较耗空间的函数，会导致函数执行时goroutine进行段的分配，而执行完成返回时，进行段的销毁，这样就会导致在循环中出现多次栈的扩容和收缩，造成很大的性能损失，这种情况被称作栈分裂（Stack Split）。</p>
-<h3 id="连续栈-Contiguous-Stacks"><a href="#连续栈-Contiguous-Stacks" class="headerlink" title="连续栈 Contiguous Stacks"></a>连续栈 Contiguous Stacks</h3><p>go 1.3推出了连续栈，连续栈使用了另外一种策略，不再把栈分成一段一段的，当栈空间不够时，直接new一个2倍大的栈空间，并将原先栈空间中的数据拷贝到新的栈空间中，而后销毁旧栈。这样当出现栈空间触及边界时，不会产生栈分裂的情况。</p>
-<p>继续假设当前栈空间即将用尽，并且需要在for循环中执行一个比较消耗空间的函数。当该函数执行时，栈空间发生了扩容，变成原先2倍大小，函数执行完成一次后，栈空间的使用量缩小回执行前的大小，但是栈空间的使用量并没有小于栈大小的1/4，不会触发栈收缩，所以在整个for循环执行过程中，不会反复触发栈空间的收缩扩容。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>相比于分段栈，连续栈避免了某些场景下栈空间的的频繁伸缩。有一点需要注意的是，连续栈的收缩也是需要重新申请一段空间（原先的1/2大小），并进行栈拷贝操作的。</p>
-<h3 id="点击关注知乎专栏Golang私房菜"><a href="#点击关注知乎专栏Golang私房菜" class="headerlink" title="点击关注知乎专栏Golang私房菜"></a>点击关注知乎专栏<a href="https://zhuanlan.zhihu.com/golang-fans" target="_blank" rel="noopener">Golang私房菜</a></h3>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/10/11/stacks-in-go/" data-id="cjtpp9f5m0038vk53ubytyw75" class="article-share-link">Share</a>
-      
-        <a href="http://www.simpleapples.com/2018/10/11/stacks-in-go/#disqus_thread" class="article-comment-link">留言</a>
       
       
     </footer>
@@ -981,7 +1071,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
     </div>
   </div>
 
@@ -992,6 +1082,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
+          </li>
         
           <li>
             <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
@@ -1007,10 +1101,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
           </li>
         
       </ul>

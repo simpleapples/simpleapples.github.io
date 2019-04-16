@@ -79,6 +79,58 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-ios6-screen-rotation" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/05/21/ios6-screen-rotation/" class="article-date">
+  <time datetime="2013-05-21T04:26:00.000Z" itemprop="datePublished">2013-05-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mobile/">Mobile</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/05/21/ios6-screen-rotation/">iOS6屏幕旋转问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用iOS6 SDK创建xib文件时，会默认启用AutoLayout功能，AutoLayout是iOS6中新推出的自动布局功能，通过相对定位来实现适应多种屏幕分辩率的自动布局（iOS设备分辨率会朝着多样化的方向发展？）。<br>当使用AutoLayout的项目在iOS6以下的系统中运行时，程序执行会报错，于是，关闭所有xib的AutoLayout选项，再次运行，发现原本设置为横屏显示的项目变成了竖屏，所有横屏设置失效。<br>解决办法是，在需要横屏的Controller中添加如下代码，最好在将self.window设定成一个RootViewController，然后在RootViewController中添加如下代码：</p>
+<pre><code>// ios5下的旋屏
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+}
+
+// ios6下的旋屏
+-(BOOL)shouldAutorotate {
+    return YES;
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2013/05/21/ios6-screen-rotation/" data-id="cjuj81ofg002eum53qqzx10tu" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2013/05/21/ios6-screen-rotation/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-actionscript3-download-manager" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2013/04/24/actionscript3-download-manager/" class="article-date">
@@ -110,7 +162,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/04/24/actionscript3-download-manager/" data-id="cjtpp9f43000fvk534vryorct" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/04/24/actionscript3-download-manager/" data-id="cjuj81oed000cum5326p100s7" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/04/24/actionscript3-download-manager/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -155,7 +207,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/03/07/javascript-runtime-environment-for-vim/" data-id="cjtpp9f56002cvk53jlrxwld8" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/03/07/javascript-runtime-environment-for-vim/" data-id="cjuj81ofe002aum53j4fe8tzg" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/03/07/javascript-runtime-environment-for-vim/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -206,7 +258,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/03/05/ios-6-text-alignment/" data-id="cjtpp9f510020vk53ocg0to7a" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/03/05/ios-6-text-alignment/" data-id="cjuj81ofb0023um53o8gc9i7t" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/03/05/ios-6-text-alignment/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -277,7 +329,7 @@ Person.apply(this, [name, age]);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2013/01/06/classes-and-inheritance-in-javascript/" data-id="cjtpp9f4d000svk53f11i2jyb" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2013/01/06/classes-and-inheritance-in-javascript/" data-id="cjuj81oep000yum5359z2iw08" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2013/01/06/classes-and-inheritance-in-javascript/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -328,7 +380,7 @@ Person.apply(this, [name, age]);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/12/19/a-problem-with-nettop/" data-id="cjtpp9f3u0004vk536ys3pksi" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/12/19/a-problem-with-nettop/" data-id="cjuj81oe50004um53sbr3jqbj" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/12/19/a-problem-with-nettop/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -371,7 +423,7 @@ Person.apply(this, [name, age]);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/12/11/browser-js/" data-id="cjtpp9f4a000nvk531kg3mk5b" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/12/11/browser-js/" data-id="cjuj81oei000jum537o20oe5o" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/12/11/browser-js/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -428,7 +480,7 @@ Person.apply(this, [name, age]);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/12/03/a-test-about-javascript/" data-id="cjtpp9f3v0005vk53262vrjvd" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/12/03/a-test-about-javascript/" data-id="cjuj81oe60005um53e639kntw" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/12/03/a-test-about-javascript/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -486,7 +538,7 @@ var b = [3]; //正确！
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/" data-id="cjtpp9f5k0034vk53y1mz0qh1" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/" data-id="cjuj81oft0036um53v0d020nb" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -535,70 +587,9 @@ var b = [3]; //正确！
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/12/01/magic-search/" data-id="cjtpp9f5b002ovk53sxz0kto3" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/12/01/magic-search/" data-id="cjuj81ofj002mum530zj6vwx5" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/12/01/magic-search/#disqus_thread" class="article-comment-link">留言</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-load-swf-in-flash-and-play-frame-by-frame" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/" class="article-date">
-  <time datetime="2012-11-22T05:36:00.000Z" itemprop="datePublished">2012-11-22</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Actionscript/">Actionscript</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/">在Flash中载入swf文件并逐帧播放</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在Flash中导入swf并且播放，使用ActionScript中的loadMovie()函数就可以完成，但是如果要逐帧播放就比较麻烦了。因为逐帧播放时，要么给每帧定一个播放时间，要么然手动设置按钮控制。</p>
-<p>这里以按时间逐帧播放为例，介绍一下如何使用ActionScript控制。</p>
-<p>控制逐帧播放的代码如下：</p>
-<pre><code>var currentPage = _root._currentframe;  //设定当前页变量
-var i = 0;
-function timer() {
-    if(currentPage == _root._currentframe) {  //如果播放到当前页则跳到下一页
-        gotoAndPlay(currentPage + 1);
-        currentPage = _root._currentframe;
-    }
-}
-timeInter = setInterval(timer, 3000);  //设置定时器3000ms
-</code></pre><p>载入影片代码：</p>
-<pre><code>loadMovie(&quot;XXX.swf&quot;,_root);
-</code></pre><p>具体效果图：</p>
-<p><img src="/upload/flash.png" alt="Alt text"></p>
-<p>Interval层第一帧为计时器代码，Interval最后一帧代码非常重要：</p>
-<pre><code>ClearInterval(timeInter);
-</code></pre><p>最后一帧清除掉计时器，是防止循环播放后重复添加多个计时器。<br>Stop层每一帧添加stop();命令。Content层为具体内容。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/" data-id="cjtpp9f58002gvk53vs8zcw36" class="article-share-link">Share</a>
-      
-        <a href="http://www.simpleapples.com/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/#disqus_thread" class="article-comment-link">留言</a>
       
       
     </footer>
@@ -638,7 +629,7 @@ timeInter = setInterval(timer, 3000);  //设置定时器3000ms
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
     </div>
   </div>
 
@@ -649,6 +640,10 @@ timeInter = setInterval(timer, 3000);  //设置定时器3000ms
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
+          </li>
         
           <li>
             <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
@@ -664,10 +659,6 @@ timeInter = setInterval(timer, 3000);  //设置定时器3000ms
         
           <li>
             <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
           </li>
         
       </ul>

@@ -79,6 +79,78 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-wegame-causing-bsod-on-xps-15-9560" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/20/wegame-causing-bsod-on-xps-15-9560/" class="article-date">
+  <time datetime="2018-06-20T06:00:00.000Z" itemprop="datePublished">2018-06-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Tech/">Tech</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/20/wegame-causing-bsod-on-xps-15-9560/">大毒瘤！卸载WeGame解决XPS 15蓝屏问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="潜伏期"><a href="#潜伏期" class="headerlink" title="潜伏期"></a>潜伏期</h1><p>去年4月底买了一台美版XPS 15 9560，用了几个月之后就会偶尔出现蓝屏问题，由于之前就在论坛上看到很多吐槽XPS品控的帖子，以为自己也中了枪，好在蓝屏也不频繁，不影响使用也就没管。</p>
+<h1 id="上升期"><a href="#上升期" class="headerlink" title="上升期"></a>上升期</h1><p>进入今年5月，升级了Win10 1803后（基本上软件有更新我都会第一时间升级，体验最新的改进），蓝屏的次数开始多了起来，开始变得影响使用，于是开始着手查找问题。</p>
+<p>由于心急，并没有看转储文件，而是直接Google了XPS 15的蓝屏问题，希望能尽快找到方案。很快发现具有类似问题的人不在少数，也有很大一部分人以此说XPS 15品控不好，看了很多内容后，把怀疑的方向放在了驱动层面（Dell有一个Dell Update软件，一有更新提示我就会更新驱动），于是从更新频率最高的显卡驱动入手，降级显卡驱动到上一个版本，然而并没有什么用。于是又降级了Wifi驱动，因为Wifi驱动也是最近更新的，并且XPS 15的Killer显卡兼容性似乎没有那么好。</p>
+<p><img src="/upload/20180620_01.png" alt="XPS 15的驱动列表，可以看到Wifi和显卡驱动都是最近发布的"></p>
+<p>降级完驱动之后，电脑进入了短暂的回光返照阶段，用了几个小时都没有蓝屏，然而紧接着更加不幸的问题就要发生了。</p>
+<h1 id="爆发期"><a href="#爆发期" class="headerlink" title="爆发期"></a>爆发期</h1><p>用QQ接收一个大文件，大概1G，进行到一半的时候忽然蓝屏，重启后重新接收，准备传完之后再解决蓝屏问题，然而不幸的是传了一半又蓝屏了… 这时我把怀疑的方向转向了硬盘，于是降级了Intel RST驱动，心想降级要是没用的话，有可能是SSD跪了… 降级后怀着忐忑的心情再次重试，竟然…又蓝屏了…</p>
+<p>这次把怀疑的方向转到了QQ或者Wifi上，毕竟是一用QQ接收大文件就出问题，那么不是QQ就是Wifi了，于是卸载QQ，用迅雷下载一个大文件，果不其然，又跪了…</p>
+<p><img src="/upload/20180620_02.png" alt=""></p>
+<p>然而已经降级了Wifi驱动，之前也一直没有什么问题，难道真的是硬件出了问题？这个时候，我内心已经有点放弃PC，转而在京东上看MBP的价格了…</p>
+<p>然而MBP高企的售价让我冷静了下来，回来死马当活马医，继续找问题吧。</p>
+<p>既然自己怀疑的方向都不对，只能信仰科学了，安装了WinDbg和BlueScreenView这两款软件来查看和分析转储文件（具体过程不再赘述，可以参考文末的相关资源）。</p>
+<p><img src="/upload/20180620_03.jpeg" alt="从BlueScreenView里可以看到，机器以近乎疯狂的频率蓝屏"></p>
+<p>从BlueScreenView里并没有看到太多信息，现在只剩下WinDbg这一根救命稻草了。</p>
+<p><img src="/upload/20180620_04.jpeg" alt=""></p>
+<p>不过好在WinDbg非常给力，分析了几个不同时间的转储文件，都提示问题可能是由tdx.sys文件造成的。</p>
+<p><img src="/upload/20180620_05.png" alt=""></p>
+<p>tdx是TDI Translation Driver的意思，TDI是传输层驱动接口的意思，那么可以肯定问题来自于网络，这也印证了每次使用网络传输大文件就会蓝屏的现象。紧接着，看到了另外一段话：</p>
+<blockquote>
+<p>WARNING: Unable to verify timestamp for QMTgpNetFlow764.sys</p>
+</blockquote>
+<p>这个QMTgpNetFlow764.sys又是什么，看前缀似乎像第三方的文件，先Google一下。</p>
+<h1 id="真相大白"><a href="#真相大白" class="headerlink" title="真相大白"></a>真相大白</h1><p>Google了一下这个QMTgpNetFlow764.sys，终于拨云见日。</p>
+<p><img src="/upload/20180620_06.png" alt="原来早有人发现了QMTgpNetFlow764.sys引发蓝屏问题的秘密"></p>
+<p>根据网友们的分析（具体可以查看文末的相关资源），这5个文件来自于腾讯的游戏平台WeGame，于是卸载了腾讯系的游戏，并且重启删除了C:\Windows\system32\drivers目录下以QMT开头的5个文件，没关机使用至今（大约半个月）再也没有出现过蓝屏的情况，至此可以证明，腾讯WeGame平台是引起蓝屏的主要原因。</p>
+<p><img src="/upload/20180620_07.png" alt="毒瘤们"></p>
+<h1 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h1><p>BlueScreenView下载地址：<a href="https://www.nirsoft.net/utils/blue_screen_view.html" target="_blank" rel="noopener">https://www.nirsoft.net/utils/blue_screen_view.html</a></p>
+<p>WinDbg下载地址：<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools</a></p>
+<p>WinDbg使用说明：<a href="https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html" target="_blank" rel="noopener">https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html</a></p>
+<p>知乎用户<a href="https://www.zhihu.com/people/weasley-frank" target="_blank" rel="noopener">Weasley Frank</a>的专栏文章<a href="https://zhuanlan.zhihu.com/p/33723838" target="_blank" rel="noopener">TGP/WeGame驱动导致WSL网络服务异常
+</a>对这个问题进行了简单分析</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2018/06/20/wegame-causing-bsod-on-xps-15-9560/" data-id="cjuj81og9003yum53a21270xc" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2018/06/20/wegame-causing-bsod-on-xps-15-9560/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-things-you-dont-know-about-python" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/11/things-you-dont-know-about-python/" class="article-date">
@@ -285,7 +357,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/06/11/things-you-dont-know-about-python/" data-id="cjtpp9f5s003ivk534q5pzo7k" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/06/11/things-you-dont-know-about-python/" data-id="cjuj81og0003ium53i9v05gfh" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/06/11/things-you-dont-know-about-python/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -338,7 +410,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/05/31/python-cheat-sheet/" data-id="cjtpp9f5e002svk53wt70wch5" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/05/31/python-cheat-sheet/" data-id="cjuj81ofn002uum53715vksbv" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/05/31/python-cheat-sheet/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -442,7 +514,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/05/22/four-types-of-queue-in-python/" data-id="cjtpp9f50001yvk53c8vxai9r" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/05/22/four-types-of-queue-in-python/" data-id="cjuj81of1001hum53rw7gybj8" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/05/22/four-types-of-queue-in-python/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -509,7 +581,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/05/07/right-way-to-use-assert-in-python/" data-id="cjtpp9f5i0030vk53bij3wyam" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/05/07/right-way-to-use-assert-in-python/" data-id="cjuj81ofp002yum5327xognh5" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/05/07/right-way-to-use-assert-in-python/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -578,7 +650,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/04/26/using-decorators-to-validate-form/" data-id="cjtpp9f630040vk53x6nkhpqf" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/04/26/using-decorators-to-validate-form/" data-id="cjuj81og8003wum53d68ip334" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/04/26/using-decorators-to-validate-form/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -646,7 +718,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/04/22/python-parameter-passing/" data-id="cjtpp9f5g002wvk53142z51y2" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/04/22/python-parameter-passing/" data-id="cjuj81ofo002wum53fhf50z0n" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/04/22/python-parameter-passing/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -709,7 +781,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/" data-id="cjtpp9f3p0001vk53sshhq1r3" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/" data-id="cjuj81ody0001um53nf7lxo9d" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -779,7 +851,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/03/30/python-access-control/" data-id="cjtpp9f5f002uvk53amet7zrf" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/03/30/python-access-control/" data-id="cjuj81ofm002sum53vtyowmrq" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/03/30/python-access-control/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -834,65 +906,9 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/03/26/extract-lockscreen-wallpapers-in-win10/" data-id="cjtpp9f4k0014vk53uhks8co3" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2018/03/26/extract-lockscreen-wallpapers-in-win10/" data-id="cjuj81oev0017um5337jbqk6s" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2018/03/26/extract-lockscreen-wallpapers-in-win10/#disqus_thread" class="article-comment-link">留言</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-implementation-of-the-token-bucket-algorithm-in-python" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/" class="article-date">
-  <time datetime="2018-03-20T04:50:00.000Z" itemprop="datePublished">2018-03-20</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Python/">Python</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/">15行Python代码，帮你理解令牌桶算法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/upload/20180320_01.jpg" alt=""></p>
-<p>在网络中传输数据时，为了防止网络拥塞，需限制流出网络的流量，使流量以比较均匀的速度向外发送，令牌桶算法就实现了这个功能，<strong>可控制发送到网络上数据的数目，并允许突发数据的发送。</strong></p>
-<h1 id="什么是令牌"><a href="#什么是令牌" class="headerlink" title="什么是令牌"></a>什么是令牌</h1><p>从名字上看令牌桶，大概就是一个装有令牌的桶吧，那么什么是令牌呢？</p>
-<p>紫薇格格拿的令箭，可以发号施令，令行禁止。在计算机的世界中，令牌也有令行禁止的意思，有令牌，则相当于得到了进行操作的授权，没有令牌，就什么都不能做。</p>
-<h1 id="用令牌实现限速器"><a href="#用令牌实现限速器" class="headerlink" title="用令牌实现限速器"></a>用令牌实现限速器</h1><p>我们用1块令牌来代表发送1字节数据的资格，假设我们源源不断的发放令牌给程序，程序就有资格源源不断的发送数据，当我们不发放令牌给程序，程序就相当于被限流，无法发送数据了。接下来我们说说限速器，所谓限速器，就是让程序在单位时间内，最多只能发送一定大小的数据。假设在1秒发放10块令牌，那么程序发送数据的速度就会被限制在10bytes/s。如果1秒内有大于10bytes的数据需要发送，就会因为没有令牌而被丢弃。</p>
-<h1 id="改进限速器——加个桶"><a href="#改进限速器——加个桶" class="headerlink" title="改进限速器——加个桶"></a>改进限速器——加个桶</h1><p><img src="/upload/20180320_02.jpg" alt=""></p>
-<p>我们实现的限速器，速度是恒定的，但是在实际的应用中，往往会有突发的传输需求（需要更快速的发送，但是不会持续太久，也不会引起网络拥塞），这种数据碰上我们的限速器，就因为拿不到令牌而无法发送。</p>
-<p>对限速器进行一下改动，依然1秒产生10块令牌，但是我们把产生出来的令牌先放到一个桶里，当程序需要发送的时候，从桶里取令牌，不需要的时候，令牌就会在桶里沉淀下来，假设桶里沉淀了10块令牌，程序最多就可以在1秒内发送20bytes的数据，满足了突发数据传输的要求，并且由于桶里的令牌被用完，下一秒最多依然只能发10bytes的数据，不会因为持续发送大量数据，对网络造成压力。</p>
-<p><img src="/upload/20180320_03.jpg" alt=""></p>
-<h1 id="15行Python代码实践令牌桶"><a href="#15行Python代码实践令牌桶" class="headerlink" title="15行Python代码实践令牌桶"></a>15行Python代码实践令牌桶</h1><p>令牌桶需要以一定的速度生成令牌放入桶中，当程序要发送数据时，再从桶中取出令牌。这里似乎有点问题，如果我们使用一个死循环，来不停地发放令牌，程序就被阻塞住了，有没有更好的办法？</p>
-<p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
-<p>接下来看代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenBucket</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, rate, capacity)</span>:</span></span><br><span class="line">        self._rate = rate</span><br><span class="line">        self._capacity = capacity</span><br><span class="line">        self._current_amount = <span class="number">0</span></span><br><span class="line">        self._last_consume_time = int(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">consume</span><span class="params">(self, token_amount)</span>:</span></span><br><span class="line">        increment = (int(time.time()) - self._last_consume_time) * self._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        self._current_amount = min(</span><br><span class="line">            increment + self._current_amount, self._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; self._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">False</span></span><br><span class="line">        self._last_consume_time = int(time.time())</span><br><span class="line">        self._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">True</span></span><br></pre></td></tr></table></figure>
-<h1 id="扫码关注Python私房菜"><a href="#扫码关注Python私房菜" class="headerlink" title="扫码关注Python私房菜"></a>扫码关注Python私房菜</h1><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/" data-id="cjtpp9f510022vk530ob5zbh0" class="article-share-link">Share</a>
-      
-        <a href="http://www.simpleapples.com/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/#disqus_thread" class="article-comment-link">留言</a>
       
       
     </footer>
@@ -932,7 +948,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
     </div>
   </div>
 
@@ -943,6 +959,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
+          </li>
         
           <li>
             <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
@@ -958,10 +978,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
           </li>
         
       </ul>

@@ -79,6 +79,67 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-load-swf-in-flash-and-play-frame-by-frame" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/" class="article-date">
+  <time datetime="2012-11-22T05:36:00.000Z" itemprop="datePublished">2012-11-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Actionscript/">Actionscript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/">在Flash中载入swf文件并逐帧播放</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在Flash中导入swf并且播放，使用ActionScript中的loadMovie()函数就可以完成，但是如果要逐帧播放就比较麻烦了。因为逐帧播放时，要么给每帧定一个播放时间，要么然手动设置按钮控制。</p>
+<p>这里以按时间逐帧播放为例，介绍一下如何使用ActionScript控制。</p>
+<p>控制逐帧播放的代码如下：</p>
+<pre><code>var currentPage = _root._currentframe;  //设定当前页变量
+var i = 0;
+function timer() {
+    if(currentPage == _root._currentframe) {  //如果播放到当前页则跳到下一页
+        gotoAndPlay(currentPage + 1);
+        currentPage = _root._currentframe;
+    }
+}
+timeInter = setInterval(timer, 3000);  //设置定时器3000ms
+</code></pre><p>载入影片代码：</p>
+<pre><code>loadMovie(&quot;XXX.swf&quot;,_root);
+</code></pre><p>具体效果图：</p>
+<p><img src="/upload/flash.png" alt="Alt text"></p>
+<p>Interval层第一帧为计时器代码，Interval最后一帧代码非常重要：</p>
+<pre><code>ClearInterval(timeInter);
+</code></pre><p>最后一帧清除掉计时器，是防止循环播放后重复添加多个计时器。<br>Stop层每一帧添加stop();命令。Content层为具体内容。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.simpleapples.com/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/" data-id="cjuj81ofh002ium53guqlhu24" class="article-share-link">Share</a>
+      
+        <a href="http://www.simpleapples.com/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/#disqus_thread" class="article-comment-link">留言</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-compass-web-app" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2012/11/14/compass-web-app/" class="article-date">
@@ -124,7 +185,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/11/14/compass-web-app/" data-id="cjtpp9f4e000uvk53439dveo9" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/11/14/compass-web-app/" data-id="cjuj81oeo000vum53g90ytdg8" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/11/14/compass-web-app/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -184,7 +245,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/11/12/thunder-link-decoder/" data-id="cjtpp9f5t003kvk53wouve7ui" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/11/12/thunder-link-decoder/" data-id="cjuj81og1003kum53svzjc277" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/11/12/thunder-link-decoder/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -237,7 +298,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/11/10/a-lbs-web-app-based-on-html5/" data-id="cjtpp9f3t0003vk53zzymkbvm" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/11/10/a-lbs-web-app-based-on-html5/" data-id="cjuj81oe30003um536fyqtsso" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/11/10/a-lbs-web-app-based-on-html5/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -284,7 +345,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/11/07/a-timer-based-on-canvas/" data-id="cjtpp9f3y0007vk53egznaico" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/11/07/a-timer-based-on-canvas/" data-id="cjuj81oe90007um53lic4arl7" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/11/07/a-timer-based-on-canvas/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -337,7 +398,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/11/01/the-first-offer-and-the-first-rejection-letter/" data-id="cjtpp9f5q003cvk532dgptkz0" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/11/01/the-first-offer-and-the-first-rejection-letter/" data-id="cjuj81ofx003cum53iu8le42k" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/11/01/the-first-offer-and-the-first-rejection-letter/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -408,7 +469,7 @@ person3.prototype.name = &quot;name3&quot;;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/10/22/about-prototype-and-constructor-in-javascript/" data-id="cjtpp9f3z0008vk5348qu8yn4" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/10/22/about-prototype-and-constructor-in-javascript/" data-id="cjuj81oea0008um53aujtfdrk" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/10/22/about-prototype-and-constructor-in-javascript/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -468,7 +529,7 @@ person3.prototype.name = &quot;name3&quot;;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/10/20/solve-removeattribute-not-be-supported/" data-id="cjtpp9f5o003avk53oreqfdf4" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/10/20/solve-removeattribute-not-be-supported/" data-id="cjuj81ofs0034um53048lf4ka" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/10/20/solve-removeattribute-not-be-supported/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -517,7 +578,7 @@ person3.prototype.name = &quot;name3&quot;;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/10/20/fix-the-outline-of-link/" data-id="cjtpp9f4q001evk5331ytx915" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/10/20/fix-the-outline-of-link/" data-id="cjuj81oez001cum53r2qigfvr" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/10/20/fix-the-outline-of-link/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -582,66 +643,9 @@ person3.prototype.name = &quot;name3&quot;;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/10/19/add-apache-mysql-to-centos-system-service/" data-id="cjtpp9f42000cvk535irdgu7d" class="article-share-link">Share</a>
+      <a data-url="http://www.simpleapples.com/2012/10/19/add-apache-mysql-to-centos-system-service/" data-id="cjuj81oee000fum531yghm78d" class="article-share-link">Share</a>
       
         <a href="http://www.simpleapples.com/2012/10/19/add-apache-mysql-to-centos-system-service/#disqus_thread" class="article-comment-link">留言</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-macos-vmware-fusion-centos-network-setting" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2012/10/19/macos-vmware-fusion-centos-network-setting/" class="article-date">
-  <time datetime="2012-10-19T04:39:00.000Z" itemprop="datePublished">2012-10-19</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Mac-Linux/">Mac&Linux</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2012/10/19/macos-vmware-fusion-centos-network-setting/">MacOS+VMware Fusion安装CentOS网络设置</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在vmware中最小化安装centos6.3后发现无论vmware设置城共享还是桥接形式都无法连接网络，在网络上查询到vmware workstation下安装centos的设置方法，尝试后发现并不适用mac os下的vmware fusion。<br>经过尝试，发现fusion下centos网络配置非常简单。方法如下：</p>
-<ol>
-<li>将vmware设置成桥接网络</li>
-<li><p>改变网卡设置</p>
-<p> $vi /etc/sysconfig/network-scripts/ifcfg-eth0</p>
-</li>
-</ol>
-<p>修改为如下值：</p>
-<pre><code>BOOTPROTO=&quot;dhcp&quot; //使用dhcp配置ip地址  
-ONBOOT=&quot;yes&quot; //使设备启动  
-</code></pre><p>3.重启网络服务</p>
-<pre><code>$service network restart
-</code></pre><p>4.查看网络</p>
-<pre><code>$ifconfig
-</code></pre><p>查看设备eth0是否分配到正确ip，网络是否可以ping通。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.simpleapples.com/2012/10/19/macos-vmware-fusion-centos-network-setting/" data-id="cjtpp9f59002kvk53dfp8it7y" class="article-share-link">Share</a>
-      
-        <a href="http://www.simpleapples.com/2012/10/19/macos-vmware-fusion-centos-network-setting/#disqus_thread" class="article-comment-link">留言</a>
       
       
     </footer>
@@ -681,7 +685,7 @@ ONBOOT=&quot;yes&quot; //使设备启动
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">十月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">九月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">五月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">四月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/03/">三月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">一月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/12/">十二月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/11/">十一月 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">十月 2012</a></li></ul>
     </div>
   </div>
 
@@ -692,6 +696,10 @@ ONBOOT=&quot;yes&quot; //使设备启动
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/19/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
+          </li>
         
           <li>
             <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
@@ -707,10 +715,6 @@ ONBOOT=&quot;yes&quot; //使设备启动
         
           <li>
             <a href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
           </li>
         
       </ul>
