@@ -93,6 +93,7 @@
     </div>
   </div><div class="post-content"><p><img src="/upload/20190125_01.jpg" alt=""></p>
 <p>本文从 Python logging 库的基础概念入手，理解 logging 库的执行流程，以及可能忽视的一些细节。</p>
+<a id="more"></a>
 <h3 id="日志级别"><a href="#日志级别" class="headerlink" title="日志级别"></a>日志级别</h3><p>logging 库预置了 5 个错误级别，还有一个 <code>NOTSET</code> 级别，作为 logger 的默认值。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CRITICAL = <span class="number">50</span></span><br><span class="line">ERROR = <span class="number">40</span></span><br><span class="line">WARNING = <span class="number">30</span></span><br><span class="line">INFO = <span class="number">20</span></span><br><span class="line">DEBUG = <span class="number">10</span></span><br><span class="line">NOTSET = <span class="number">0</span></span><br></pre></td></tr></table></figure>
 <p>logging 库也支持自定义错误级别，通过上面的源码可以看到，在不同级别的错误中间预留了 10 个数字的位置，方便我们在预置错误级别的基础上添加更细致的错误级别。</p>

@@ -93,6 +93,7 @@
     </div>
   </div><div class="post-content"><p><img src="/upload/20181207_01.jpg" alt=""></p>
 <p>Unicode 和 UTF-8 的概念是一个非常基础和重要，但是却容易被忽略的问题。</p>
+<a id="more"></a> 
 <h3 id="字符集"><a href="#字符集" class="headerlink" title="字符集"></a>字符集</h3><p>在计算机系统中，所有的数据都以二进制存储，所有的运算也以二进制表示，人类语言和符号也需要转化成二进制的形式，才能存储在计算机中，于是需要有一个从人类语言到二进制编码的映射表。这个映射表就叫做字符集。</p>
 <h3 id="ASCII"><a href="#ASCII" class="headerlink" title="ASCII"></a>ASCII</h3><p>最早的字符集叫 American Standard Code for Information Interchange（美国信息交换标准代码），简称 ASCII，由 American National Standard Institute（美国国家标准协会）制定。在ASCII 字符集中，字母 <code>A</code> 对应的字符编码是 <code>65</code>，转换成二进制是 <code>0100 0001</code>，由于二进制表示比较长，通常使用十六进制 <code>41</code>。</p>
 <h3 id="GB2312、GBK"><a href="#GB2312、GBK" class="headerlink" title="GB2312、GBK"></a>GB2312、GBK</h3><p>ASCII 字符集总共规定了 128 种字符规范，但是并没有涵盖西文字母之外的字符，当需要计算机显示存储中文的时候，就需要一种对中文进行编码的字符集，GB 2312 就是解决中文编码的字符集，由国家标准委员会发布。同时考虑到中文语境中往往也需要使用西文字母，GB 2312 也实现了对 ASCII 的向下兼容，原理是西文字母使用和 ASCII 中相同的代码，但是 GB 2312 只涵盖了 6000 多个汉字，还有很多没有包含在其中，所以又出现了 GBK 和 GB 18030，两种字符集都是在 GB 2312 的基础上进行了扩展。</p>

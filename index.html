@@ -148,153 +148,9 @@
 
     <div class="post-content"><p><img src="/upload/20190125_01.jpg" alt=""></p>
 <p>本文从 Python logging 库的基础概念入手，理解 logging 库的执行流程，以及可能忽视的一些细节。</p>
-<h3 id="日志级别"><a href="#日志级别" class="headerlink" title="日志级别"></a>日志级别</h3><p>logging 库预置了 5 个错误级别，还有一个 <code>NOTSET</code> 级别，作为 logger 的默认值。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CRITICAL = <span class="number">50</span></span><br><span class="line">ERROR = <span class="number">40</span></span><br><span class="line">WARNING = <span class="number">30</span></span><br><span class="line">INFO = <span class="number">20</span></span><br><span class="line">DEBUG = <span class="number">10</span></span><br><span class="line">NOTSET = <span class="number">0</span></span><br></pre></td></tr></table></figure>
-<p>logging 库也支持自定义错误级别，通过上面的源码可以看到，在不同级别的错误中间预留了 10 个数字的位置，方便我们在预置错误级别的基础上添加更细致的错误级别。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">logging.addLevelName(<span class="number">31</span>, <span class="string">'SERIOUS WARNING'</span>)</span><br><span class="line">logger = logging.getLogger(<span class="string">'log'</span>)</span><br><span class="line">logger.warn(<span class="string">'warn info'</span>)</span><br><span class="line">logger.log(logging.getLevelName(<span class="string">'SERIOUS_WARNING'</span>), <span class="string">'serious warn'</span>)</span><br></pre></td></tr></table></figure>
-<p>例如添加一个 SERIOUS WARNING 类型的错误，值为 31，就可以用 log 方法输出该级别的错误。</p>
-<p>也可以覆盖 logging 预置的错误级别，例如将 WARNING 修改为 SERIOUS WARNING。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">logging.addLevelName(<span class="number">30</span>, <span class="string">'SERIOUS WARNING'</span>)</span><br><span class="line">logger = logging.getLogger(<span class="string">'log'</span>)</span><br><span class="line">print(logging.getLevelName(<span class="number">30</span>))  <span class="comment"># SERIOUS WARNING</span></span><br></pre></td></tr></table></figure>
-<h3 id="LogRecord、Formatter"><a href="#LogRecord、Formatter" class="headerlink" title="LogRecord、Formatter"></a>LogRecord、Formatter</h3><p>logging 库中的每一条 log 都以 LogRecord 的形式存在，当调用 logger 打印 log 时候，都会有一条 LogRecord 被自动创建出来，LogRecord 中包含了大量的和该条日志相关的属性，也包含用户传入的 message。</p>
-<table>
-<thead>
-<tr>
-<th>属性名</th>
-<th>格式</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>asctime</td>
-<td><code>%(asctime)s</code></td>
-<td>以可读格式表示的日志创建时间</td>
-</tr>
-<tr>
-<td>created</td>
-<td><code>%(created)f</code></td>
-<td>通过 <code>time.time()</code> 函数获取的日志创建时间</td>
-</tr>
-<tr>
-<td>filename</td>
-<td><code>%(filename)s</code></td>
-<td><code>pathname</code> 中的文件名称部分</td>
-</tr>
-<tr>
-<td>funcName</td>
-<td><code>%(funcName)s</code></td>
-<td>日志输出位置的函数名称</td>
-</tr>
-<tr>
-<td>levelname</td>
-<td><code>%(levelname)s</code></td>
-<td>字符串形式的日志级别</td>
-</tr>
-<tr>
-<td>levelno</td>
-<td><code>%(levelno)s</code></td>
-<td>数字形式的日志级别</td>
-</tr>
-<tr>
-<td>lineno</td>
-<td><code>%(lineno)d</code></td>
-<td>输出日志的源码行号</td>
-</tr>
-<tr>
-<td>message</td>
-<td><code>%(message)s</code></td>
-<td>用户传入的经过格式化的日志内容</td>
-</tr>
-<tr>
-<td>module</td>
-<td><code>%(module)s</code></td>
-<td><code>filename</code> 中的模块名部分</td>
-</tr>
-<tr>
-<td>msecs</td>
-<td><code>%(msecs)d</code></td>
-<td>日志创建时间的毫秒部分</td>
-</tr>
-<tr>
-<td>name</td>
-<td><code>%(name)s</code></td>
-<td>logger 的名称</td>
-</tr>
-<tr>
-<td>pathname</td>
-<td><code>%(pathname)s</code></td>
-<td>源码的路径</td>
-</tr>
-<tr>
-<td>process</td>
-<td><code>%(process)d</code></td>
-<td>进程 ID</td>
-</tr>
-<tr>
-<td>processName</td>
-<td><code>%(processName)s</code></td>
-<td>进程名</td>
-</tr>
-<tr>
-<td>relativeCreated</td>
-<td><code>%(relativeCreated)d</code></td>
-<td>相对于 logging 模块加载时间的毫秒数</td>
-</tr>
-<tr>
-<td>thread</td>
-<td><code>%(thread)d</code></td>
-<td>线程 ID</td>
-</tr>
-<tr>
-<td>threadName</td>
-<td><code>%(threadName)s</code></td>
-<td>线程名</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">logger = logging.getLogger(<span class="string">'log'</span>)</span><br><span class="line">logger.warning(<span class="string">'a warning message'</span>)  <span class="comment"># a warning message</span></span><br></pre></td></tr></table></figure>
-<p>执行上述代码，会发现，logger 并没有输出列表中列出的 LogRecord 的各种属性，只有 message 内容。因为 LogRecord 只是承载每条日志内容和属性的对象，在一条 log 产生的时候就被创建了，而日志的输出格式则是在被输出时才确定，由 Formatter 来控制。Formatter 负责将一条 log（以 LogRecord 对象的形式存在）转换为可读的字符串，默认情况下，格式是<code>%(message)s</code>，所以当没有指定 Formatter 时，只输出用户传入的内容。</p>
-<h3 id="Logger、Handler、Filter"><a href="#Logger、Handler、Filter" class="headerlink" title="Logger、Handler、Filter"></a>Logger、Handler、Filter</h3><p>Logger 对象是 logging 库中最为常用的对象，Logger 对象的作用主要有三个：</p>
-<ol>
-<li>为应用暴露出 info、warning、error 等方法，应用可以通过这些方法创建对应级别的日志。</li>
-<li>根据 Filter 和日志级别的设置，来决定哪些日志可以被传入给下一个流程处理，</li>
-<li>将日志传递到所有相关的 Handler 中。</li>
-</ol>
-<p>同时 Logger 对象还可以继承，一个 Logger 可以把 LogRecord 传递给父级的 Logger。</p>
-<p>Handler 负责将日志写入到最终的归宿，可能文件、电子邮件、内存、队列… 由于一个 Logger 可以有多个 Handler，所以每个 Handler 都可以设置接收日志的级别和 Filter，换句话说，不同级别的日志可以输出到不同的归宿。</p>
-<p>Python 官方文档提供了 logging 处理日志的逻辑流程图。</p>
-<p><img src="/upload/20190125_02.png" alt=""></p>
-<p>这里我们可能会有一个疑问，为 Logger 和 Handler 设置日志级别已经可以表示处理哪些日志，不处理哪些日志，为什么还需要 Filter 呢？</p>
-<p>相比于日志级别，Filter 可定制性更丰富，可以在 Logger 和 Handler 上实现颗粒度更细的控制。例如希望只记录长度大于 10 的日志，可以用如下的代码实现。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CustomFilter</span><span class="params">(logging.Filterer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">filter</span><span class="params">(self, record)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> len(record.msg) &gt; <span class="number">10</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">logger = logging.getLogger(<span class="string">'log'</span>)</span><br><span class="line">filter = CustomFilter()</span><br><span class="line">logger.addFilter(filter)</span><br><span class="line">logger.warning(<span class="string">'a warning message'</span>)  <span class="comment"># a warning message</span></span><br><span class="line">logger.warning(<span class="string">'a warn'</span>)</span><br><span class="line">logger.warning(<span class="string">'another warning message'</span>)  <span class="comment"># another warning message</span></span><br></pre></td></tr></table></figure>
-<p>长度小于 10 的第二条 log 并不会被输出。</p>
-<h3 id="实践中的一些经验"><a href="#实践中的一些经验" class="headerlink" title="实践中的一些经验"></a>实践中的一些经验</h3><p>在使用 Python logging 库的过程中，我们发现了一些容易容易忽视的细节，这些细节可能会导致一些预期之外的情况，在此做以总结。</p>
-<h4 id="Logger-的继承链"><a href="#Logger-的继承链" class="headerlink" title="Logger 的继承链"></a>Logger 的继承链</h4><p>Logger 对象是有一条继承链的，使用 <code>logging.getLogger()</code> 方法获取 logger 时，获取的是 root logger。如果为 getLogger 方法传入参数，获取的是子 logger。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root_logger = logging.getLogger()</span><br><span class="line">sub_logger = logging.getLogger(<span class="string">'log'</span>)</span><br><span class="line">print(sub_logger.parent == root_logger)  <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
-<p>logging 的官方文档中推荐使用 <code>__name__</code> 作为 getLogger 的参数，<code>__name__</code> 是 module 的路径名，例如在 utils.log 包中使用 <code>logging.getLogger(__name___)</code> 相当于执行 <code>logging.getLogger(&#39;base.db&#39;)</code>，这样就创建了一个名为 base.db 的 logger，这个 db 包的 logger 继承自 root logger。</p>
-<p>如果我们在 base 中也创建一个 logger，<code>logger.getLogger(&#39;base&#39;)</code>，这时候，base logger 也继承自 root logger，但是 db logger 的继承顺序则被修改成了继承自 base logger。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root_logger = logging.getLogger()</span><br><span class="line">db_logger = logging.getLogger(<span class="string">'base.db'</span>)</span><br><span class="line">print(db_logger.name)  <span class="comment"># base.db</span></span><br><span class="line">print(db_logger.parent.name)  <span class="comment"># root</span></span><br><span class="line">base_logger = logging.getLogger(<span class="string">'base'</span>)  <span class="comment"># base</span></span><br><span class="line">print(db_logger.name)  <span class="comment"># base.db</span></span><br><span class="line">print(db_logger.parent.name)  <span class="comment"># base</span></span><br></pre></td></tr></table></figure>
-<p>换句话说我们可以通过 xxx.xxx 的形式获取任何一级的 logger，但是这些中间层的 logger 并不一定是存在的。</p>
-<h4 id="Logger-奇葩的默认行为"><a href="#Logger-奇葩的默认行为" class="headerlink" title="Logger 奇葩的默认行为"></a>Logger 奇葩的默认行为</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root_logger = logging.getLogger()</span><br><span class="line">root_logger.info(<span class="string">'root info'</span>)</span><br></pre></td></tr></table></figure>
-<p>执行上面的代码，会发现没有任何输出，但是如果打一个 warning 级别的 log，是可以输出的。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root_logger = logging.getLogger()</span><br><span class="line">sub_logger = logging.getLogger(<span class="string">'sub'</span>)</span><br><span class="line"></span><br><span class="line">print(root_logger.level)  <span class="comment"># 30 = WARNING</span></span><br><span class="line">print(sub_logger.level)  <span class="comment"># 0 = NOTSET</span></span><br></pre></td></tr></table></figure>
-<p>打印一下 root logger 的默认级别，会发现 30 对应的是 WARNING，也就是说，只有比 WARNING 高的级别才会被输出出来，而 INFO 对应值是 20， 比 WARNING 低，所以默认情况下 root logger 将不会接受 INFO 级别的错误。</p>
-<p>但是只有 root logger 的默认级别是 WARNING，其他 logger 的默认级别 是 NOTSET = 0。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root_logger = logging.getLogger()</span><br><span class="line">sub_logger = logging.getLogger(<span class="string">'sub'</span>)</span><br><span class="line"></span><br><span class="line">root_logger.info(<span class="string">'root info'</span>)</span><br><span class="line">sub_logger.info(<span class="string">'sub info'</span>)</span><br></pre></td></tr></table></figure>
-<p>执行上面代码，会发现依然没有任何输出，既然其他 logger 的默认级别是 NOTSET，为什么比 NOTSET 高的 INFO 还是不会输出呢？</p>
-<p>当一个 logger 的 level 被设置为 NOTSET 时，如果有父 logger，会将 log 传递给父 logger 处理，只有在 logger 是 root logger 或 propagate 属性设置为 False 时，才会由自己处理。接下来再修改一下上面的代码。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sub_logger = logging.getLogger(<span class="string">'sub'</span>)</span><br><span class="line">sub_logger.propagate = <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line">sub_logger.info(<span class="string">'sub info'</span>)</span><br><span class="line">sub_logger.warning(<span class="string">'sub warn'</span>)  <span class="comment"># sub warn</span></span><br></pre></td></tr></table></figure>
-<p>上面的代码中禁用了 logger 的传递功能，所以 logger 会自己处理错误，但是 INFO 级别的日志依然没有被输出，如果输出一下 sub_logger.handlers 属性，会发现默认情况下 logger 并没有任何的 handlers，这能解释为什么无法输出日志，但是下一行代码输出了 WARNING 级别的日志，显然又是和这个猜测违背的，原因到底是什么呢？</p>
-<p>跟踪源码会发现，当一个 logger 需要自己处理日志时且没有任何一个 handler 时，会尝试使用 lastResort 属性所存储的 handler 来处理。</p>
-<p>文档中是这样定义 lastResort 的。</p>
-<blockquote>
-<p>A “handler of last resort” is available through this attribute. This is a StreamHandler writing to sys.stderr with a level of WARNING, and is used to handle logging events in the absence of any logging configuration. The end result is to just print the message to sys.stderr. This replaces the earlier error message saying that “no handlers could be found for logger XYZ”. If you need the earlier behaviour for some reason, lastResort can be set to None.</p>
-</blockquote>
-<p>所以，当一个 logger 没有任何 handler 的时候，依然能输出 WARNING 及以上级别的日志。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.im/post/5bc2bd3a5188255c94465d31" target="_blank" rel="noopener">Python日志库logging总结-可能是目前为止将logging库总结的最好的一篇文章 - 掘金</a></p>
-<p><a href="https://docs.python.org/3/library/logging.html" target="_blank" rel="noopener">logging — Logging facility for Python</a></p>
-<p><a href="https://docs.python.org/3.7/howto/logging.html" target="_blank" rel="noopener">Logging HOWTO</a></p>
-<h3 id="关注知乎专栏【Python私房菜】"><a href="#关注知乎专栏【Python私房菜】" class="headerlink" title="关注知乎专栏【Python私房菜】"></a><a href="https://zhuanlan.zhihu.com/python-fans" target="_blank" rel="noopener">关注知乎专栏【Python私房菜】</a></h3>
+          <div class="read-more">
+            <a href="/2019/01/25/practice-on-python-logging/" class="read-more-link">阅读更多</a>
+          </div>
         </div></article>
       <article class="post">
     <header class="post-header">
@@ -312,35 +168,9 @@
 
     <div class="post-content"><p><img src="/upload/20181224_01.png" alt=""></p>
 <p>在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。</p>
-<h3 id="整数变浮点数问题"><a href="#整数变浮点数问题" class="headerlink" title="整数变浮点数问题"></a>整数变浮点数问题</h3><p>假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span></span><br><span class="line">	Age <span class="keyword">int64</span></span><br><span class="line">	Weight <span class="keyword">float64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    person := Person&#123;</span><br><span class="line">        Name: <span class="string">"Wang Wu"</span>,</span><br><span class="line">        Age: <span class="number">30</span>,</span><br><span class="line">        Weight: <span class="number">150.07</span>,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    jsonBytes, _ := json.Marshal(person)</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(jsonBytes))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> personFromJSON <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">    json.Unmarshal(jsonBytes, &amp;personFromJSON)</span><br><span class="line"></span><br><span class="line">    r := personFromJSON.(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>代码执行到这里看上去一切正常，但是打印一下 map[string]interface{} 就会发现不太对了。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(reflect.TypeOf(r[<span class="string">"Age"</span>]).Name())  <span class="comment">// float64</span></span><br><span class="line">fmt.Println(reflect.TypeOf(r[<span class="string">"Weight"</span>]).Name())  <span class="comment">// float64</span></span><br></pre></td></tr></table></figure>
-<p>转换成 map[string]interface{} 之后，原先的 uint64 和 float64 类型都被转换成了 float64 类型，这显然是不符合我们的预期的。</p>
-<p><img src="/upload/20181224_02.png" alt=""></p>
-<p>查看 json 的规范可以看到，在 json 中是没有整型和浮点型之分的，所以现在可以理解 json 包中的 Unmarshal 方法转出的数字类型为什么都是 float64 了，因为根据 json 规范，数字都是同一种类型，那么对应到 go 的类型中最接近的就是 float64 了。</p>
-<p>json 包还针对这个问题提供了更好的解决方案，不过需要使用 json.Decoder 来代替 json.Unmarshal 方法，将 json.Unmarhsal 替换如下。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> personFromJSON <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">decoder := json.NewDecoder(bytes.NewReader(jsonBytes))</span><br><span class="line">decoder.UseNumber()</span><br><span class="line">decoder.Decode(&amp;personFromJSON)</span><br><span class="line"></span><br><span class="line">r := personFromJSON.(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br></pre></td></tr></table></figure>
-<p>这种方法首先创建了一个 jsonDecoder，然后调用了 UseNumber 方法，从文档中可以知道，使用 UseNumber 方法后，json 包会将数字转换成一个内置的 Number 类型（而不是 float64），这个 Number 类型提供了转换为 int64、float64 等多个方法。</p>
-<p><img src="/upload/20181224_03.png" alt=""></p>
-<h3 id="时间格式"><a href="#时间格式" class="headerlink" title="时间格式"></a>时间格式</h3><p>对于 json 格式，是没有时间类型的，日期和时间以 json 格式存储时，需要转换为字符串类型。这就带来了一个问题，日期时间的字符串表示有多种多样，go 的 json 包支持的是哪一种呢？</p>
-<p>使用下面的代码来输出 json.Marshal 方法将 Time 类型转换为字符串后的格式。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span></span><br><span class="line">	Birth time.Time</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	person := Person&#123;</span><br><span class="line">		Name: <span class="string">"Wang Wu"</span>,</span><br><span class="line">		Birth: time.Now(),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;"Name":"Wang Wu","Birth":"2018-12-20T16:22:02.00287617+08:00"&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>根据输出可以判断，go 的 json 包使用的是 RFC3339 标准中定义的格式。接下来测试一下 json.Unmarshal 方法所支持的日期时间格式。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">dateStr := <span class="string">"2018-10-12"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> person Person</span><br><span class="line">jsonStr := fmt.Sprintf(<span class="string">"&#123;\"name\":\"Wang Wu\", \"Birth\": \"%s\"&#125;"</span>, dateStr)</span><br><span class="line">json.Unmarshal([]<span class="keyword">byte</span>(jsonStr), &amp;person)</span><br><span class="line"></span><br><span class="line">fmt.Println(person.Birth)  <span class="comment">// 0001-01-01 00:00:00 +0000 UTC</span></span><br></pre></td></tr></table></figure>
-<p>对于形如 2018-10-12 的字符串，json 包并没有成功将其解析，接下来我们把 time 包中支持的所有格式都试一下。</p>
-<p><img src="/upload/20181224_04.png" alt=""></p>
-<p>经过试验，发现 json.Unmarshal 方法只支持 RFC3339 和 RFC3339Nano 两种格式的转换。还有一个需要注意的地方，使用 time.Now() 生成的时间是带有一个 Monotonic Time 的，经过 json.Marshal 转换时候，由于 RFC3339 规范里没有存放 Monotonic Time 的位置，会丢掉这一部分。</p>
-<h3 id="对于字段为空的处理"><a href="#对于字段为空的处理" class="headerlink" title="对于字段为空的处理"></a>对于字段为空的处理</h3><p>json 包对于空值的处理是一个非常容易出错的地方，看下面代码。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name     <span class="keyword">string</span></span><br><span class="line">	Age      <span class="keyword">int64</span></span><br><span class="line">	Birth    time.Time</span><br><span class="line">	Children []Person</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	person := Person&#123;&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;"Name":"","Age":0,"Birth":"0001-01-01T00:00:00Z","Children":null&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>当 struct 中的字段没有值时，使用 json.Marshal 方法并不会自动忽略这些字段，而是根据字段的类型输出了他们的默认空值，这往往和我们的预期不一致，json 包提供了对字段的控制手段，我们可以为字段增加 omitempty tag，这个 tag 会在字段值为零值（int 和 float 类型零值是 0，string 类型零值是 “”，对象类型零值是 nil）时，忽略该字段。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> PersonAllowEmpty <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name     <span class="keyword">string</span>             <span class="string">`json:",omitempty"`</span></span><br><span class="line">	Age      <span class="keyword">int64</span>              <span class="string">`json:",omitempty"`</span></span><br><span class="line">	Birth    time.Time          <span class="string">`json:",omitempty"`</span></span><br><span class="line">	Children []PersonAllowEmpty <span class="string">`json:",omitempty"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	person := PersonAllowEmpty&#123;&#125;</span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;"Birth":"0001-01-01T00:00:00Z"&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以看到，这次输出的 json 中只有 Birth 字段了，string、int、对象类型的字段，都因为没有赋值，默认是零值，所以被忽略，对于日期时间类型，由于不可以设置为零值，也就是 0000-00-00 00:00:00，不会被忽略。</p>
-<p>需要注意这样的情况：如果一个人的年龄是 0 （对于刚出生的婴儿，这个值是合理的），刚好是 int 字段的零值，在添加 omitempty tag 的情况下，年龄字段会被忽略。</p>
-<p>如果想要某一个字段在任何情况下都被 json 包忽略，需要使用如下的写法。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name     <span class="keyword">string</span> <span class="string">`json:"-"`</span></span><br><span class="line">	Age      <span class="keyword">int64</span> <span class="string">`json:"-"`</span></span><br><span class="line">	Birth    time.Time <span class="string">`json:"-"`</span></span><br><span class="line">	Children []<span class="keyword">string</span> <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    birth, _ := time.Parse(time.RFC3339, <span class="string">"1988-12-02T15:04:27+08:00"</span>)</span><br><span class="line">	person := Person&#123;</span><br><span class="line">		Name: <span class="string">"Wang Wu"</span>,</span><br><span class="line">		Age: <span class="number">30</span>,</span><br><span class="line">		Birth: birth,</span><br><span class="line">		Children: []<span class="keyword">string</span>&#123;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(person)</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(jsonBytes))  <span class="comment">// &#123;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以看到，使用 json:”-“ 标签的字段都被忽略了。</p>
-<h3 id="关注知乎专栏Golang私房菜"><a href="#关注知乎专栏Golang私房菜" class="headerlink" title="关注知乎专栏Golang私房菜"></a>关注知乎专栏<a href="https://zhuanlan.zhihu.com/golang-fans" target="_blank" rel="noopener">Golang私房菜</a></h3>
+          <div class="read-more">
+            <a href="/2018/12/24/practice-in-json-with-go/" class="read-more-link">阅读更多</a>
+          </div>
         </div></article>
       <article class="post">
     <header class="post-header">
@@ -378,22 +208,9 @@
 
     <div class="post-content"><h3 id="ngrok"><a href="#ngrok" class="headerlink" title="ngrok"></a>ngrok</h3><p>用 ssh 访问一台主机，如果和主机在一个局域网中或者主机拥有公网 IP，就可以使用 ssh 命令直接连接主机的 IP 地址，但是大部分公司和家庭内部都是局域网，并不能给局域网内的每一台主机都分配一个公网 IP，这时候就需要进行内网穿透，才能从外部连接到局域网内的主机。</p>
 <p>ngrok 是一个反向代理工具，可以实现将内网的端口暴露到公网，通过 ngrok，也能将 ssh 使用的端口暴露出去，以此实现 ssh 的内网穿透。</p>
-<h3 id="注册并下载-ngrok"><a href="#注册并下载-ngrok" class="headerlink" title="注册并下载 ngrok"></a>注册并下载 ngrok</h3><p>访问 <a href="https://ngrok.com/" target="_blank" rel="noopener">https://ngrok.com/</a> 注册 ngrok 账号并下载 ngrok 客户端。</p>
-<h3 id="查看-ngrok-的-token"><a href="#查看-ngrok-的-token" class="headerlink" title="查看 ngrok 的 token"></a>查看 ngrok 的 token</h3><p>访问 <a href="https://dashboard.ngrok.com/auth" target="_blank" rel="noopener">https://dashboard.ngrok.com/auth</a> 查看 token并复制。</p>
-<p><img src="/upload/20181210_01.png" alt=""></p>
-<h3 id="在内网机器上启动-ngrok"><a href="#在内网机器上启动-ngrok" class="headerlink" title="在内网机器上启动 ngrok"></a>在内网机器上启动 ngrok</h3><p>连接 ngrok 账号</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ngrok authtoken 5TqUhMnum6ntDE8Z5HkNb_49F9ffzzcV9V7pKLVdDYc</span><br></pre></td></tr></table></figure>
-<p>启动 ngrok 并打开 22 端口转发</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ngrok tcp 22 --<span class="built_in">log</span>=stdout &gt; <span class="string">"<span class="variable">$HOME</span>/ngrok.log"</span> --region ap &amp;</span><br></pre></td></tr></table></figure>
-<p>其中 region 的 ap 代表 ngrok 新加坡节点，访问速度相比美国节点会快一些。访问 <a href="https://ngrok.com/docs#config-options" target="_blank" rel="noopener">https://ngrok.com/docs#config-options</a> 可以查看支持的所有区域。</p>
-<p>访问 <code>http://127.0.0.1:4040</code>。</p>
-<p>可以看到一个tcp开头的地址，通过访问这个地址，就可以转发到本机的 22 端口上。</p>
-<p><img src="/upload/20181210_02.png" alt=""></p>
-<h3 id="通过-ssh-访问内网机器"><a href="#通过-ssh-访问内网机器" class="headerlink" title="通过 ssh 访问内网机器"></a>通过 ssh 访问内网机器</h3><p>查看到转发地址后，就可以在外网通过 ssh 命令访问内网机器来。以上图为例，ssh 访问的命令是：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -p 10502 username@0.tcp.ap.ngrok.io</span><br></pre></td></tr></table></figure>
-<h3 id="需要注意的问题"><a href="#需要注意的问题" class="headerlink" title="需要注意的问题"></a>需要注意的问题</h3><p>由于所有流量都要经过 ngrok 服务器，而 ngrok 的服务节点又只有美国、新加坡等地，所以速度上还是比较慢的。另外，如果 ngrok 的服务节点存在安全隐患的话，存在敏感内容的泄漏的可能性。</p>
-<h3 id="关注Python私房菜"><a href="#关注Python私房菜" class="headerlink" title="关注Python私房菜"></a>关注Python私房菜</h3><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
-
+          <div class="read-more">
+            <a href="/2018/12/10/ssh-via-ngrok/" class="read-more-link">阅读更多</a>
+          </div>
         </div></article>
       <article class="post">
     <header class="post-header">
@@ -411,18 +228,9 @@
 
     <div class="post-content"><p><img src="/upload/20181207_01.jpg" alt=""></p>
 <p>Unicode 和 UTF-8 的概念是一个非常基础和重要，但是却容易被忽略的问题。</p>
-<h3 id="字符集"><a href="#字符集" class="headerlink" title="字符集"></a>字符集</h3><p>在计算机系统中，所有的数据都以二进制存储，所有的运算也以二进制表示，人类语言和符号也需要转化成二进制的形式，才能存储在计算机中，于是需要有一个从人类语言到二进制编码的映射表。这个映射表就叫做字符集。</p>
-<h3 id="ASCII"><a href="#ASCII" class="headerlink" title="ASCII"></a>ASCII</h3><p>最早的字符集叫 American Standard Code for Information Interchange（美国信息交换标准代码），简称 ASCII，由 American National Standard Institute（美国国家标准协会）制定。在ASCII 字符集中，字母 <code>A</code> 对应的字符编码是 <code>65</code>，转换成二进制是 <code>0100 0001</code>，由于二进制表示比较长，通常使用十六进制 <code>41</code>。</p>
-<h3 id="GB2312、GBK"><a href="#GB2312、GBK" class="headerlink" title="GB2312、GBK"></a>GB2312、GBK</h3><p>ASCII 字符集总共规定了 128 种字符规范，但是并没有涵盖西文字母之外的字符，当需要计算机显示存储中文的时候，就需要一种对中文进行编码的字符集，GB 2312 就是解决中文编码的字符集，由国家标准委员会发布。同时考虑到中文语境中往往也需要使用西文字母，GB 2312 也实现了对 ASCII 的向下兼容，原理是西文字母使用和 ASCII 中相同的代码，但是 GB 2312 只涵盖了 6000 多个汉字，还有很多没有包含在其中，所以又出现了 GBK 和 GB 18030，两种字符集都是在 GB 2312 的基础上进行了扩展。</p>
-<h3 id="Unicode"><a href="#Unicode" class="headerlink" title="Unicode"></a>Unicode</h3><p>可以看到，光是简体中文，就先后出现了至少三种字符集，繁体中文方面也有 BIG5 等字符集，几乎每种语言都需要有一个自己的字符集，每个字符集使用了自己的编码规则，往往互不兼容。同一个字符在不同字符集下的字符代码不同，这使得跨语言交流的过程中双方必须要使用相同的字符编码才能不出现乱码的情况。为了解决传统字符编码的局限性，Unicode 诞生了，Unicoide 的全称是 Universal Multiple-Octet Coded Character Set（通用多八位字符集，简称 UCS）。Unicode 在一个字符集中包含了世界上所有文字和符号，统一编码，来终结不同编码产生乱码的问题。</p>
-<h3 id="字符编码-UTF-8"><a href="#字符编码-UTF-8" class="headerlink" title="字符编码 UTF-8"></a>字符编码 UTF-8</h3><p>Unicode 统一了所有字符的编码，是一个 Character Set，也就是字符集，字符集只是给所有的字符一个唯一编号，但是却没有规定如何存储，一个编号为 <code>65</code> 的字符，只需要一个字节就可以存下，但是编号 <code>40657</code> 的字符需要两个字节的空间才可以装下，而更靠后的字符可能会需要三个甚至四个字节的空间。</p>
-<p>这时，用什么规则存储 Unicode 字符就成了关键，我们可以规定，一个字符使用四个字节存储，也就是 32 位，这样就能涵盖现有 Unicode 包含的所有字符，这种编码方式叫做 UTF-32（UTF 是 UCS Transformation Format 的缩写）。UTF-32 的规则虽然简单，但是缺陷也很明显，假设使用 UTF-32 和 ASCII 分别对一个只有西文字母的文档编码，前者需要花费的空间是后者的四倍（ASCII 每个字符只需要一个字节存储）。</p>
-<p>在存储和网络传输中，通常使用更为节省空间的变长编码方式 UTF-8，UTF-8 代表 8 位一组表示 Unicode 字符的格式，使用 1 - 4 个字节来表示字符。</p>
-<p>UTF-8 的编码规则如下（U+ 后面的数字代表 Unicode 字符代码）：</p>
-<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">U+ <span class="number">0000</span> <span class="symbol">~ U+ 007F</span>: <span class="number">0</span>XXXXXXX</span><br><span class="line">U+ <span class="number">0080</span> <span class="symbol">~ U+ 07FF</span>: <span class="number">110</span>XXXXX <span class="number">10</span>XXXXXX</span><br><span class="line">U+ <span class="number">0800</span> <span class="symbol">~ U+ FFFF</span>: <span class="number">1110</span>XXXX <span class="number">10</span>XXXXXX <span class="number">10</span>XXXXXX</span><br><span class="line">U+<span class="number">10000</span> <span class="symbol">~ U+1FFFF</span>: <span class="number">11110</span>XXX <span class="number">10</span>XXXXXX <span class="number">10</span>XXXXXX <span class="number">10</span>XXXXXX</span><br></pre></td></tr></table></figure>
-<p>可以看到，UTF-8 通过开头的标志位位数实现了变长。对于单字节字符，只占用一个字节，实现了向下兼容 ASCII，并且能和 UTF-32 一样，包含 Unicode 中的所有字符，又能有效减少存储传输过程中占用的空间。</p>
-<h3 id="关注Python私房菜"><a href="#关注Python私房菜" class="headerlink" title="关注Python私房菜"></a>关注Python私房菜</h3><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
-
+          <div class="read-more">
+            <a href="/2018/12/07/unicode-and-utf-8/" class="read-more-link">阅读更多</a>
+          </div>
         </div></article>
       <article class="post">
     <header class="post-header">
@@ -442,29 +250,9 @@
 <p>在golang中创建并打印一个时间对象，会看到如下输出</p>
 <figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:50.306558969 <span class="string">+0800</span> CST m=<span class="string">+0</span>.000401093</span><br></pre></td></tr></table></figure>
 <p>前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？</p>
-<h3 id="Monotonic-Clocks-和-Wall-Clocks"><a href="#Monotonic-Clocks-和-Wall-Clocks" class="headerlink" title="Monotonic Clocks 和 Wall Clocks"></a>Monotonic Clocks 和 Wall Clocks</h3><p>根据golang的time包的文档可以知道，golang的time结构中存储了两种时钟，一种是Wall Clocks，一种是Monotonic Clocks。</p>
-<p>Wall Clocks，顾名思义，表示墙上挂的钟，在这里表示我们平时理解的时间，存储的形式是自 1970 年 1 月 1 日 0 时 0 分 0 秒以来的时间戳，当系统和授时服务器进行校准时间时间操作时，有可能造成这一秒是2018-1-1 00:00:00，而下一秒变成了2017-12-31 23:59:59的情况。Monotonic Clocks，意思是单调时间的，所谓单调，就是只会不停的往前增长，不受校时操作的影响，这个时间是自进程启动以来的秒数。</p>
-<p>如果每隔一秒生成一个Time并打印出来，就会看到如下输出。</p>
-<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:50.306558969 <span class="string">+0800</span> CST m=<span class="string">+0</span>.000401093</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:51.310559881 <span class="string">+0800</span> CST m=<span class="string">+1</span>.004425285</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:52.311822486 <span class="string">+0800</span> CST m=<span class="string">+2</span>.005711106</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:53.314599457 <span class="string">+0800</span> CST m=<span class="string">+3</span>.008511329</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:54.31882248 <span class="string">+0800</span> CST m=<span class="string">+4</span>.012757636</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:55.320059921 <span class="string">+0800</span> CST m=<span class="string">+5</span>.014018292</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:56.323814998 <span class="string">+0800</span> CST m=<span class="string">+6</span>.017796644</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:57.324858749 <span class="string">+0800</span> CST m=<span class="string">+7</span>.018863606</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:58.325164174 <span class="string">+0800</span> CST m=<span class="string">+8</span>.019192224</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:59.329058535 <span class="string">+0800</span> CST m=<span class="string">+9</span>.023109863</span><br><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:16:00.329591268 <span class="string">+0800</span> CST m=<span class="string">+10</span>.023665796</span><br></pre></td></tr></table></figure>
-<p>可以看到m=+后面所显示的数字，就是文档中所说的Monotonic Clocks。</p>
-<h3 id="Time结构"><a href="#Time结构" class="headerlink" title="Time结构"></a>Time结构</h3><p>那么Monotonic Clock和Wall Clock在Time中是怎么存储的呢？来看一下Time结构体。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Time <span class="keyword">struct</span> &#123;</span><br><span class="line">	wall <span class="keyword">uint64</span></span><br><span class="line">	ext  <span class="keyword">int64</span></span><br><span class="line">	loc *Location</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Time结构体中由三部分组成，loc比较明了，表示时区，wall和ext所存储的信息规则相对复杂，根据文档的介绍总结成了下图：</p>
-<p><img src="/upload/20181026_02.jpg" alt=""></p>
-<p>golang中的Time结构，不像很多语言保存Unix时间戳（也就是最早只能表示到1970年1月1日），而是至少可以安全的表示1885年以来的时间。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t, _ := time.Parse(time.RFC3339, <span class="string">"1890-01-02T15:04:05Z"</span>)</span><br><span class="line">fmt.Println(t) <span class="comment">// 1890-01-02 15:04:05 +0000 UTC</span></span><br></pre></td></tr></table></figure>
-<h3 id="实践中需要注意的问题"><a href="#实践中需要注意的问题" class="headerlink" title="实践中需要注意的问题"></a>实践中需要注意的问题</h3><p>既然Time结构所表示的时间，有可能有Monotonic Clock也可能没有，那么在使用中就有可能遇到一些问题，例如下面这种情况。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">now := time.Now()</span><br><span class="line">encodeNow, _ := json.Marshal(now)</span><br><span class="line"></span><br><span class="line">decodeNow := time.Time&#123;&#125;</span><br><span class="line">json.Unmarshal(encodeNow, &amp;decodeNow)</span><br><span class="line"></span><br><span class="line">fmt.Println(now)  <span class="comment">// 2018-10-26 16:04:55.230121766 +0800 CST m=+0.000520419</span></span><br><span class="line">fmt.Println(decodeNow)  <span class="comment">// 2018-10-26 16:04:55.230121766 +0800 CST</span></span><br></pre></td></tr></table></figure>
-<p>可以看到，经过JSON转码之后，Time结构体会被表示成不带Monotonic Clock的字符串，丢失了Monotonic Clock信息，而将字符串转码回Time结构时，自然也就和转码之前的不一样了。同样的情况，也发生在数据库存储中，存储到数据库里的Time结构和从数据库取出来的也是不一样的。</p>
-<p>当调用Equal比较两个Time时，只有两个Time都含有Monotonic Clock时，才会根据Monotonic Clock比较大小，其他情况只比较Wall Clock部分。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">timeA := time.Now()</span><br><span class="line">timeB := time.Unix(<span class="number">0</span>, timeA.UnixNano())</span><br><span class="line"></span><br><span class="line">fmt.Println(timeA)  <span class="comment">// 2018-10-26 16:37:02.216165074 +0800 CST m=+0.000363156</span></span><br><span class="line">fmt.Println(timeB)  <span class="comment">// 2018-10-26 16:37:02.216165074 +0800 CST</span></span><br><span class="line"></span><br><span class="line">r := timeA.Equal(timeB)</span><br><span class="line">fmt.Println(r)  <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
-<p>上面两个时间的Wall Clock部分相同，一个有Monotonic Clock一个没有，但是比较的结果是两个时间是相同的。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">timeA := time.Now()</span><br><span class="line">timeB := time.Unix(timeA.Unix(), <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">fmt.Println(timeA)  <span class="comment">// 2018-10-26 16:38:25.653953438 +0800 CST m=+0.000364851</span></span><br><span class="line">fmt.Println(timeB)  <span class="comment">// 2018-10-26 16:38:25 +0800 CST</span></span><br><span class="line"></span><br><span class="line">r := timeA.Equal(timeB)</span><br><span class="line">fmt.Println(r)  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
-<p>需要注意的是Wall Clock并不是秒之前的部分，Wall Clock本身也可以精确到纳秒级别，所以一个精确到纳秒的时间和一个精确到秒的时间也是不同的。</p>
-<p>对于Time中的Monotonic Clock，我们可以使用<code>time.Round(0)</code>方法将其消除掉，以实现和其他语言一致的行为。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">timeA := time.Now()</span><br><span class="line">timeB := timeA.Round(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">fmt.Println(timeA)  <span class="comment">// 2018-10-26 16:43:03.799263739 +0800 CST m=+0.000357758</span></span><br><span class="line">fmt.Println(timeB)  <span class="comment">// 2018-10-26 16:43:03.799263739 +0800 CST</span></span><br></pre></td></tr></table></figure>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://golang.org/pkg/time/" target="_blank" rel="noopener">https://golang.org/pkg/time/</a></p>
-<h3 id="点击关注知乎专栏Golang私房菜"><a href="#点击关注知乎专栏Golang私房菜" class="headerlink" title="点击关注知乎专栏Golang私房菜"></a>点击关注知乎专栏<a href="https://zhuanlan.zhihu.com/golang-fans" target="_blank" rel="noopener">Golang私房菜</a></h3>
+          <div class="read-more">
+            <a href="/2018/10/26/understand-time-struct-in-go/" class="read-more-link">阅读更多</a>
+          </div>
         </div></article>
       <article class="post">
     <header class="post-header">
@@ -482,71 +270,9 @@
 
     <div class="post-content"><p><img src="/upload/20181025_11.png" alt=""></p>
 <p>更快的Python（<a href="http://pythonfasterway.org" target="_blank" rel="noopener">Python Faster Way</a>）使用代码示例来说明如何书写Python代码能带来更高的性能。本文对代码进行了讲解，从性能和可读性等角度来选择出最适合的写法。</p>
-<h3 id="例子11：字符串连接"><a href="#例子11：字符串连接" class="headerlink" title="例子11：字符串连接"></a>例子11：字符串连接</h3><p><img src="/upload/20181025_01.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>1.15</strong></li>
-<li>使用建议：一次性连接多个（3个以上）的字符串的时候，使用join，其他情况使用加号或f-string。</li>
-<li>说明：又是一个字符串连接的问题，不过这个例子举的不好，join适用的场景是一次连接多个字符串，会比加号连接多个字符串要快很多（加号相当于一个一个连接）。</li>
-</ul>
-<h3 id="例子12：数字的格式化"><a href="#例子12：数字的格式化" class="headerlink" title="例子12：数字的格式化"></a>例子12：数字的格式化</h3><p><img src="/upload/20181025_02.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>1.29</strong></li>
-<li>使用建议：需要复杂格式，推荐使用format方法；将数字转换为字符串，直接使用str方法。</li>
-<li>说明：将数字转为字符串，使用str方法要快于format方法，因为format方法支持在转换过程中增加规则，例如将数字转为货币形式（每三位加一个逗号分隔符）。</li>
-</ul>
-<h3 id="例子13：获取内置列表类型的长度"><a href="#例子13：获取内置列表类型的长度" class="headerlink" title="例子13：获取内置列表类型的长度"></a>例子13：获取内置列表类型的长度</h3><p><img src="/upload/20181025_03.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>1.20</strong></li>
-<li>使用建议：使用len()方法。</li>
-<li>说明：当调用len()方法时，系统实际上是调用了对象内置的<strong>len</strong>方法，从这个层面理解，直接调用<strong>len</strong>应该比len()方法更快。但是当len()内置的列表方法时，Python解释器做了优化，直接返回了列表对象中存储长度信息的变量，并不会调用<strong>len</strong>。</li>
-</ul>
-<h3 id="例子14：整数类型的运算"><a href="#例子14：整数类型的运算" class="headerlink" title="例子14：整数类型的运算"></a>例子14：整数类型的运算</h3><p><img src="/upload/20181025_04.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>2.63</strong></li>
-<li>使用建议：不要直接调用<strong>add</strong>等魔术方法。</li>
-<li>说明：对于整数类型，调用魔术方法完成运算的速度远远慢于直接使用运算符，使用运算符时，Python解释器直接调用C实现的operaotr包中的运算方法，所以速度很快；而使用调用魔术方法，在Python层面多出了调用<strong>add</strong>等魔术方法的额外操作。</li>
-</ul>
-<h3 id="例子15：自定义类型的运算符重载"><a href="#例子15：自定义类型的运算符重载" class="headerlink" title="例子15：自定义类型的运算符重载"></a>例子15：自定义类型的运算符重载</h3><p><img src="/upload/20181025_05.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>1.06</strong></li>
-<li>使用建议：不要直接调用<strong>add</strong>等魔术方法。</li>
-<li>说明：对于重载了运算符的对象，没有对应的C实现运算方法，所以直接直接调用魔术方法速度会更快。</li>
-</ul>
-<h3 id="例子16：对range结果求和"><a href="#例子16：对range结果求和" class="headerlink" title="例子16：对range结果求和"></a>例子16：对range结果求和</h3><p><img src="/upload/20181025_06.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>2.95</strong></li>
-<li>使用建议：推荐使用第一种。</li>
-<li>说明：和第一种相比，第三种会遍历range先生成一个列表，然后将列表传给sum，速度最慢，而第一种直接传递迭代器给sum，省去了遍历生成列表的过程；第二种和第一种相比则是在Python层面实现了求和，而sum是C层面实现的求和，所以也没有第一种块。</li>
-</ul>
-<h3 id="例子17：for循环和表达式构建列表的区别"><a href="#例子17：for循环和表达式构建列表的区别" class="headerlink" title="例子17：for循环和表达式构建列表的区别"></a>例子17：for循环和表达式构建列表的区别</h3><p><img src="/upload/20181025_07.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>2.05</strong></li>
-<li>使用建议：推荐使用表达式构建。</li>
-<li>说明：两种方式看上去逻辑一样，都是把range迭代器遍历，生成一个列表，但是表达式是在字节码层面构建了一个循环来生成，而第二种则是在Python层面创建列表，并不断Append，性能上要差于第一种。</li>
-</ul>
-<h3 id="例子18：for循环和表达式构建字典的区别"><a href="#例子18：for循环和表达式构建字典的区别" class="headerlink" title="例子18：for循环和表达式构建字典的区别"></a>例子18：for循环和表达式构建字典的区别</h3><p><img src="/upload/20181025_08.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>1.49</strong></li>
-<li>使用建议：推荐使用表达式。</li>
-<li>说明：dict的update方法适用于合并两个字典的情况，也就是说可以一次合并多个key，所以相比于直接访问key速度要慢；根据图中的测试，在100这个量级上，表达式生成的速度要慢一些，但是在更大的量级上，表达式的优势就体现出来了，并且更加Pythonic。首先表达式方法是在字节码层面生成循环的，所以理论上比Python层面生成循环构建字典要快的，那么为什么在小量级的场景下，字节码反倒没有优势呢？根据dis出的字节码可以看到，表达式构建首先会MAKE_FUNCTION然后再CALL_FUNCTION，这里会有一些基本的消耗，量级小的时候，这些基本消耗占比高，量级越大，这些基本消耗所占比例就越低，表达式方法的优势也就越明显。</li>
-</ul>
-<h3 id="例子19：for循环和表达式构建字典的区别"><a href="#例子19：for循环和表达式构建字典的区别" class="headerlink" title="例子19：for循环和表达式构建字典的区别"></a>例子19：for循环和表达式构建字典的区别</h3><p><img src="/upload/20181025_09.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>2.89</strong></li>
-<li>使用建议：推荐使用表达式构建。</li>
-<li>说明：理由同上一个例子。</li>
-</ul>
-<h3 id="例子20：转换为bool值"><a href="#例子20：转换为bool值" class="headerlink" title="例子20：转换为bool值"></a>例子20：转换为bool值</h3><p><img src="/upload/20181025_10.png" alt=""></p>
-<ul>
-<li>最差/最优时间比：<strong>N/A</strong></li>
-<li>使用建议：根据具体情况选择。</li>
-<li>说明：这个比较似乎没有什么好说的，时间的区别主要原因是构建a对象的成本不同。</li>
-</ul>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><ul>
-<li><a href="http://pythonfasterway.org" target="_blank" rel="noopener">Python Faster Way</a></li>
-</ul>
-<h3 id="关注公众号【Python私房菜】"><a href="#关注公众号【Python私房菜】" class="headerlink" title="关注公众号【Python私房菜】"></a>关注公众号【Python私房菜】</h3><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
-
+          <div class="read-more">
+            <a href="/2018/10/25/faster-python-part-2/" class="read-more-link">阅读更多</a>
+          </div>
         </div></article>
       <nav class="pagination"><a class="next" href="/page/2/">
         <span class="next-text">下一页</span>

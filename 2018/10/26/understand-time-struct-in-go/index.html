@@ -95,6 +95,7 @@
 <p>在golang中创建并打印一个时间对象，会看到如下输出</p>
 <figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:50.306558969 <span class="string">+0800</span> CST m=<span class="string">+0</span>.000401093</span><br></pre></td></tr></table></figure>
 <p>前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？</p>
+<a id="more"></a> 
 <h3 id="Monotonic-Clocks-和-Wall-Clocks"><a href="#Monotonic-Clocks-和-Wall-Clocks" class="headerlink" title="Monotonic Clocks 和 Wall Clocks"></a>Monotonic Clocks 和 Wall Clocks</h3><p>根据golang的time包的文档可以知道，golang的time结构中存储了两种时钟，一种是Wall Clocks，一种是Monotonic Clocks。</p>
 <p>Wall Clocks，顾名思义，表示墙上挂的钟，在这里表示我们平时理解的时间，存储的形式是自 1970 年 1 月 1 日 0 时 0 分 0 秒以来的时间戳，当系统和授时服务器进行校准时间时间操作时，有可能造成这一秒是2018-1-1 00:00:00，而下一秒变成了2017-12-31 23:59:59的情况。Monotonic Clocks，意思是单调时间的，所谓单调，就是只会不停的往前增长，不受校时操作的影响，这个时间是自进程启动以来的秒数。</p>
 <p>如果每隔一秒生成一个Time并打印出来，就会看到如下输出。</p>
