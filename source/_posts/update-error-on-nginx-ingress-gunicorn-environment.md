@@ -10,6 +10,8 @@ categories: DevOps
 
 在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。
 
+<!-- more --> 
+
 ### 文件上传过程
 
 ![](/upload/20190228_02.jpg)

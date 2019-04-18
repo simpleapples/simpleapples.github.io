@@ -10,6 +10,8 @@ categories: Python
 
 更快的Python（[Python Faster Way](http://pythonfasterway.org)）使用代码示例来说明如何书写Python代码能带来更高的性能。本文对代码进行了讲解，从性能和可读性等角度来选择出最适合的写法。
 
+<!-- more --> 
+
 ### 例子11：字符串连接
 
 ![](/upload/20181025_01.png)

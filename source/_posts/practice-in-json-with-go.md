@@ -10,6 +10,8 @@ categories: Golang
 
 在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。
 
+<!-- more --> 
+
 ### 整数变浮点数问题
 
 假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。

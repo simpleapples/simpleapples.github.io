@@ -16,6 +16,8 @@ categories: Golang
 
 前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？
 
+<!-- more --> 
+
 ### Monotonic Clocks 和 Wall Clocks
 
 根据golang的time包的文档可以知道，golang的time结构中存储了两种时钟，一种是Wall Clocks，一种是Monotonic Clocks。

@@ -18,6 +18,8 @@ categories: Tech
 
 如果隔几秒再请求（例如使用 Chrome 开发者工具中的 Replay XHR），就会成功。
 
+<!-- more --> 
+
 ![](/upload/20190326_01.png)
 
 ### nbf 字段的原理

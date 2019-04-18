@@ -12,6 +12,8 @@ categories: Tech
 
 ngrok 是一个反向代理工具，可以实现将内网的端口暴露到公网，通过 ngrok，也能将 ssh 使用的端口暴露出去，以此实现 ssh 的内网穿透。
 
+<!-- more --> 
+
 ### 注册并下载 ngrok
 
 访问 [https://ngrok.com/](https://ngrok.com/) 注册 ngrok 账号并下载 ngrok 客户端。

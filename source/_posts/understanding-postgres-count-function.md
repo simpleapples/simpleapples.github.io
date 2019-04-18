@@ -8,6 +8,8 @@ categories: DevOps
 
 关于 count 函数的使用一直存在争议，尤其是在 MySQL 中，作为流行度越来越高的 PostgreSQL 是否也有类似的问题呢，我们通过实践来理解一下 PostgreSQL 中 count 函数的行为。
 
+<!-- more -->
+
 ### 构建测试数据库
 
 创建测试数据库，并创建测试表。测试表中有自增 ID、创建时间、内容三个字段，自增 ID 字段是主键。

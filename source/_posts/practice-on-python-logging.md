@@ -10,6 +10,8 @@ categories: Python
 
 本文从 Python logging 库的基础概念入手，理解 logging 库的执行流程，以及可能忽视的一些细节。
 
+<!-- more -->
+
 ### 日志级别
 
 logging 库预置了 5 个错误级别，还有一个 `NOTSET` 级别，作为 logger 的默认值。
