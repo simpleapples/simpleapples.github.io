@@ -109,6 +109,27 @@
         </div></article>
       <article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2019/04/18/building-docker-image-behind-proxy/">使用代理进行 docker build 问题的解决思路</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-04-18
+        </span><span class="post-category">
+            <a href="/categories/DevOps/">DevOps</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>在使用 docker build 打包镜像时，遇到了需要使用代理访问网络的需求。使用如下的 Dockerfile 来模拟这个场景：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span> curl www.google.com --max-time 3</span><br></pre></td></tr></table></figure>
+<p>国内一般网络环境下，curl <a href="http://www.google.com" target="_blank" rel="noopener">www.google.com</a> 是无法正常返回的，加入 –max-time 让 curl 的耗时不要太长。</p>
+          <div class="read-more">
+            <a href="/2019/04/18/building-docker-image-behind-proxy/" class="read-more-link">阅读更多</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
         </h1>
 
@@ -268,26 +289,6 @@
 <p>前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？</p>
           <div class="read-more">
             <a href="/2018/10/26/understand-time-struct-in-go/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/10/25/faster-python-part-2/">翻译 | 更快的Python（二）</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-10-25
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20181025_11.png" alt=""></p>
-<p>更快的Python（<a href="http://pythonfasterway.org" target="_blank" rel="noopener">Python Faster Way</a>）使用代码示例来说明如何书写Python代码能带来更高的性能。本文对代码进行了讲解，从性能和可读性等角度来选择出最适合的写法。</p>
-          <div class="read-more">
-            <a href="/2018/10/25/faster-python-part-2/" class="read-more-link">阅读更多</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="next" href="/page/2/">

@@ -90,6 +90,54 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2014/10/23/build-a-safari-extension/">创建一个简单的Safari扩展</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-10-23
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>之前做过一个把网址转为二维码的<a href="https://chrome.google.com/webstore/detail/url2qrcode/dohkaoejmhididdilnijehaeegkgchfl?utm_source=chrome-ntp-icon" target="_blank" rel="noopener">Chrome扩展</a>，想在Safari中也使用这样的扩展，搜索了一下貌似没有同类型的，所以自己打造了一个Safari扩展，并且把过程记录下来。</p>
+<h2 id="获得开发者证书"><a href="#获得开发者证书" class="headerlink" title="获得开发者证书"></a>获得开发者证书</h2><p>要建立一个Safari扩展，首先需要生成一个开发者证书。访问<a href="https://developer.apple.com/account/overview.action" target="_blank" rel="noopener">Apple开发者中心</a>，加入Safari Developer Program，加入开发者计划是免费的。加入开发者计划后就可以生成证书了，访问<a href="https://developer.apple.com/account/safari/certificate/certificateList.action" target="_blank" rel="noopener">Certificates, Identifiers &amp; Profiles</a>，点击右上角的加号，生成一个开发者证书。成功后将证书下载到本地并导入Keychain Access中。</p>
+<h2 id="在Safari中创建扩展"><a href="#在Safari中创建扩展" class="headerlink" title="在Safari中创建扩展"></a>在Safari中创建扩展</h2><p>打开Safari，在菜单中选择<em>Safari—Preferences-Advanced</em>，勾选最下方的<em>Show Develop menu in menu bar</em>，如图。</p>
+<p><img src="/upload/safari-extension-1.png" alt="图1"></p>
+<p>这时在菜单栏中会出现<em>Develop</em>菜单，选择<em>Develope-Show Extension Builder</em>，打开扩展编辑器，点击左下角的<em>+</em>，选择<em>New Extension</em>，保存到一个位置（例如Desktop）。</p>
+<p><img src="/upload/safari-extension-2.png" alt="图2"></p>
+<p>这时，Desktop文件夹中会出现一个<em>demo.safariextension</em>文件夹，这个文件夹里的内容就是我们生成的Safari扩展的根目录。如果前面的开发者证书已经正确导入，扩展的介绍里会出现Safari开发者的Id。</p>
+<p><img src="/upload/safari-extension-3.png" alt="图3"></p>
+<h2 id="编辑扩展基本信息"><a href="#编辑扩展基本信息" class="headerlink" title="编辑扩展基本信息"></a>编辑扩展基本信息</h2><p>扩展建立后，下面会有一票东西需要填写，首先填写扩展的基本信息。</p>
+<ul>
+<li>Display Name: 扩展的显示名称</li>
+<li>Author: 作者名字</li>
+<li>Description: 插件介绍</li>
+<li>Website: 插件网站</li>
+<li>Bundle Identifier: 这里需要填写唯一id</li>
+<li>Update Manifest: 这里需要填写一个plist格式文件的地址，Apple会定期检查这个地址中的Version，如果有升级，就会访问插件的下载地址更新插件，当然，如果插件只是自用而不提交Safari Extensions Gallery的话，这一栏可以不填，plist文件格式如下：</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">key</span>&gt;</span>Extension Updates<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.zangzhiya.url2qrcode<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>Developer Identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>开发者ID<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleVersion<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleShortVersionString<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>URL<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://simpleapples.com/upload/url2qrcode-safari/url2qrcode.safariextz<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Access Level: 这里需要选择插件对页面访问的权限，比如我们我们要做的URL转二维码插件，需要获取当前Tab的URL，那么这里需要选择ALL</li>
+</ul>
+<p><img src="/upload/safari-extension-4.png" alt="图4"></p>
+<h2 id="添加图标"><a href="#添加图标" class="headerlink" title="添加图标"></a>添加图标</h2><p>我们的扩展到现在还没有图标，Safari会分配一个默认的指南针图标，添加图标的方式很简单，在扩展的根目录下放置一个16px * 16px的png格式图片，Safari就会自动将其置为图标。</p>
+<h2 id="添加Toolbar-Item和Popovers"><a href="#添加Toolbar-Item和Popovers" class="headerlink" title="添加Toolbar Item和Popovers"></a>添加Toolbar Item和Popovers</h2><p>首先看一下这个扩展的完成态，如图。</p>
+<p><img src="/upload/safari-extension-5.png" alt="图5"></p>
+<p>可以看到这个插件有两部分组成，一个是工具栏的按钮，在Safari中被称为Toolbar Item，一个是点击按钮后弹出的层，是一个Popover，和Chrome中的Popup类似，这个Popover也是一个html页面。</p>
+<p>接下来，需要在Safari Extension Builder中继续编辑，添加一个Toolbar Item和一个Popover，如图。</p>
+<p><img src="/upload/safari-extension-6.png" alt="图6"></p>
+<p>Toobar Item红的Image必须是一个8bit的16px * 16px透明背景的黑白png图像（繁琐的要求），而Popover需要是一个html文件。这里的路径都是相对于扩展文件夹的。到这里插件的配置工作就完成了。</p>
+<h2 id="编程"><a href="#编程" class="headerlink" title="编程"></a>编程</h2><p>可以在<a href="https://github.com/simpleapples/url2qrcode-safari" target="_blank" rel="noopener">我的Github上</a>查看这个扩展的代码，里面用到的Safari Api（获取当前页URL），可以在<a href="https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html" target="_blank" rel="noopener">Safari Developer Libray</a>中找到，里面的内容非常详细。</p>
+<h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2><p>当扩展开发完成后，就可以点击Safari Extension Builder中的<em>Build Package</em>打包了，打包出来的会是一个<em>safariextz</em>格式的文件，双击就可以安装。如果不想提交Safari Extension Gallery，可以直接把这个文件拷贝给他人安装。</p>
+<p><img src="/upload/safari-extension-7.png" alt="图7"></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2014/09/19/ios8-register-notification-fail/">iOS8注册推送失败的探究</a>
         </h1>
 
@@ -285,38 +333,6 @@
     <div class="post-content"><p>从收垃圾的阿姨开始变得友善而又慈祥的那一刻起，我就感觉到，毕业，离我们不远了。<br>本以为没什么好不舍，没什么好悲伤，可学位授予仪式结束时的那首《再见》，还是让鼻子酸酸的。<br>学生证被盖上了毕业留念四个字，好像在宣告什么的终结。<br>宿舍里空荡而凌乱，收拾行李时翻出来的旧物件，把人一下子拉回到过往的岁月里。楼道里时不时响起拉行李箱的声音，不用回头就知道，又有人离开了。<br>有人选择默默地走，有人选择和每个人告别，共同之处在于，都是闪电战。这个时候，不能有半点拖泥带水，走就走，墨迹纸就不够用了。<br>昏黄路灯下弹吉他的少年，和穿着毕业衫来来往往的情侣，让所有人的目光变的温暖，如果这不是毕业季，就更好了。<br>入夜，带着最后一点行李从学校离开。</p>
 <p><img src="/upload/leave-1024x494.jpg" alt="Alt text"></p>
 <p><em>Young and beautiful</em></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/06/02/why-write-blog/">为什么写博客</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-06-02
-        </span><span class="post-category">
-            <a href="/categories/生活/">生活</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>最近在读刘未鹏的<a href="http://book.douban.com/subject/6709809/" target="_blank" rel="noopener">《暗时间》</a>，书中有一章说到为什么要写博客，看了很有感触。借用《暗时间》中关于这个问题讨论的思路，我也结合自己的体验，记录下自己的观点。</p>
-<p>我的博客史</p>
-<p>第一个博客是在初中三年级申请的，上计算机课时老师介绍了博客这么一个东西，于是跟风申请了一个免费博客，把自己拍的几张照片传了上去。除了刚申请时候传了几张照片，就再也没更新过，时间一长，地址都忘了。<br>后来断断续续申请过几个博客，都是一时突发奇想要说点什么，等申请好了，也就忘了要说什么了，于是也就不了了之。大学之后有一阵做acm的题，申请了一个新浪博客，把解题的答案放到上面去，没几天，也断了更新。<br>现在的这个博客，是大四实习时申请的，当时在工作中碰到了一个棘手的问题，查了很多零零碎碎的资料才得以解决，很有成就感，想把解决问题的思路记下来，于是在sae上架了一个wordpress，就是今天的博客。直到这时候，我才算正式开始写博客。</p>
-<p>博客的价值</p>
-<p>1.博客是经验的记录和分享</p>
-<p>这个博客搭建的初衷就是为了记录自己在工作中解决问题的思路，所以最初的几篇文章都是记录一些问题的解决方法的，自己也一直把博客定位成技术博客，一方面记录下这些东西，将来自己遇到相同问题可以返回来看，另一方面，也能分享给有需要的人，当然，还能满足自己的一点点虚荣心 : )</p>
-<p>2.博客是一份自己的简历</p>
-<p>找工作的时候觉得很委屈，自己在大学里做过很多技术方面的实践工作，而写到简历里，一两句话就要说一两年的工作，对于技术类职位，单独一两句话很难让人信服，面试官也不知道你到底具体做了些什么。那时候刚搭博客，文章少的可怜，一下子意识到自己没有将之前的经历记录下来是多么的遗憾。如果当时有一个经营了几年的博客，很多事情也就不那么麻烦了。</p>
-<p>3.给别人讲明白是最有效的学习方式<br>去年在sae官方微博发了一个叫《是否真的了解Javascript？》的小测试，看到以后也自测了一下，觉得理解算是比较完全，于是决定写篇博客记录下来，在写的时候才发现，有一些原理自己想当然了，虽然结果正确，可是想法却错的离谱。有些东西只有在自己想给别人讲清楚时，才会把自己的思路完整的审视一遍。<br>我想很多人和我一样，不写博客不是因为不知道这样做的好处，而是总想着写博客可能带来的问题。</p>
-<p>写博客会遇到的问题</p>
-<p>1.觉得没有价值</p>
-<p>应该说这一点是我之前很长一段时间不写博客的重要原因，说到底，做什么事情都需要有一个目的去支撑，如果写一个博客，自己不看，别人不看，还要花钱买空间买域名，是在是一件反人类的事情。后来开始写博客，并不是我的生活开始有意义，而是很多有价值被记录的事情之前被忽略了。</p>
-<p>2.担心被笑话</p>
-<p>我很少写博客，写也是写技术类的文章，最多再记录下不疼不痒的事情，不写个人观点明显的东西。之前读到好书时候想写书评，最后也不了了之了，除了怕写出的东西没价值，还有一个担心就是怕被笑话。应该说，在网络上发表自己的观点，有一部分目的就是为了获得认同感，如果发的东西被大家各种喷，会一下子兴致全无，尤其是现在很多人喜欢当公知、喜欢喷人，所以很难放心的在互联网上说话。就算没有人喷，如果不小心说了误导性的东西，对别人产生了不好的影响，自己心里也会不好受。<br>现在觉得这事情得辩证的想，写出没水平的东西是容易被笑话，但是如果不写不交流，水平也没法提高，总不能把自己藏在暗处一辈子。现在的东西被笑话，坚持个一两年，也许自己写的东西就没那么幼稚，坚持个十年八年，恐怕也成了半个大师。关键在于，要敢于迈出这一步。</p>
-<p>3.写不出来</p>
-<p>写作这件事，我也有点体会，越写越能写。有的人读书很多，但是不喜欢动笔，时间一长，脑子里惊涛骇浪，就是表达不到纸上，非常捉急。所以有些时候要拿出小学生写日记的劲头，强迫自己写，笔头子是能练出来的。<br>我说过，我基本不写除技术类文章之外的博客，之所以这次破例，很大程度上受了《暗时间》中关于这部分内容的启发。我甚至没有想到一写写了这么一大堆，所以在这里要感谢作者刘未鹏，如果不是拜读了这本大作，现在还把自己禁锢在牢笼中。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/4/">
