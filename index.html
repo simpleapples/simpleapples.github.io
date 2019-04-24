@@ -103,7 +103,7 @@
     </header>
 
     <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>在使用 docker build 打包镜像时，遇到了需要使用代理访问网络的需求。使用如下的 Dockerfile 来模拟这个场景：</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span> curl www.google.com --max-time 3</span><br></pre></td></tr></table></figure>
 <p>国内一般网络环境下，curl <a href="http://www.google.com" target="_blank" rel="noopener">www.google.com</a> 是无法正常返回的，加入 –max-time 让 curl 的耗时不要太长。</p>
           <div class="read-more">
             <a href="/2019/04/18/building-docker-image-behind-proxy/" class="read-more-link">阅读更多</a>
