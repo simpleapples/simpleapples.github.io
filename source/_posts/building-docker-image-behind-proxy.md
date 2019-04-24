@@ -17,7 +17,7 @@ RUN curl www.google.com --max-time 3
 
 国内一般网络环境下，curl www.google.com 是无法正常返回的，加入 --max-time 让 curl 的耗时不要太长。
 
-<!-- more --> 
+<!-- more -->
 
 ### 配置 http_proxy 变量
 
@@ -38,7 +38,7 @@ ENV HTTPS_PROXY "http://127.0.0.1:1087"
 RUN curl www.google.com --max-time 3
 ```
 
-重新执行 docker build 会发现 curl 依旧无法访问 www.google.com，从报错信息上可以看到 127.0.0.1 上的 1087 端口上并没有服务。
+重新执行 docker build 会发现 curl 依旧无法访问 www.google.com，从报错信息上可以看到 127.0.0.1 上的 1087 端口上并没有服务：
 
 ### 访问宿主机
 
@@ -64,9 +64,9 @@ docker 中还有一种 host 网络模式，就是让 container 使用宿主机�
 首先在宿主上导入 http_proxy 环境变量：
 
 ```bash
-export http_proxy="http://127.0.0.1:1087";
-export HTTP_PROXY="http://127.0.0.1:1087";
-export https_proxy="http://127.0.0.1:1087";
+export http_proxy="http://127.0.0.1:1087"
+export HTTP_PROXY="http://127.0.0.1:1087"
+export https_proxy="http://127.0.0.1:1087"
 export HTTPS_PROXY="http://127.0.0.1:1087"
 ```
 
@@ -77,4 +77,10 @@ FROM golang:1.12
 RUN curl www.google.com --max-time 3
 ```
 
-重新执行，curl 就可以像在宿主上直接执行一样，通过代理访问 www.google.com 了。
+重新执行 docker build，加上参数 --network host，使用宿主网络：
+
+```bash
+docker build --network host .
+```
+
+执行后 curl 就可以像在宿主上直接执行一样，通过代理访问 www.google.com 了。
