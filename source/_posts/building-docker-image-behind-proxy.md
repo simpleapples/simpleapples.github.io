@@ -38,7 +38,7 @@ ENV HTTPS_PROXY "http://127.0.0.1:1087"
 RUN curl www.google.com --max-time 3
 ```
 
-重新执行 docker build 会发现 curl 依旧无法访问 www.google.com，从报错信息上可以看到 127.0.0.1 上的 1087 端口上并没有服务：
+重新执行 docker build 会发现 curl 依旧无法访问 www.google.com，从报错信息上可以看到 127.0.0.1 上的 1087 端口上并没有服务。
 
 ### 访问宿主机
 
