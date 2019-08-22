@@ -90,6 +90,25 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2013/06/27/bye-buct/">Bye,BUCT</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-06-27
+        </span><span class="post-category">
+            <a href="/categories/生活/">生活</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>从收垃圾的阿姨开始变得友善而又慈祥的那一刻起，我就感觉到，毕业，离我们不远了。<br>本以为没什么好不舍，没什么好悲伤，可学位授予仪式结束时的那首《再见》，还是让鼻子酸酸的。<br>学生证被盖上了毕业留念四个字，好像在宣告什么的终结。<br>宿舍里空荡而凌乱，收拾行李时翻出来的旧物件，把人一下子拉回到过往的岁月里。楼道里时不时响起拉行李箱的声音，不用回头就知道，又有人离开了。<br>有人选择默默地走，有人选择和每个人告别，共同之处在于，都是闪电战。这个时候，不能有半点拖泥带水，走就走，墨迹纸就不够用了。<br>昏黄路灯下弹吉他的少年，和穿着毕业衫来来往往的情侣，让所有人的目光变的温暖，如果这不是毕业季，就更好了。<br>入夜，带着最后一点行李从学校离开。</p>
+<p><img src="/upload/leave-1024x494.jpg" alt="Alt text"></p>
+<p><em>Young and beautiful</em></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/06/02/why-write-blog/">为什么写博客</a>
         </h1>
 
@@ -323,38 +342,6 @@ Person.apply(this, [name, age]);
 </code></pre><p>或</p>
 <pre><code>function.call(undefined);
 </code></pre><p>时，function的this会被绑定为window。于是输出this就是window。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/12/02/some-research-about-new-operator-in-javascript/">Javascript中new操作符的探究</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-12-02
-        </span><span class="post-category">
-            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>Javascript中有一个很有意思的new操作符，在<a href="http://book.douban.com/subject/3590768/" target="_blank" rel="noopener">《Javascript语言精粹》（Javascript:The Good Parts）</a>中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。<br>先来一段代码：<br>    function test() {<br>        var foo1 = new function () {<br>            this.i = 1;<br>        }<br>        var foo2 = function () {<br>            this.i = 2;<br>        }<br>        M.dis(foo1.i);        //1<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //undefined<br>        foo2();<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //2<br>        M.dis(foo1.prototype);    //undefined<br>        M.dis(foo2.prototype);    //[object Object]<br>    }<br>*代码中的<code>M.dis() = document.writeln()</code><br>上面代码很能说明使用new操作符和不使用new操作符的区别。<br>以下是本人根据以上结果对使用new操作符和不使用new操作符的一些理解。    </p>
-<ol>
-<li><p>使用new操作符函数会被立刻执行。不使用new操作符，函数会在被调用时执行。<br>foo1在定义的时候就被执行了，所以输出<code>foo1.i = 1</code>，而<code>foo2</code>在定义时未被执行，所以输出<code>foo2</code>的结果为<code>undefined</code>，<br><code>foo2</code>中<code>var foo2 = function () {}</code>的定义形式和<code>function foo2 () {}</code>的效果是一样的。</p>
-</li>
-<li><p>使用new操作符后<code>this</code>会被绑定到函数本身。  </p>
-</li>
-</ol>
-<p>这一点很好理解，首先<code>foo1</code>的定义方式中，<code>foo1</code>是立刻执行的，那么为了方便理解可以看成<code>foo1</code>是function的执行空间，<code>this</code>自然就会绑定到<code>foo1</code>上，也就是绑定到function自身上。于是输出<code>foo1.i</code>可以得到结果。而不使用new操作符时，函数没有立即执行，当调用该函数（即<code>foo2</code>）时，执行空间是<code>test()</code>函数，所以在<code>test()</code>中输出this.i才能得到结果。至于<code>foo2.i</code>为    <code>undefined</code>的情况也好理解，这样的执行方式相当于执行<code>foo2().i</code>，显然，没有这种用法。</p>
-<p>3.使用new操作符和不使用new操作符的原型差异。</p>
-<p>使用new操作符时，相当于讲一个构造函数实例化了，那么它的prototype自然是<code>undefined</code>的。<br>而不使用new操作符时，<code>foo2</code>就是一个function，<code>foo2</code>的prototype就是function的prototype。<br>关于使用new和不使用new的原型问题，请参考淘宝UED团队的一篇文章：</p>
-<p><a href="http://ued.taobao.com/blog/2007/05/15/" target="_blank" rel="noopener">http://ued.taobao.com/blog/2007/05/15/</a>你真的会写javascript吗？</p>
-<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>对于new操作符的探究目前仅限于new function，而对于new Array()和[] 的区别以及new Object()和{}的区别，本人认为并没有new function和function的区别这么大，但也有人说new Array()和[]是有区别的（见《你真的会写javascript吗？》评论）。</p>
-<h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>new Array()和字面量定义Array还有一个很重要的区别，比如想定义一个只有一个元素3的数组，看代码：  </p>
-<pre><code>var a = new Array(3); //这样只能定义一个长度为3的数组
-var b = [3]; //正确！
-</code></pre><p>可见，只有字面量可以定义一个元素的数组。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/5/">

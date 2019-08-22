@@ -90,6 +90,62 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2019/08/22/reading-more-than-65536-lines-excel-files-with-pandas/">使用 Pandas 读取超过 65536 行的 Excel 文件？</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-08-22
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>使用 Pandas 的 <code>read_excel</code> 方法读取一个 16 万行的 Excel 文件报 <code>AssertionError</code> 错误：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">"/Users/Zzy/Desktop/test/csv_test/venv/lib/python3.7/site-packages/xlrd/xlsx.py"</span>, <span class="keyword">line</span> 637, <span class="keyword">in</span> do_row</span><br><span class="line">    <span class="keyword">assert</span> 0 &lt;= self.rowx &lt; X12_MAX_ROWS</span><br><span class="line">AssertionError</span><br></pre></td></tr></table></figure>
+<h3 id="背后原理"><a href="#背后原理" class="headerlink" title="背后原理"></a>背后原理</h3><p>Excel 文件的格式曾经发生过一次变化，在 Excel 2007 以前，使用扩展名为 <code>.xls</code> 格式的文件，这种文件格式是一种特定的二进制格式，最多支持 65,536 行，256 列表格。从 Excel 2007 版开始，默认采用了基于 XML 的新的文件格式 <code>.xlsx</code>，支持的表格行数达到了 1,048,576，列数达到了 16,384。需要注意的是，将 <code>.xlsx</code> 格式的文件转换为 <code>.xls</code> 格式的文件时，65536 行和 256 列之后的数据都会被丢弃。</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>最大行数</th>
+<th>最大列数</th>
+<th>文件格式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>早于 Excel 2007 的版本</td>
+<td>65,536</td>
+<td>256</td>
+<td>.xls</td>
+</tr>
+<tr>
+<td>Excel 2007 及以后版本</td>
+<td>1,048,576</td>
+<td>16,384</td>
+<td>.xlsx</td>
+</tr>
+</tbody>
+</table>
+<p>Pandas 读取 Excel 文件的引擎是 <code>xlrd</code>，<code>xlrd</code> 虽然同时支持 <code>.xlsx</code> 和 <code>.xls</code> 两种文件格式，但是在源码文件 <a href="https://github.com/python-excel/xlrd/blob/master/xlrd/sheet.py" target="_blank" rel="noopener">xlrd/sheet.py</a> 中限制了读取的 Excel 文件行数必须小于 65536，列数必须小于 256。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> self.biff_version &gt;= <span class="number">80</span>:</span><br><span class="line">    self.utter_max_rows = <span class="number">65536</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    self.utter_max_rows = <span class="number">16384</span></span><br><span class="line">self.utter_max_cols = <span class="number">256</span></span><br></pre></td></tr></table></figure>
+<p>这就导致，即使是 <code>.xlsx</code> 格式的文件，<code>xlrd</code> 依然不支持读取 65536 行以上的 Excel 文件（源码中还有一个行数限制是 16384，这是因为 Excel 95 时代，<code>xls</code> 文件所支持的最大行数是 16384）。</p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p><code>openpyxl</code> 是一个专门用来操作 <code>.xlsx</code> 格式文件的 Python 库，和 <code>xlrd</code> 相比它对于最大行列数的支持和 <code>.xlsx</code> 文件所定义的最大行列数一致。</p>
+<p>首先安装 <code>openpyxl</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install openpyxl</span><br></pre></td></tr></table></figure>
+<p>Pandas 的 read_excel 方法中，有 <code>engine</code> 字段，可以指定所使用的处理 Excel 文件的引擎，填入 <code>openpyxl</code>，再读取文件就可以了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">df = pd.read_excel(<span class="string">'./data.xlsx'</span>, engine=<span class="string">'openpyxl'</span>)</span><br><span class="line">print(len(df))  <span class="comment"># 160000</span></span><br></pre></td></tr></table></figure>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a href="https://en.wikipedia.org/wiki/Microsoft_Excel" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Microsoft_Excel</a></p>
+<p><a href="https://office-watch.com/2010/excel-a-history-of-rows-and-columns/" target="_blank" rel="noopener">https://office-watch.com/2010/excel-a-history-of-rows-and-columns/</a></p>
+<p><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_excel.html" target="_blank" rel="noopener">https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_excel.html</a></p>
+<p><a href="https://openpyxl.readthedocs.io" target="_blank" rel="noopener">https://openpyxl.readthedocs.io</a></p>
+<p><a href="https://github.com/python-excel/xlrd/" target="_blank" rel="noopener">https://github.com/python-excel/xlrd/</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2019/04/18/building-docker-image-behind-proxy/">使用代理进行 docker build 问题的解决思路</a>
         </h1>
 
@@ -103,7 +159,7 @@
     </header>
 
     <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>在使用 docker build 打包镜像时，遇到了需要使用代理访问网络的需求。使用如下的 Dockerfile 来模拟这个场景：</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span> curl www.google.com --max-time 3</span><br></pre></td></tr></table></figure>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
 <p>国内一般网络环境下，curl <a href="http://www.google.com" target="_blank" rel="noopener">www.google.com</a> 是无法正常返回的，加入 –max-time 让 curl 的耗时不要太长。</p>
           <div class="read-more">
             <a href="/2019/04/18/building-docker-image-behind-proxy/" class="read-more-link">阅读更多</a>
@@ -267,28 +323,6 @@
 <p>Unicode 和 UTF-8 的概念是一个非常基础和重要，但是却容易被忽略的问题。</p>
           <div class="read-more">
             <a href="/2018/12/07/unicode-and-utf-8/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/10/26/understand-time-struct-in-go/">理解Golang的Time结构</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-10-26
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20181026_01.png" alt=""></p>
-<p>在golang中创建并打印一个时间对象，会看到如下输出</p>
-<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:50.306558969 <span class="string">+0800</span> CST m=<span class="string">+0</span>.000401093</span><br></pre></td></tr></table></figure>
-<p>前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？</p>
-          <div class="read-more">
-            <a href="/2018/10/26/understand-time-struct-in-go/" class="read-more-link">阅读更多</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="next" href="/page/2/">
