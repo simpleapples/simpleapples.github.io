@@ -109,6 +109,7 @@
     </div>
   </div><div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>使用 Pandas 的 <code>read_excel</code> 方法读取一个 16 万行的 Excel 文件报 <code>AssertionError</code> 错误：</p>
 <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">"/Users/Zzy/Desktop/test/csv_test/venv/lib/python3.7/site-packages/xlrd/xlsx.py"</span>, <span class="keyword">line</span> 637, <span class="keyword">in</span> do_row</span><br><span class="line">    <span class="keyword">assert</span> 0 &lt;= self.rowx &lt; X12_MAX_ROWS</span><br><span class="line">AssertionError</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <h3 id="背后原理"><a href="#背后原理" class="headerlink" title="背后原理"></a>背后原理</h3><p>Excel 文件的格式曾经发生过一次变化，在 Excel 2007 以前，使用扩展名为 <code>.xls</code> 格式的文件，这种文件格式是一种特定的二进制格式，最多支持 65,536 行，256 列表格。从 Excel 2007 版开始，默认采用了基于 XML 的新的文件格式 <code>.xlsx</code>，支持的表格行数达到了 1,048,576，列数达到了 16,384。需要注意的是，将 <code>.xlsx</code> 格式的文件转换为 <code>.xls</code> 格式的文件时，65536 行和 256 列之后的数据都会被丢弃。</p>
 <table>
 <thead>
