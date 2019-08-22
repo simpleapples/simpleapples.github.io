@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 使用 Pandas 读取超过 65536 行的 Excel 文件？
+title: 使用 Pandas 读取超过 65536 行的 Excel 文件
 date: 2019-08-22 15:50
 comments: true
 categories: Python
