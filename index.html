@@ -90,7 +90,7 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2019/08/22/reading-more-than-65536-lines-excel-files-with-pandas/">使用 Pandas 读取超过 65536 行的 Excel 文件</a>
+      <h1 class="post-title"><a class="post-link" href="/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/">探究 Pandas 读取 Excel 文件报错问题</a>
         </h1>
 
       <div class="post-meta">
@@ -103,9 +103,9 @@
     </header>
 
     <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>使用 Pandas 的 <code>read_excel</code> 方法读取一个 16 万行的 Excel 文件报 <code>AssertionError</code> 错误：</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">"/Users/Zzy/Desktop/test/csv_test/venv/lib/python3.7/site-packages/xlrd/xlsx.py"</span>, <span class="keyword">line</span> 637, <span class="keyword">in</span> do_row</span><br><span class="line">    <span class="keyword">assert</span> 0 &lt;= self.rowx &lt; X12_MAX_ROWS</span><br><span class="line">AssertionError</span><br></pre></td></tr></table></figure>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">"/Users/XXX/excel_test/venv/lib/python3.7/site-packages/xlrd/xlsx.py"</span>, <span class="keyword">line</span> 637, <span class="keyword">in</span> do_row</span><br><span class="line">    <span class="keyword">assert</span> 0 &lt;= self.rowx &lt; X12_MAX_ROWS</span><br><span class="line">AssertionError</span><br></pre></td></tr></table></figure>
           <div class="read-more">
-            <a href="/2019/08/22/reading-more-than-65536-lines-excel-files-with-pandas/" class="read-more-link">阅读更多</a>
+            <a href="/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/" class="read-more-link">阅读更多</a>
           </div>
         </div></article>
       <article class="post">
