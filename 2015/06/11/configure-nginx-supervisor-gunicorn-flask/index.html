@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/"/>
+<meta name="description" content="在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -115,7 +115,7 @@
 <p>配置完成后重启ssh服务</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">systemctl</span> <span class="selector-tag">restart</span> <span class="selector-tag">sshd</span><span class="selector-class">.service</span></span><br></pre></td></tr></table></figure>
 <p>CentOS7中用firewalld替换了iptables，需要手动将80端口和修改后的ssh端口添加到firewalld中</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">firewalld --<span class="keyword">add</span><span class="bash">-port 80/tcp --permanent</span></span><br><span class="line"><span class="bash">firewalld --add-port 65535/tcp --permanent</span></span><br><span class="line"><span class="bash">firewalld --reload</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">80/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">65535/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">reload</span></span><br></pre></td></tr></table></figure>
 <h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><p>yum中可以直接安装nginx</p>
 <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> nginx</span><br></pre></td></tr></table></figure>
 <p>安装好后在/etc/nginx/default.d中添加location的配置，并指向8001端口，以后Flask会监听8001端口</p>
@@ -130,7 +130,7 @@
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">source</span> venv<span class="regexp">/bin/</span>active</span><br></pre></td></tr></table></figure>
 <p>退出虚拟环境使用Ctrl+C或deactive命令</p>
 <h2 id="安装配置Gunicorn"><a href="#安装配置Gunicorn" class="headerlink" title="安装配置Gunicorn"></a>安装配置Gunicorn</h2><p>Gunicorn使用pip install gunicorn安装，注意需要在虚拟环境中使用pip安装，这样才对应虚拟环境中的Python版本。安装好后，新建一个Gunicorn的配置文件，比如deploy_config.py，加入内容如下</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">bind='127.0.0.1:8001' <span class="comment">#绑定的端口</span></span><br><span class="line">workers=4	<span class="comment">#worker数量</span></span><br><span class="line">backlog=2048</span><br><span class="line">debug=True</span><br><span class="line">proc_name='gunicorn.pid'</span><br><span class="line">pidfile='/var/log/gunicorn/debug.log'</span><br><span class="line">loglevel='debug'</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line"><span class="attribute">bind</span>=<span class="string">'127.0.0.1:8001'</span> #绑定的端口</span><br><span class="line"><span class="attribute">workers</span>=4	#worker数量</span><br><span class="line"><span class="attribute">backlog</span>=2048</span><br><span class="line"><span class="attribute">debug</span>=<span class="literal">True</span></span><br><span class="line"><span class="attribute">proc_name</span>=<span class="string">'gunicorn.pid'</span></span><br><span class="line"><span class="attribute">pidfile</span>=<span class="string">'/var/log/gunicorn/debug.log'</span></span><br><span class="line"><span class="attribute">loglevel</span>=<span class="string">'debug'</span></span><br></pre></td></tr></table></figure>
 <p>保存文件后在虚拟环境中使用Gunicorn尝试启动</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">gunicorn</span> <span class="selector-tag">-c</span> <span class="selector-tag">deploy_config</span><span class="selector-class">.py</span> <span class="selector-tag">myapp</span><span class="selector-pseudo">:app</span></span><br></pre></td></tr></table></figure>
 <p>myapp是入口Python文件名，app是函数名。如果输出worker相关信息，表明启动成功。</p>
@@ -190,7 +190,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

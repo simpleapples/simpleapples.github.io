@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="Go语言中defer的一些坑"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/09/14/how-to-use-defer-in-go/"/>
+<meta name="description" content="Go语言中defer的一些坑"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2018/09/14/how-to-use-defer-in-go/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -107,7 +107,7 @@
     <div class="post-toc-content">
       <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#defer触发时机"><span class="toc-text">defer触发时机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#defer执行顺序"><span class="toc-text">defer执行顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#坑1：defer在匿名返回值和命名返回值函数中的不同表现"><span class="toc-text">坑1：defer在匿名返回值和命名返回值函数中的不同表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#坑2：在for循环中使用defer可能导致的性能问题"><span class="toc-text">坑2：在for循环中使用defer可能导致的性能问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#坑3：判断执行没有err之后，再defer释放资源"><span class="toc-text">坑3：判断执行没有err之后，再defer释放资源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#坑4：调用os-Exit时defer不会被执行"><span class="toc-text">坑4：调用os.Exit时defer不会被执行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#点击关注知乎专栏Golang私房菜"><span class="toc-text">点击关注知乎专栏Golang私房菜</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p><img src="/upload/20180914_01.png" alt=""></p>
+  </div><div class="post-content"><p><img src="/upload/20180914_01.png" alt></p>
 <p>defer语句是Go中一个非常有用的特性，可以将一个方法延迟到包裹该方法的方法返回时执行，在实际应用中，defer语句可以充当其他语言中try…catch…的角色，也可以用来处理关闭文件句柄等收尾操作。</p>
 <h3 id="defer触发时机"><a href="#defer触发时机" class="headerlink" title="defer触发时机"></a>defer触发时机</h3><blockquote>
 <p>A “defer” statement invokes a function whose execution is deferred to the moment the surrounding function returns, either because the surrounding function executed a return statement, reached the end of its function body, or because the corresponding goroutine is panicking.</p>
@@ -190,7 +190,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

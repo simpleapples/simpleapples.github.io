@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="理解Golang的Time结构"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/10/26/understand-time-struct-in-go/"/>
+<meta name="description" content="理解Golang的Time结构"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2018/10/26/understand-time-struct-in-go/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -107,7 +107,7 @@
     <div class="post-toc-content">
       <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Monotonic-Clocks-和-Wall-Clocks"><span class="toc-text">Monotonic Clocks 和 Wall Clocks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Time结构"><span class="toc-text">Time结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实践中需要注意的问题"><span class="toc-text">实践中需要注意的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考文章"><span class="toc-text">参考文章</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#点击关注知乎专栏Golang私房菜"><span class="toc-text">点击关注知乎专栏Golang私房菜</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p><img src="/upload/20181026_01.png" alt=""></p>
+  </div><div class="post-content"><p><img src="/upload/20181026_01.png" alt></p>
 <p>在golang中创建并打印一个时间对象，会看到如下输出</p>
 <figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2018<span class="string">-10</span><span class="string">-26</span> 14:15:50.306558969 <span class="string">+0800</span> CST m=<span class="string">+0</span>.000401093</span><br></pre></td></tr></table></figure>
 <p>前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？</p>
@@ -120,7 +120,7 @@
 <h3 id="Time结构"><a href="#Time结构" class="headerlink" title="Time结构"></a>Time结构</h3><p>那么Monotonic Clock和Wall Clock在Time中是怎么存储的呢？来看一下Time结构体。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Time <span class="keyword">struct</span> &#123;</span><br><span class="line">	wall <span class="keyword">uint64</span></span><br><span class="line">	ext  <span class="keyword">int64</span></span><br><span class="line">	loc *Location</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Time结构体中由三部分组成，loc比较明了，表示时区，wall和ext所存储的信息规则相对复杂，根据文档的介绍总结成了下图：</p>
-<p><img src="/upload/20181026_02.jpg" alt=""></p>
+<p><img src="/upload/20181026_02.jpg" alt></p>
 <p>golang中的Time结构，不像很多语言保存Unix时间戳（也就是最早只能表示到1970年1月1日），而是至少可以安全的表示1885年以来的时间。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t, _ := time.Parse(time.RFC3339, <span class="string">"1890-01-02T15:04:05Z"</span>)</span><br><span class="line">fmt.Println(t) <span class="comment">// 1890-01-02 15:04:05 +0000 UTC</span></span><br></pre></td></tr></table></figure>
 <h3 id="实践中需要注意的问题"><a href="#实践中需要注意的问题" class="headerlink" title="实践中需要注意的问题"></a>实践中需要注意的问题</h3><p>既然Time结构所表示的时间，有可能有Monotonic Clock也可能没有，那么在使用中就有可能遇到一些问题，例如下面这种情况。</p>
@@ -184,7 +184,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

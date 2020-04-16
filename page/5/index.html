@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/page/5/"/>
+<link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/page/5/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -89,6 +89,91 @@
       <main id="main" class="main">
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-06-11
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。</p>
+<h2 id="配置Centos7"><a href="#配置Centos7" class="headerlink" title="配置Centos7"></a>配置Centos7</h2><p>root登录后，首先新建一个普通用户并设置密码</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser user</span><br><span class="line">passwd user</span><br></pre></td></tr></table></figure>
+<p>接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">Port</span> <span class="number">65535</span></span><br><span class="line"><span class="string">PasswordAuthentication</span> <span class="literal">no</span></span><br><span class="line"><span class="string">PermitRootLogin</span> <span class="literal">no</span></span><br></pre></td></tr></table></figure>
+<p>配置完成后重启ssh服务</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">systemctl</span> <span class="selector-tag">restart</span> <span class="selector-tag">sshd</span><span class="selector-class">.service</span></span><br></pre></td></tr></table></figure>
+<p>CentOS7中用firewalld替换了iptables，需要手动将80端口和修改后的ssh端口添加到firewalld中</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">80/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">65535/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">reload</span></span><br></pre></td></tr></table></figure>
+<h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><p>yum中可以直接安装nginx</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> nginx</span><br></pre></td></tr></table></figure>
+<p>安装好后在/etc/nginx/default.d中添加location的配置，并指向8001端口，以后Flask会监听8001端口</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">location</span> <span class="title">/ &#123;</span></span><br><span class="line"><span class="title">	proxy_pass</span> http://<span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">8001</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置好后重新载入nginx配置</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">systemctl</span> <span class="selector-tag">reload</span> <span class="selector-tag">nginx</span><span class="selector-class">.service</span></span><br></pre></td></tr></table></figure>
+<h2 id="安装Python"><a href="#安装Python" class="headerlink" title="安装Python"></a>安装Python</h2><p>CentOS自带Python2.7，如果使用Python3，需要单独安装。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget http<span class="variable">s:</span>//www.<span class="keyword">python</span>.org/ftp/<span class="keyword">python</span>/<span class="number">3.4</span>.<span class="number">3</span>/Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line">tar xf Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line"><span class="keyword">cd</span> Python-<span class="number">3.4</span>.<span class="number">3</span></span><br><span class="line">./configure --prefix=/usr/local --enable-shared</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> altinstall</span><br></pre></td></tr></table></figure>
+<p>接下来在项目中搭建虚拟环境，Python2虚拟环境使用virtualenv安装（使用pip install virtualenv命令安装），Python3环境使用pyvenv安装（Python3自带pyvenv），以Python3环境为例，在Web项目中，建立虚拟环境文件夹venv</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pyvenv venv</span></span><br></pre></td></tr></table></figure>
+<p>接下来在项目路径下启用虚拟环境</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">source</span> venv<span class="regexp">/bin/</span>active</span><br></pre></td></tr></table></figure>
+<p>退出虚拟环境使用Ctrl+C或deactive命令</p>
+<h2 id="安装配置Gunicorn"><a href="#安装配置Gunicorn" class="headerlink" title="安装配置Gunicorn"></a>安装配置Gunicorn</h2><p>Gunicorn使用pip install gunicorn安装，注意需要在虚拟环境中使用pip安装，这样才对应虚拟环境中的Python版本。安装好后，新建一个Gunicorn的配置文件，比如deploy_config.py，加入内容如下</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line"><span class="attribute">bind</span>=<span class="string">'127.0.0.1:8001'</span> #绑定的端口</span><br><span class="line"><span class="attribute">workers</span>=4	#worker数量</span><br><span class="line"><span class="attribute">backlog</span>=2048</span><br><span class="line"><span class="attribute">debug</span>=<span class="literal">True</span></span><br><span class="line"><span class="attribute">proc_name</span>=<span class="string">'gunicorn.pid'</span></span><br><span class="line"><span class="attribute">pidfile</span>=<span class="string">'/var/log/gunicorn/debug.log'</span></span><br><span class="line"><span class="attribute">loglevel</span>=<span class="string">'debug'</span></span><br></pre></td></tr></table></figure>
+<p>保存文件后在虚拟环境中使用Gunicorn尝试启动</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">gunicorn</span> <span class="selector-tag">-c</span> <span class="selector-tag">deploy_config</span><span class="selector-class">.py</span> <span class="selector-tag">myapp</span><span class="selector-pseudo">:app</span></span><br></pre></td></tr></table></figure>
+<p>myapp是入口Python文件名，app是函数名。如果输出worker相关信息，表明启动成功。</p>
+<h2 id="安装配置Supervisor"><a href="#安装配置Supervisor" class="headerlink" title="安装配置Supervisor"></a>安装配置Supervisor</h2><p>yum可以直接安装Supervisor，需要注意的是Supervisor只支持Python2，所以不要在虚拟环境中使用pip安装supervisor。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> supervisor</span><br></pre></td></tr></table></figure>
+<p>安装后，在/etc/supervisord.d中建立配置文件xxx.ini，内容如下</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[program:xxx]</span></span><br><span class="line"><span class="attr">command</span>=/var/proj/xxx/venv/bin/python /usr/bin/gunicorn -c /var/proj/xxx/deploy_config.py myapp:app</span><br><span class="line"><span class="attr">autorstart</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">directory</span>=/var/proj/xxx</span><br><span class="line"><span class="attr">autorestart</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">startsecs</span>=<span class="number">10</span></span><br><span class="line"><span class="attr">startretries</span>=<span class="number">20</span></span><br></pre></td></tr></table></figure>
+<p>xxx是项目名称，注意command中最好都写全路径，以区别系统环境和项目虚拟环境。完成后启动supervisord，使配置生效</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisord -c <span class="regexp">/etc/</span>supervisord.conf</span><br></pre></td></tr></table></figure>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/">在viewDidAppear中PushViewController失败的问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-03-13
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+{
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    [self.navigationController pushViewController:secondViewController animated:YES];
+}
+</code></pre><p>在iOS8中，这段代码工作良好，当FirstViewController出现时，由于立刻Push了SecondViewController，即使animated参数是YES，Push的动画都没有显示出来。但是在iOS7中却出现了不一样的情况，pushViewController方法似乎没有执行，SecondViewController也没有被推出。打断点可以发现pushViewController方法是被执行了的，但是界面上没有任何效果。</p>
+<p>由于pushViewController方法是在viewDidAppear中被调用的，会不会是因为viewDidAppear时FirstViewController还有什么UI上的动作没有处理完，导致立即调用pushViewController失败？那么将pushViewController放入dispatch_async中应该就能解决这个问题。使用如下代码实现：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+{
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.navigationController pushViewController:secondViewController animated:YES];
+       });
+}
+</code></pre><p>使用GCD后，SecondViewController被成功的Push了出来。虽然不能确定，但是也在一定程度上印证了上面的猜测。</p>
+
+        </div></article>
+      <article class="post">
     <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2014/10/30/beta-testing-with-testflight/">使用TestFlight进行应用的Beta测试</a>
         </h1>
@@ -169,7 +254,7 @@
 <li>Bundle Identifier: 这里需要填写唯一id</li>
 <li>Update Manifest: 这里需要填写一个plist格式文件的地址，Apple会定期检查这个地址中的Version，如果有升级，就会访问插件的下载地址更新插件，当然，如果插件只是自用而不提交Safari Extensions Gallery的话，这一栏可以不填，plist文件格式如下：</li>
 </ul>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">key</span>&gt;</span>Extension Updates<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.zangzhiya.url2qrcode<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>Developer Identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>开发者ID<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleVersion<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleShortVersionString<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>URL<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://simpleapples.com/upload/url2qrcode-safari/url2qrcode.safariextz<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">plist</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">"-//Apple//DTD PLIST 1.0//EN"</span> <span class="meta-string">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">key</span>&gt;</span>Extension Updates<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.zangzhiya.url2qrcode<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>Developer Identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>开发者ID<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleVersion<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>CFBundleShortVersionString<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">key</span>&gt;</span>URL<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://simpleapples.com/upload/url2qrcode-safari/url2qrcode.safariextz<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>Access Level: 这里需要选择插件对页面访问的权限，比如我们我们要做的URL转二维码插件，需要获取当前Tab的URL，那么这里需要选择ALL</li>
 </ul>
@@ -203,7 +288,7 @@
     <div class="post-content"><p>Apple在9月18日正式发布了iOS8，在收到更新的同时，也发现自己的应用在iOS8下无法启动。<br>并且在Console中收到如下提示：</p>
 <figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2014</span>-<span class="number">09</span>-<span class="number">19</span> <span class="number">16</span>:<span class="number">26</span>:<span class="number">20.369</span> demo[<span class="number">379</span>:<span class="number">30506</span>] registerFor<span class="comment">RemoteNotificationTypes: is not supported in iOS 8.0 and later.</span></span><br></pre></td></tr></table></figure>
 <p>查询文档可以知道，在iOS8中注册推送的方法<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">![Alt text](/upload/ios8-registerForRemoteNotificationTypes.png)</span><br><span class="line"></span><br><span class="line">按照文档中的提示，使用```registerForRemoteNotifications```方法代替，这个方法不接受参数。紧接着问题就来了，**程序在安装过这个应用的iOS8机器上可以成功注册，而在新安装的iOS8机器上则无法注册**，```application:didRegisterForRemoteNotificationsWithDeviceToken:```和```application:didFailToRegisterForRemoteNotificationsWithError:```都无法响应，并且在成功注册的机器上，收到的推送消息也没有声音提示。再次查看文档后发现这么一段话：</span><br></pre></td></tr></table></figure></p>
-<p>If you want your app’s push notifications to display alerts, play sounds, or perform other user-facing actions, you must call the registerUserNotificationSettings: method to request the types of notifications you want to use.<br><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">换句话说，如果要使用推送服务，还需要再调用```registerUserNotificationSettings```方法，而这个方法是和iOS7上的```registerForRemoteNotificationTypes```方法一样接受参数的。为什么iOS8下要把一个方法变成两个方法呢？```registerForRemoteNotifications```方法的文档中有这么一句话：</span><br></pre></td></tr></table></figure></p>
+<p>If you want your app’s push notifications to display alerts, play sounds, or perform other user-facing actions, you must call the registerUserNotificationSettings: method to request the types of notifications you want to use.<br><figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">换句话说，如果要使用推送服务，还需要再调用```registerUserNotificationSettings```方法，而这个方法是和iOS7上的```registerForRemoteNotificationTypes```方法一样接受参数的。为什么iOS8下要把一个方法变成两个方法呢？```registerForRemoteNotifications```方法的文档中有这么一句话：</span><br></pre></td></tr></table></figure></p>
 <p>Call this method to initiate the registration process with Apple Push Service. If registration succeeds, the app calls your app delegate object’s application:didRegisterForRemoteNotificationsWithDeviceToken: method and passes it a device token.<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">苹果可能考虑到一些应用注册提醒可能只是为了获取deviceToken，所以将获取deviceToken单独提成一个方法，而要接收推送还需要单独调用别的方法，这样就细化了逻辑，方便不用的开发需求。不过在真机调试中，一台刚重置过的搭载iOS8系统的iPhone5c，调用registerForRemoteNotifications方法后，并没有收到任何失败或成功的回调，和Apple文档中描述的不符，怀疑是SDK在这部分也有<span class="keyword">bug。</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">下面贴一下兼容iOS7和iOS8的注册推送代码：</span></span><br></pre></td></tr></table></figure></p>
 <p>#define IS_OS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0)<br>if (IS_OS_8_OR_LATER) {<br>    [[UIApplication sharedApplication] registerForRemoteNotifications];<br>    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes: (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound) categories:nil];<br>    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];<br>} else {<br>    [application registerForRemoteNotificationTypes:<br>     UIRemoteNotificationTypeBadge |<br>     UIRemoteNotificationTypeAlert |<br>     UIRemoteNotificationTypeSound];<br>}<br><code>`</code></p>
 
@@ -264,7 +349,7 @@
     </header>
 
     <div class="post-content"><p>先来看一段代码：</p>
-<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span></span><br><span class="line"><span class="xml">	var c1 = document.getElementById("e1");</span></span><br><span class="line"><span class="xml">	var c2 = document.getElementById("e2");</span></span><br><span class="line"><span class="xml">	var obj = </span><span class="template-variable">&#123;&#125;</span><span class="xml">;</span></span><br><span class="line"><span class="xml">	obj[c1] = 1;</span></span><br><span class="line"><span class="xml">	obj[c2] = 2;</span></span><br><span class="line"><span class="xml">	console.log(obj);</span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span></span><br><span class="line"><span class="xml">	var c1 = document.getElementById("e1");</span></span><br><span class="line"><span class="xml">	var c2 = document.getElementById("e2");</span></span><br><span class="line"><span class="xml">	var obj = </span><span class="template-variable">&#123;&#125;</span><span class="xml">;</span></span><br><span class="line"><span class="xml">	obj[c1] = 1;</span></span><br><span class="line"><span class="xml">	obj[c2] = 2;</span></span><br><span class="line"><span class="xml">	console.log(obj);</span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
 <p>上面这段代码会输出什么结果呢？答案是：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Object</span> &#123;[<span class="class"><span class="keyword">object</span> <span class="title">HTMLDivElement</span>]</span>: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
 <p>为什么给了obj两个元素，输出出来却变成了一个呢？难道c1和c2指向同一个元素？首先c1和c2是两个不同的dom节点，并且通过输出<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
@@ -299,51 +384,6 @@
 <p>前面两项都是LiteIDE层面的改进方法，而最后一项是在LiteIDE改进之前避免这种问题的方法。</p>
 
         </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/09/27/hack-google-doodle-game/">破解Google Doodle小游戏</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-09-27
-        </span><span class="post-category">
-            <a href="/categories/生活/">生活</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>今天貌似是Google十五周年纪念日，照例他们在首页上挂了一个JS小游戏，用棒子打一个五角星（十次机会），时机控制的好的话，会掉下糖果。各种刷分之后，最高分停留在了173分。</p>
-<p><img src="/upload/googledoodle1.jpg" alt="Alt text"></p>
-<p>本以为这是一个很高的分数了，可上微博一查竟然有不少180分以上的，并且180分以上有彩蛋，这不能忍，于是又是一通刷，不过一直没能达到173以上。<br>无奈之下，想从程序上下手。既然是JS游戏，理论上只要修改可以打的次数，就能提高分数。<br>去Google首页找JS文件，很容易发现一个<a href="https://www.google.com.hk/logos/2013/bday13/bday13.js" target="_blank" rel="noopener">https://www.google.com.hk/logos/2013/bday13/bday13.js</a>文件，在这里查找数字10，可以发现很多搜索结果，经过直觉判断，感觉<code>bd=10</code>这个赋值比较可疑，于是改之。刷新，成功！<br>下面是改为99次之后的分数：</p>
-<p><img src="/upload/googledoodle2.png" alt="Alt text"></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/">升级到Flex SDK 4.9.1后无法找到基类BitmapAsset的问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-08-27
-        </span><span class="post-category">
-            <a href="/categories/Actionscript/">Actionscript</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>一个使用flex sdk编译的项目在升级sdk到4.9.1后出现了如下错误：</p>
-<blockquote>
-<p>errors: 1017: The definition of base class BitmapAsset was not found.</p>
-</blockquote>
-<p>google后发现也有人遇到了这样的问题，详见：<a href="http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E" target="_blank" rel="noopener">http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E</a></p>
-<p>flex sdk 4.9中的core.swc的体积比4.8中core.swc的体积小了大概1/2，估计部分基类被从core.swc中移了出来，导致找不到BitmapAsset。</p>
-<p>解决办法是，在项目上单击右键——属性——Actionscript构建路径——添加SWC，定位到sdk安装路径下的framework/libs文件夹下，选择framework.swc。</p>
-<p>如果展开framework.swc包，可以看到BitmapAsset类，所以将其添加到构建路径中，就可以解决找不到基类的问题。</p>
-<p><img src="/upload/frameworkswc.png" alt="Alt text"></p>
-
-        </div></article>
       <nav class="pagination"><a class="prev" href="/page/4/">
         <i class="iconfont icon-left"></i>
         <span class="prev-text">上一页</span>
@@ -368,7 +408,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

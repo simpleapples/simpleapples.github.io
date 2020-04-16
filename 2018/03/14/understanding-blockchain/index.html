@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="最爱你的人，会让你不费脑细胞的理解区块链原理"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/03/14/understanding-blockchain/"/>
+<meta name="description" content="最爱你的人，会让你不费脑细胞的理解区块链原理"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2018/03/14/understanding-blockchain/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -107,7 +107,7 @@
     <div class="post-toc-content">
       <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#区块-和-链"><span class="toc-text">区块 和 链</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Peer-to-Peer"><span class="toc-text">Peer-to-Peer</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#共识机制"><span class="toc-text">共识机制</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Proof-of-work"><span class="toc-text">Proof-of-work</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#把这些捏在一起"><span class="toc-text">把这些捏在一起</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#关注Python私房菜"><span class="toc-text">关注Python私房菜</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p><img src="/upload/20180314_01.png" alt=""></p>
+  </div><div class="post-content"><p><img src="/upload/20180314_01.png" alt></p>
 <p>区块链是一个近期非常火的概念，随便走进一个写字楼的电梯，都会听到有人谈论区块链，或者炒币: ) 希望通过这篇文章，能让你对区块链的概念有一个整体的认识，在理解概念后，<strong>下一篇文章将用大约300行Python代码，实现一个区块链网络。</strong></p>
 <h1 id="区块-和-链"><a href="#区块-和-链" class="headerlink" title="区块 和 链"></a>区块 和 链</h1><p>所谓区块，就是一个块咯（要不然还是什么？），把这些块一个一个连在一起，像链条一样，就称为区块链（别急着打我，先往下看）。</p>
 <p><img src="/upload/20180314_02.jpg" alt="区块和区块链"></p>
@@ -122,9 +122,9 @@
 <p>图中每一个方脑袋就是一个Peer（节点），注意一下，这些方脑袋有一个共同点，他们都一毛一样（不仅长得一样，每一个脑袋都跟其它脑袋相连）。这也是P2P网络的最大特点——<strong>去中心化</strong>，P2P网络中不存在中心节点，所有节点都是平等的，任何一个节点，想跟谁说话就跟谁说话，并且谁（节点）都不能说了算。</p>
 <h1 id="共识机制"><a href="#共识机制" class="headerlink" title="共识机制"></a>共识机制</h1><p>你和好基友老王，还有你们共同喜欢的一个姑娘阿圆（对，就是圆滚滚的圆），组成了一个三节点的P2P网络，根据P2P网络定义你们三个人谁都不能说了算。这一天，阿圆生日，你和老王同时给阿圆送了一个大蛋糕，那么问题来了，阿圆先吃哪个呢？</p>
 <p>既然没有人能说了算，也不能让你和老王决斗（计算机这么做恐怕人类会毁灭），那么就需要采用一个文明的办法决定——商量。既然商量，就要有规矩，这个规矩叫<strong>共识机制</strong>。</p>
-<p><img src="/upload/20180314_05.png" alt=""></p>
+<p><img src="/upload/20180314_05.png" alt></p>
 <h1 id="Proof-of-work"><a href="#Proof-of-work" class="headerlink" title="Proof-of-work"></a>Proof-of-work</h1><p>区块链共识机制有很多种，Proof-of-work（POW，工作量证明）是其中一种，所谓工作量证明，有点像是比武招亲。你和老王对阿圆都很好，阿圆也很难抉择到底先吃谁的蛋糕，于是她请了两位武力相当的武林高手，让你和老王分别与高手过招，谁赢了高手，就先吃谁的蛋糕，如果你们都赢了高手，那么谁先赢算数。</p>
-<p><img src="/upload/20180314_06.jpg" alt=""></p>
+<p><img src="/upload/20180314_06.jpg" alt></p>
 <h1 id="把这些捏在一起"><a href="#把这些捏在一起" class="headerlink" title="把这些捏在一起"></a>把这些捏在一起</h1><p>了解了POW、共识机制、P2P、区块、链的概念，我们就可以把他们拼在一起，看看会发生什么了。</p>
 <p><img src="/upload/20180314_07.jpeg" alt="区块链诞生了！"></p>
 <p>我们把P2P网络中的每一个节点，赋予一条链，这样网络中所有的链都是平等的了，接下来在其中一条链上增加一个带有信息的区块，P2P网络会将这个区块同步到所有的链上，也就是这条信息会被存储在所有节点。</p>
@@ -182,7 +182,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="简析Python中的四种队列"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/05/22/four-types-of-queue-in-python/"/>
+<meta name="description" content="简析Python中的四种队列"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2018/05/22/four-types-of-queue-in-python/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -111,7 +111,7 @@
 <p>在Python文档中搜索队列（queue）会发现，Python标准库中包含了四种队列，分别是queue.Queue / asyncio.Queue / multiprocessing.Queue / collections.deque。</p>
 <h1 id="collections-deque"><a href="#collections-deque" class="headerlink" title="collections.deque"></a>collections.deque</h1><p>deque是双端队列（double-ended queue）的缩写，由于两端都能编辑，deque既可以用来实现栈（stack）也可以用来实现队列（queue）。</p>
 <p>deque支持丰富的操作方法，主要方法如图：</p>
-<p><img src="/upload/20180522_01.jpg" alt=""></p>
+<p><img src="/upload/20180522_01.jpg" alt></p>
 <p>相比于list实现的队列，deque实现拥有更低的时间和空间复杂度。list实现在出队（pop）和插入（insert）时的空间复杂度大约为O(n)，deque在出队（pop）和入队（append）时的时间复杂度是O(1)。</p>
 <p>deque也支持in操作符，可以使用如下写法：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q = collections.deque([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line">print(<span class="number">5</span> <span class="keyword">in</span> q)  <span class="comment"># False</span></span><br><span class="line">print(<span class="number">1</span> <span class="keyword">in</span> q)  <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
@@ -120,7 +120,7 @@
 <p>线程安全方面，通过查看collections.deque中的append()、pop()等方法的源码可以知道，他们都是原子操作，所以是GIL保护下的线程安全方法。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> PyObject *</span><br><span class="line">deque_append(dequeobject *<span class="built_in">deque</span>, PyObject *item) &#123; </span><br><span class="line">    Py_INCREF(item);</span><br><span class="line">    <span class="keyword">if</span> (deque_append_internal(<span class="built_in">deque</span>, item, <span class="built_in">deque</span>-&gt;maxlen) &lt; <span class="number">0</span>) </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    Py_RETURN_NONE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>通过dis方法可以看到，append是原子操作（一行字节码）。</p>
-<p><img src="/upload/20180522_02.png" alt=""></p>
+<p><img src="/upload/20180522_02.png" alt></p>
 <p> 综上，collections.deque是一个可以方便实现队列的数据结构，具有线程安全的特性，并且有很高的性能。</p>
 <h1 id="queue-Queue-amp-asyncio-Queue"><a href="#queue-Queue-amp-asyncio-Queue" class="headerlink" title="queue.Queue &amp; asyncio.Queue"></a>queue.Queue &amp; asyncio.Queue</h1><p>queue.Queue和asyncio.Queue都是支持多生产者、多消费者的队列，基于collections.deque，他们都提供了Queue（FIFO队列）、PriorityQueue（优先级队列）、LifoQueue（LIFO队列），接口方面也相同。</p>
 <p>区别在于queue.Queue适用于多线程的场景，asyncio.Queue适用于协程场景下的通信，由于asyncio的加成，queue.Queue下的阻塞接口在asyncio.Queue中则是以返回协程对象的方式执行，具体差异如下表：</p>
@@ -161,14 +161,14 @@
 </tbody>
 </table>
 <h1 id="multiprocessing-Queue"><a href="#multiprocessing-Queue" class="headerlink" title="multiprocessing.Queue"></a>multiprocessing.Queue</h1><p>multiprocessing提供了三种队列，分别是Queue、SimpleQueue、JoinableQueue。</p>
-<p><img src="/upload/20180522_03.png" alt=""></p>
+<p><img src="/upload/20180522_03.png" alt></p>
 <p>multiprocessing.Queue既是线程安全也是进程安全的，相当于queue.Queue的多进程克隆版。和threading.Queue很像，multiprocessing.Queue支持put和get操作，底层结构是multiprocessing.Pipe。</p>
 <p>multiprocessing.Queue底层是基于Pipe构建的，但是数据传递时并不是直接写入Pipe，而是写入进程本地buffer，通过一个feeder线程写入底层Pipe，这样做是为了实现超时控制和非阻塞put/get，所以Queue提供了join_thread、cancel_join_thread、close函数来控制feeder的行为，close函数用来关闭feeder线程、join_thread用来join feeder线程，cancel_join_thread用来在控制在进程退出时，不自动join feeder线程，使用cancel_join_thread有可能导致部分数据没有被feeder写入Pipe而导致的数据丢失。</p>
 <p>和threading.Queue不同的是，multiprocessing.Queue默认不支持join()和task_done操作，这两个支持需要使用mp.JoinableQueue对象。</p>
 <p>SimpleQueue是一个简化的队列，去掉了Queue中的buffer，没有了使用Queue可能出现的问题，但是put和get方法都是阻塞的并且没有超时控制。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过对比可以发现，上述四种结构都实现了队列，但是用处却各有偏重，collections.deque在数据结构层面实现了队列，但是并没有应用场景方面的支持，可以看做是一个基础的数据结构。queue模块实现了面向多生产线程、多消费线程的队列，asyncio.queue模块则实现了面向多生产协程、多消费协程的队列，而multiprocessing.queue模块实现了面向多成产进程、多消费进程的队列。</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://docs.python.org/3/library/collections.html#collections.deque" target="_blank" rel="noopener">https://docs.python.org/3/library/collections.html#collections.deque</a><br><a href="https://docs.python.org/3/library/queue.html?highlight=queue#module-queue" target="_blank" rel="noopener">https://docs.python.org/3/library/queue.html</a><br><a href="https://docs.python.org/3/library/asyncio-queue.html?highlight=queue" target="_blank" rel="noopener">https://docs.python.org/3/library/asyncio-queue.html</a><br><a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" target="_blank" rel="noopener">https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue</a><br><a href="https://bugs.python.org/issue15329" target="_blank" rel="noopener">https://bugs.python.org/issue15329</a><br><a href="http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/" target="_blank" rel="noopener">http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/</a><br><a href="http://cyrusin.github.io/2016/04/27/python-gil-implementaion/" target="_blank" rel="noopener">http://cyrusin.github.io/2016/04/27/python-gil-implementaion/</a></p>
-<h1 id="欢迎关注我的公众号【Python私房菜】"><a href="#欢迎关注我的公众号【Python私房菜】" class="headerlink" title="欢迎关注我的公众号【Python私房菜】"></a>欢迎关注我的公众号【Python私房菜】</h1><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+<h1 id="欢迎关注我的公众号【Python私房菜】"><a href="#欢迎关注我的公众号【Python私房菜】" class="headerlink" title="欢迎关注我的公众号【Python私房菜】"></a>欢迎关注我的公众号【Python私房菜】</h1><p><img src="/upload/wechat-qrcode.jpg" alt></p>
 
       </div>
       <div class="post-copyright">
@@ -219,7 +219,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

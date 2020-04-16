@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="探究 Pandas 读取 Excel 文件报错问题"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/"/>
+<meta name="description" content="探究 Pandas 读取 Excel 文件报错问题"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -108,7 +108,7 @@
       <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#问题描述"><span class="toc-text">问题描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#背后原理"><span class="toc-text">背后原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决办法"><span class="toc-text">解决办法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-Pandas-openpyxl-读取-Excel-文件"><span class="toc-text">使用 Pandas + openpyxl 读取 Excel 文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考文档"><span class="toc-text">参考文档</span></a></li></ol>
     </div>
   </div><div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>使用 Pandas 的 <code>read_excel</code> 方法读取一个 16 万行的 Excel 文件报 <code>AssertionError</code> 错误：</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">"/Users/XXX/excel_test/venv/lib/python3.7/site-packages/xlrd/xlsx.py"</span>, <span class="keyword">line</span> 637, <span class="keyword">in</span> do_row</span><br><span class="line">    <span class="keyword">assert</span> 0 &lt;= self.rowx &lt; X12_MAX_ROWS</span><br><span class="line">AssertionError</span><br></pre></td></tr></table></figure>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">"/Users/XXX/excel_test/venv/lib/python3.7/site-packages/xlrd/xlsx.py"</span>, line <span class="number">637</span>, in do_row</span><br><span class="line">    <span class="meta">assert</span> <span class="number">0</span> &lt;= <span class="keyword">self.rowx </span>&lt; X12_MAX_ROWS</span><br><span class="line"><span class="symbol">AssertionError</span></span><br></pre></td></tr></table></figure>
 <a id="more"></a> 
 <h3 id="背后原理"><a href="#背后原理" class="headerlink" title="背后原理"></a>背后原理</h3><p>Excel 文件有两种默认格式，在 Excel 2007 以前，使用扩展名为 <code>.xls</code> 格式的文件，这种文件格式是一种特定的二进制格式，最多支持 65,536 行（在 Excel 97 之前支持的最大行数是 16,384），256 列表格。从 Excel 2007 版开始，默认采用了基于 XML 的新的文件格式 <code>.xlsx</code>，支持的表格行数达到了 1,048,576，列数达到了 16,384。需要注意的是，将 <code>.xlsx</code> 格式的文件转换为 <code>.xls</code> 格式的文件时，65,536 行和 256 列之后的数据都会被丢弃。</p>
 <table>
@@ -142,7 +142,7 @@
 </tbody>
 </table>
 <p>Pandas 读取 Excel 文件的引擎是 <code>xlrd</code>，<code>xlrd</code> 在读取 Excel 文件时，<a href="https://github.com/python-excel/xlrd/blob/master/xlrd/xlsx.py" target="_blank" rel="noopener"><code>xlrd/xlsx.py</code></a> 文件的 637 行会对行号做断言，判断行号是否在 0 - 1,048,576（Excel支持的最大行数） 的范围内。这段代码是这样的：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">row_number = row_elem.get(<span class="string">'r'</span>)</span><br><span class="line"><span class="keyword">if</span> row_number <span class="keyword">is</span> <span class="keyword">None</span>: <span class="comment"># Yes, it's optional.</span></span><br><span class="line">    self.rowx += <span class="number">1</span></span><br><span class="line">    explicit_row_number = <span class="number">0</span></span><br><span class="line">    <span class="keyword">if</span> self.verbosity <span class="keyword">and</span> <span class="keyword">not</span> self.warned_no_row_num:</span><br><span class="line">        self.dumpout(<span class="string">"no row number; assuming rowx=%d"</span>, self.rowx)</span><br><span class="line">        self.warned_no_row_num = <span class="number">1</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    self.rowx = row_number - <span class="number">1</span></span><br><span class="line">    explicit_row_number = <span class="number">1</span></span><br><span class="line"><span class="keyword">assert</span> <span class="number">0</span> &lt;= self.rowx &lt; X12_MAX_ROWS</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">row_number = row_elem.get(<span class="string">'r'</span>)</span><br><span class="line"><span class="keyword">if</span> row_number <span class="keyword">is</span> <span class="literal">None</span>: <span class="comment"># Yes, it's optional.</span></span><br><span class="line">    self.rowx += <span class="number">1</span></span><br><span class="line">    explicit_row_number = <span class="number">0</span></span><br><span class="line">    <span class="keyword">if</span> self.verbosity <span class="keyword">and</span> <span class="keyword">not</span> self.warned_no_row_num:</span><br><span class="line">        self.dumpout(<span class="string">"no row number; assuming rowx=%d"</span>, self.rowx)</span><br><span class="line">        self.warned_no_row_num = <span class="number">1</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    self.rowx = row_number - <span class="number">1</span></span><br><span class="line">    explicit_row_number = <span class="number">1</span></span><br><span class="line"><span class="keyword">assert</span> <span class="number">0</span> &lt;= self.rowx &lt; X12_MAX_ROWS</span><br></pre></td></tr></table></figure>
 <p>代码会从 Excel 文件中获取 row_number，这个 row_number 是每一行的行号，正常文件行号从 1 开始，而出现问题的文件行号从 0 开始，当行号为 0，进入 else 语句，导致越界问题。</p>
 <h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>除了 <code>xlrd</code>， Pandas 还支持 <code>openpyxl</code>（0.25 版），<code>openpyxl</code> 是一个专门用来操作 <code>.xlsx</code> 格式文件的 Python 库，和 <code>xlrd</code> 相比它的速度会慢一些，但是不会碰到上面所说的问题。这是 openpyxl 中 <a href="https://bitbucket.org/openpyxl/openpyxl/src/default/openpyxl/reader/excel.py" target="_blank" rel="noopener"><code>reader/excel.py</code></a> 文件处理行的代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_row</span><span class="params">(self, row)</span>:</span></span><br><span class="line">    attrs = dict(row.attrib)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="string">"r"</span> <span class="keyword">in</span> attrs:</span><br><span class="line">        self.max_row = int(attrs[<span class="string">'r'</span>])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        self.max_row += <span class="number">1</span></span><br><span class="line">    keys = set(attrs)</span><br><span class="line">    <span class="keyword">for</span> key <span class="keyword">in</span> keys:</span><br><span class="line">        <span class="keyword">if</span> key.startswith(<span class="string">'&#123;'</span>):</span><br><span class="line">            <span class="keyword">del</span> attrs[key]</span><br><span class="line"></span><br><span class="line">    keys = set(attrs)</span><br><span class="line">    <span class="keyword">if</span> keys != set([<span class="string">'r'</span>, <span class="string">'spans'</span>]) <span class="keyword">and</span> keys != set([<span class="string">'r'</span>]):</span><br><span class="line">        <span class="comment"># don't create dimension objects unless they have relevant information</span></span><br><span class="line">        self.row_dimensions[attrs[<span class="string">'r'</span>]] = attrs</span><br><span class="line"></span><br><span class="line">    cells = [self.parse_cell(el) <span class="keyword">for</span> el <span class="keyword">in</span> row]</span><br><span class="line">    <span class="keyword">return</span> self.max_row, cells</span><br></pre></td></tr></table></figure>
@@ -205,7 +205,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

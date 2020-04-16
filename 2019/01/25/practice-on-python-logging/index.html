@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="Python 日志库 logging 的理解和实践经验"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2019/01/25/practice-on-python-logging/"/>
+<meta name="description" content="Python 日志库 logging 的理解和实践经验"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2019/01/25/practice-on-python-logging/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -107,7 +107,7 @@
     <div class="post-toc-content">
       <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#日志级别"><span class="toc-text">日志级别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LogRecord、Formatter"><span class="toc-text">LogRecord、Formatter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Logger、Handler、Filter"><span class="toc-text">Logger、Handler、Filter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实践中的一些经验"><span class="toc-text">实践中的一些经验</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Logger-的继承链"><span class="toc-text">Logger 的继承链</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Logger-奇葩的默认行为"><span class="toc-text">Logger 奇葩的默认行为</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考资料"><span class="toc-text">参考资料</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关注知乎专栏【Python私房菜】"><span class="toc-text">关注知乎专栏【Python私房菜】</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p><img src="/upload/20190125_01.jpg" alt=""></p>
+  </div><div class="post-content"><p><img src="/upload/20190125_01.jpg" alt></p>
 <p>本文从 Python logging 库的基础概念入手，理解 logging 库的执行流程，以及可能忽视的一些细节。</p>
 <a id="more"></a>
 <h3 id="日志级别"><a href="#日志级别" class="headerlink" title="日志级别"></a>日志级别</h3><p>logging 库预置了 5 个错误级别，还有一个 <code>NOTSET</code> 级别，作为 logger 的默认值。</p>
@@ -225,7 +225,7 @@
 <p>同时 Logger 对象还可以继承，一个 Logger 可以把 LogRecord 传递给父级的 Logger。</p>
 <p>Handler 负责将日志写入到最终的归宿，可能文件、电子邮件、内存、队列… 由于一个 Logger 可以有多个 Handler，所以每个 Handler 都可以设置接收日志的级别和 Filter，换句话说，不同级别的日志可以输出到不同的归宿。</p>
 <p>Python 官方文档提供了 logging 处理日志的逻辑流程图。</p>
-<p><img src="/upload/20190125_02.png" alt=""></p>
+<p><img src="/upload/20190125_02.png" alt></p>
 <p>这里我们可能会有一个疑问，为 Logger 和 Handler 设置日志级别已经可以表示处理哪些日志，不处理哪些日志，为什么还需要 Filter 呢？</p>
 <p>相比于日志级别，Filter 可定制性更丰富，可以在 Logger 和 Handler 上实现颗粒度更细的控制。例如希望只记录长度大于 10 的日志，可以用如下的代码实现。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CustomFilter</span><span class="params">(logging.Filterer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">filter</span><span class="params">(self, record)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> len(record.msg) &gt; <span class="number">10</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">logger = logging.getLogger(<span class="string">'log'</span>)</span><br><span class="line">filter = CustomFilter()</span><br><span class="line">logger.addFilter(filter)</span><br><span class="line">logger.warning(<span class="string">'a warning message'</span>)  <span class="comment"># a warning message</span></span><br><span class="line">logger.warning(<span class="string">'a warn'</span>)</span><br><span class="line">logger.warning(<span class="string">'another warning message'</span>)  <span class="comment"># another warning message</span></span><br></pre></td></tr></table></figure>
@@ -245,7 +245,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root_logger = logging.getLogger()</span><br><span class="line">sub_logger = logging.getLogger(<span class="string">'sub'</span>)</span><br><span class="line"></span><br><span class="line">root_logger.info(<span class="string">'root info'</span>)</span><br><span class="line">sub_logger.info(<span class="string">'sub info'</span>)</span><br></pre></td></tr></table></figure>
 <p>执行上面代码，会发现依然没有任何输出，既然其他 logger 的默认级别是 NOTSET，为什么比 NOTSET 高的 INFO 还是不会输出呢？</p>
 <p>当一个 logger 的 level 被设置为 NOTSET 时，如果有父 logger，会将 log 传递给父 logger 处理，只有在 logger 是 root logger 或 propagate 属性设置为 False 时，才会由自己处理。接下来再修改一下上面的代码。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sub_logger = logging.getLogger(<span class="string">'sub'</span>)</span><br><span class="line">sub_logger.propagate = <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line">sub_logger.info(<span class="string">'sub info'</span>)</span><br><span class="line">sub_logger.warning(<span class="string">'sub warn'</span>)  <span class="comment"># sub warn</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sub_logger = logging.getLogger(<span class="string">'sub'</span>)</span><br><span class="line">sub_logger.propagate = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">sub_logger.info(<span class="string">'sub info'</span>)</span><br><span class="line">sub_logger.warning(<span class="string">'sub warn'</span>)  <span class="comment"># sub warn</span></span><br></pre></td></tr></table></figure>
 <p>上面的代码中禁用了 logger 的传递功能，所以 logger 会自己处理错误，但是 INFO 级别的日志依然没有被输出，如果输出一下 sub_logger.handlers 属性，会发现默认情况下 logger 并没有任何的 handlers，这能解释为什么无法输出日志，但是下一行代码输出了 WARNING 级别的日志，显然又是和这个猜测违背的，原因到底是什么呢？</p>
 <p>跟踪源码会发现，当一个 logger 需要自己处理日志时且没有任何一个 handler 时，会尝试使用 lastResort 属性所存储的 handler 来处理。</p>
 <p>文档中是这样定义 lastResort 的。</p>
@@ -306,7 +306,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

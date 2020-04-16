@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="「贪吃蛇大作战」的刷分尝试"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2016/08/28/snake-crack/"/>
+<meta name="description" content="「贪吃蛇大作战」的刷分尝试"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2016/08/28/snake-crack/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -112,7 +112,7 @@
 <h2 id="使用Charles抓取请求"><a href="#使用Charles抓取请求" class="headerlink" title="使用Charles抓取请求"></a>使用Charles抓取请求</h2><p>既然是研究接口，第一步就是看看接口的URL和参数返回都是什么了，请出神器Charles。</p>
 <p><img src="/upload/snake-2.png" alt="图2"></p>
 <p>通过Charles可以清楚地看到，游戏提交分数的接口和参数，至于返回，貌似没什么用。接下来仔细研究下请求，有几个参数能比较容易的判断他们的含义和作用。</p>
-<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">device_id:</span> 设备ID</span><br><span class="line"><span class="symbol">game_mode:</span> <span class="number">1</span>是无尽模式 <span class="number">2</span>是限时模式</span><br><span class="line"><span class="symbol">kill:</span> 击杀次数</span><br><span class="line"><span class="symbol">length:</span> 蛇的长度</span><br><span class="line"><span class="symbol">market:</span> 我抓的是iOS设备发的请求，所以这里是apple</span><br><span class="line"><span class="symbol">platform:</span> 抓到的请求里是<span class="number">1</span>，还不太明白具体的意思</span><br><span class="line"><span class="symbol">push_channel:</span> 也是<span class="number">1</span>，不明白意思</span><br><span class="line"><span class="symbol">push_id:</span> 固定值<span class="number">111111111222222223333333344444444</span>，后面逆向apk也证明了这一点</span><br><span class="line"><span class="symbol">sid:</span> 每次登录都会更新</span><br><span class="line"><span class="symbol">snake_sign:</span> 签名</span><br><span class="line"><span class="symbol">uid:</span> 用户ID</span><br><span class="line"><span class="symbol">version:</span> 我使用的版本是固定值<span class="number">2.1</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">device_id:</span> <span class="string">设备ID</span></span><br><span class="line"><span class="attr">game_mode:</span> <span class="number">1</span><span class="string">是无尽模式</span> <span class="number">2</span><span class="string">是限时模式</span></span><br><span class="line"><span class="attr">kill:</span> <span class="string">击杀次数</span></span><br><span class="line"><span class="attr">length:</span> <span class="string">蛇的长度</span></span><br><span class="line"><span class="attr">market:</span> <span class="string">我抓的是iOS设备发的请求，所以这里是apple</span></span><br><span class="line"><span class="attr">platform:</span> <span class="string">抓到的请求里是1，还不太明白具体的意思</span></span><br><span class="line"><span class="attr">push_channel:</span> <span class="string">也是1，不明白意思</span></span><br><span class="line"><span class="attr">push_id:</span> <span class="string">固定值111111111222222223333333344444444，后面逆向apk也证明了这一点</span></span><br><span class="line"><span class="attr">sid:</span> <span class="string">每次登录都会更新</span></span><br><span class="line"><span class="attr">snake_sign:</span> <span class="string">签名</span></span><br><span class="line"><span class="attr">uid:</span> <span class="string">用户ID</span></span><br><span class="line"><span class="attr">version:</span> <span class="string">我使用的版本是固定值2.1</span></span><br></pre></td></tr></table></figure>
 <h2 id="通过逆向APK获取签名算法"><a href="#通过逆向APK获取签名算法" class="headerlink" title="通过逆向APK获取签名算法"></a>通过逆向APK获取签名算法</h2><p>明确了参数的意思，接下来就可以伪造请求了，不过在伪造请求之前，还有一个参数比较麻烦，那就是snake_sign，请求签名，从图中snake_sign的内容看，似乎有点像是一个base64过的东西，不过base64decode发现，根本不可读。与其猜签名算法，不如考虑一下其他办法。</p>
 <p>「贪吃蛇大作战」还有安卓版本，并且引导下载的页面提供了apk，于是下载apk，使用<a href="https://github.com/skylot/jadx" target="_blank" rel="noopener">jadx-gui</a>进行逆向，使用jadx-gui打开apk后，代码一览无余。</p>
 <p>通过查看代码，可以清楚的看到snake_sign字段的签名逻辑，首先将请求中所有参数按ASCII码顺序排列拼接成字符串，然后在字符串前添加<code>POST&amp; + [URL Path]</code>，添加后使用Key进行SHA1加密，key也可以在代码中获取到。对加密生成的结果，需要做一次base64，才是最终snake_sign字段的结果。</p>
@@ -171,7 +171,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>

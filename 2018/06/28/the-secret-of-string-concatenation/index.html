@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
-<meta name="theme-color" content="#f8f5ec" />
+<meta name="theme-color" content="#f8f5ec">
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="你所不知道的Python | 字符串连接的秘密"/><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/06/28/the-secret-of-string-concatenation/"/>
+<meta name="description" content="你所不知道的Python | 字符串连接的秘密"><link rel="alternate" href="/atom.xml" title="simpleapples"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://www.simpleapples.com/2018/06/28/the-secret-of-string-concatenation/">
 
-<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" /><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
@@ -107,7 +107,7 @@
     <div class="post-toc-content">
       <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#方法1：加号连接"><span class="toc-text">方法1：加号连接</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#方法2：使用-操作符"><span class="toc-text">方法2：使用%操作符</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#方法3：使用format方法"><span class="toc-text">方法3：使用format方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#方法4：使用f-string"><span class="toc-text">方法4：使用f-string</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#方法5：使用str-join-方法"><span class="toc-text">方法5：使用str.join()方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#对比测试"><span class="toc-text">对比测试</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#欢迎关注我的公众号【Python私房菜】"><span class="toc-text">欢迎关注我的公众号【Python私房菜】</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p><img src="/upload/20180628_04.jpg" alt=""></p>
+  </div><div class="post-content"><p><img src="/upload/20180628_04.jpg" alt></p>
 <p>字符串连接，就是将2个或以上的字符串合并成一个，看上去连接字符串是一个非常基础的小问题，但是在Python中，我们可以用多种方式实现字符串的连接，稍有不慎就有可能因为选择不当而给程序带来性能损失。</p>
 <h1 id="方法1：加号连接"><a href="#方法1：加号连接" class="headerlink" title="方法1：加号连接"></a>方法1：加号连接</h1><p>很多语言都支持使用加号连接字符串，Python也不例外，只需要简单的将2个或多个字符串相加就可以完成拼接。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'Python'</span></span><br><span class="line">b = <span class="string">'私房菜'</span></span><br><span class="line">r = a + b  <span class="comment"># 输出'Python私房菜'</span></span><br></pre></td></tr></table></figure>
@@ -121,15 +121,15 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'Python'</span></span><br><span class="line">b = <span class="string">'私房菜'</span></span><br><span class="line">r = <span class="string">''</span>.join([a, b])</span><br></pre></td></tr></table></figure>
 <h1 id="对比测试"><a href="#对比测试" class="headerlink" title="对比测试"></a>对比测试</h1><p>既然连接字符串有这么多方法，那么使用时到底选择哪种呢？我们从代码可读性和性能两个层面来评估一下上面5种方法。</p>
 <p>使用timeit模块，分别执行上述5种方法的示例代码100000次，执行时间如图。</p>
-<p><img src="/upload/20180628_05.png" alt=""></p>
+<p><img src="/upload/20180628_05.png" alt></p>
 <p>可以看到，%操作符、format和f-string都是字符串格式化方法，性能依次递增，加号连接的性能和f-string不相上下。</p>
 <p>有一点需要注意的是，字符串类型是不可变的，所以每一次应用加号连接字符串都会生成一个新的字符串，连接多个字符串时，效率低下就是必然的了，我们将一次连接的字符串提升到10个和20个，再来进行2轮测试，下面是连接20个字符串时的耗时情况。</p>
-<p><img src="/upload/20180628_06.png" alt=""></p>
+<p><img src="/upload/20180628_06.png" alt></p>
 <p>和连接两个字符串时的结果出现了一些不同，首先使用加号连接的方式在字符串数量较多时（大于10个），性能会急剧下降，str.join()方法在连接大量字符串时性能最好。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>连接少量字符串时</strong><br>使用<strong>加号</strong>连接符在性能和可读性上都是明智的，如果对可读性有更高的要求，并且使用的Python 3.6以上版本，<strong>f-string</strong>也是一个非常好的选择，例如下面这种情况，f-string的可读性显然比加号连接好得多。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">f'姓名：<span class="subst">&#123;name&#125;</span> 年龄：<span class="subst">&#123;age&#125;</span> 性别：<span class="subst">&#123;gender&#125;</span>'</span></span><br><span class="line">b = <span class="string">'姓名：'</span> + name + <span class="string">'年龄：'</span> + age + <span class="string">'性别：'</span> + gender</span><br></pre></td></tr></table></figure>
 <p><strong>连接大量字符串时</strong><br><strong>join</strong>和<strong>f-string</strong>都是性能最好的选择，选择时依然取决于你使用的Python版本以及对可读性的要求，f-string在连接大量字符串时可读性并不一定好。切记不要使用加号连接，尤其是在for循环中。</p>
-<h1 id="欢迎关注我的公众号【Python私房菜】"><a href="#欢迎关注我的公众号【Python私房菜】" class="headerlink" title="欢迎关注我的公众号【Python私房菜】"></a>欢迎关注我的公众号【Python私房菜】</h1><p><img src="/upload/wechat-qrcode.jpg" alt=""></p>
+<h1 id="欢迎关注我的公众号【Python私房菜】"><a href="#欢迎关注我的公众号【Python私房菜】" class="headerlink" title="欢迎关注我的公众号【Python私房菜】"></a>欢迎关注我的公众号【Python私房菜】</h1><p><img src="/upload/wechat-qrcode.jpg" alt></p>
 
       </div>
       <div class="post-copyright">
@@ -180,7 +180,7 @@
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2011 - 2019<span class="heart">
+  <span class="copyright-year">&copy;2011 - 2020<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>
