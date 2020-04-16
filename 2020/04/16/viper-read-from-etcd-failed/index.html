@@ -128,7 +128,6 @@
 <p>必须吐槽一下viper的命名，哪里是<code>AddSecureRemoteProvider</code>，明明应该叫<code>AddEncryptedRemoteProvider</code></p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>出现这个问题，主要是误会了<code>AddSecureRemoteProvider</code>接口表达的意思，并且go-etcd允许忽略证书验证，也让问题变得更加离奇。</p>
 <p>当然go-etcd的这种配置是非常合理的，内部系统使用自签名证书是一个很正常的行为。</p>
-<p>这个问题的排查过程，再次说明了网络基础和读源码的重要性，问题可以从源码里找到答案，而基础理论的细节是准确定位问题的基石。</p>
 
       </div>
       <div class="post-copyright">
