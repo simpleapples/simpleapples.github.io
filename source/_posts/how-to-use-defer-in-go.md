@@ -117,5 +117,3 @@ func deferExit() {
 ```
 
 上面的defer并不会输出。
-
-### 点击关注知乎专栏[Golang私房菜](https://zhuanlan.zhihu.com/golang-fans)

@@ -123,5 +123,3 @@ fmt.Println(timeB)  // 2018-10-26 16:43:03.799263739 +0800 CST
 ### 参考文章
 
 [https://golang.org/pkg/time/](https://golang.org/pkg/time/)
-
-### 点击关注知乎专栏[Golang私房菜](https://zhuanlan.zhihu.com/golang-fans)

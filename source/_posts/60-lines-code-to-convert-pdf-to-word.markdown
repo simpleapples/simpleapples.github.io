@@ -107,7 +107,3 @@ while True:
 本文介绍的所有代码，已经打包成了一个独立可运行的项目，存放在github，如果不想自己写代码，可以直接clone或下载github项目运行。项目地址如下（记得点star）：
 
 [https://github.com/simpleapples/pdf2word](https://github.com/simpleapples/pdf2word)
-
-## 欢迎关注Python私房菜
-
-![](/upload/wechat-qrcode.jpg)

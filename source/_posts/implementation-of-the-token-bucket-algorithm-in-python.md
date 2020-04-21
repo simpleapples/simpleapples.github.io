@@ -62,7 +62,3 @@ class TokenBucket(object):
         self._current_amount -= token_amount
         return True
 ```
-
-# 扫码关注Python私房菜
-
-![](/upload/wechat-qrcode.jpg)

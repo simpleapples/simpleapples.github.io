@@ -201,5 +201,3 @@ sub_logger.warning('sub warn')  # sub warn
 [logging — Logging facility for Python](https://docs.python.org/3/library/logging.html)
 
 [Logging HOWTO](https://docs.python.org/3.7/howto/logging.html)
-
-### [关注知乎专栏【Python私房菜】](https://zhuanlan.zhihu.com/python-fans)

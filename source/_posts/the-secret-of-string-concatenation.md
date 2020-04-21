@@ -89,7 +89,3 @@ b = '姓名：' + name + '年龄：' + age + '性别：' + gender
 
 **连接大量字符串时**
 **join**和**f-string**都是性能最好的选择，选择时依然取决于你使用的Python版本以及对可读性的要求，f-string在连接大量字符串时可读性并不一定好。切记不要使用加号连接，尤其是在for循环中。
-
-# 欢迎关注我的公众号【Python私房菜】
-
-![](/upload/wechat-qrcode.jpg)

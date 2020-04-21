@@ -125,7 +125,3 @@ def validate_form(self, form_cls):
 [查看PyPI](https://pypi.org/project/Flask-WTF-Decorators/)
 
 [查看Github](https://github.com/simpleapples/flask-wtf-decorators)
-
-# 欢迎关注Python私房菜
-
-![](/upload/wechat-qrcode.jpg)

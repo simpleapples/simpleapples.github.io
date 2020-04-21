@@ -76,7 +76,3 @@ class LRUCache:
 ```
 
 下次面试在遇到LRU的题目，是不是就胸有成竹了？
-
-## 扫码关注Python私房菜
-
-![](/upload/wechat-qrcode.jpg)

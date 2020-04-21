@@ -141,5 +141,3 @@ Goland是JetBrains公司推出的Go语言IDE，是一款功能强大，使用便
 [https://openhome.cc/Gossip/Go/gofmt.html](https://openhome.cc/Gossip/Go/gofmt.html)
 
 [https://github.com/hyper0x/go_command_tutorial/blob/master/0.9.md](https://github.com/hyper0x/go_command_tutorial/blob/master/0.9.md)
-
-# 点击关注知乎专栏[Golang私房菜](https://zhuanlan.zhihu.com/golang-fans)

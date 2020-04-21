@@ -82,5 +82,3 @@ dep ensure -add [github.com/gin-gonic/gin](http://github.com/gin-gonic/gin)
 ```
 dep ensure -update
 ```
-
-**欢迎关注知乎专栏【Golang私房菜】**

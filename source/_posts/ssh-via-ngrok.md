@@ -57,7 +57,3 @@ ssh -p 10502 username@0.tcp.ap.ngrok.io
 ### 需要注意的问题
 
 由于所有流量都要经过 ngrok 服务器，而 ngrok 的服务节点又只有美国、新加坡等地，所以速度上还是比较慢的。另外，如果 ngrok 的服务节点存在安全隐患的话，存在敏感内容的泄漏的可能性。
-
-### 关注Python私房菜
-
-![](/upload/wechat-qrcode.jpg)

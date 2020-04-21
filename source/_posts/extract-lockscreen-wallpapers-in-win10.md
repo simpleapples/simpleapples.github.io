@@ -57,6 +57,3 @@ for wallpaper in wallpapers:
 
 ![](/upload/20180326_04.png)
 
-# 关注Python私房菜
-
-![原创Python实战文章](/upload/wechat-qrcode.jpg)

@@ -95,7 +95,3 @@ categories: Python
 ### 参考文章
 
 - [Python Faster Way](http://pythonfasterway.org)
-
-### 关注公众号【Python私房菜】
-
-![](/upload/wechat-qrcode.jpg)

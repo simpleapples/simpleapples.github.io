@@ -89,7 +89,3 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 ![](/upload/20180410_03.png)
 
 可以看到，耗时相差了大概7倍，aiohttp+uvloop的组合在爬虫这种I/O密集型的场景下，可以说具有压倒性优势。相信在不远的将来，基于asyncio的库会将无数爬虫工程师从加班中拯救出来。
-
-# 扫码关注Python私房菜
-
-![拯救加班的你](/upload/wechat-qrcode.jpg)

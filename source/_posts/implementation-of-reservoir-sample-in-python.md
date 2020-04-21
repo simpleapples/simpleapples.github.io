@@ -93,7 +93,3 @@ Counter({7: 3084, 6: 3042, 10: 3033, 3: 3020, 8: 3016, 5: 2997, 4: 2986, 2: 2972
 # 代码
 
 上述的算法和测试代码已经放在[Github](https://github.com/python-fan/reservoir-sample)，可以直接下载使用。
-
-# 关注公众号【Python私房菜】
-
-![](/upload/wechat-qrcode.jpg)

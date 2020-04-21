@@ -105,7 +105,3 @@ SimpleQueue是一个简化的队列，去掉了Queue中的buffer，没有了使�
 [https://bugs.python.org/issue15329](https://bugs.python.org/issue15329)
 [http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/](http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/)
 [http://cyrusin.github.io/2016/04/27/python-gil-implementaion/](http://cyrusin.github.io/2016/04/27/python-gil-implementaion/)
-
-# 欢迎关注我的公众号【Python私房菜】
-
-![](/upload/wechat-qrcode.jpg)

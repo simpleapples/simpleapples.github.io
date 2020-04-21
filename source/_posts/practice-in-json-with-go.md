@@ -176,5 +176,3 @@ func main() {
 ```
 
 可以看到，使用 json:"-" 标签的字段都被忽略了。
-
-### 关注知乎专栏[Golang私房菜](https://zhuanlan.zhihu.com/golang-fans)
