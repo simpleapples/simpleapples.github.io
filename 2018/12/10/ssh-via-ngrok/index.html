@@ -105,7 +105,7 @@
     <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ngrok"><span class="toc-text">ngrok</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#注册并下载-ngrok"><span class="toc-text">注册并下载 ngrok</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查看-ngrok-的-token"><span class="toc-text">查看 ngrok 的 token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在内网机器上启动-ngrok"><span class="toc-text">在内网机器上启动 ngrok</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通过-ssh-访问内网机器"><span class="toc-text">通过 ssh 访问内网机器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#需要注意的问题"><span class="toc-text">需要注意的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关注Python私房菜"><span class="toc-text">关注Python私房菜</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ngrok"><span class="toc-text">ngrok</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#注册并下载-ngrok"><span class="toc-text">注册并下载 ngrok</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查看-ngrok-的-token"><span class="toc-text">查看 ngrok 的 token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在内网机器上启动-ngrok"><span class="toc-text">在内网机器上启动 ngrok</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通过-ssh-访问内网机器"><span class="toc-text">通过 ssh 访问内网机器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#需要注意的问题"><span class="toc-text">需要注意的问题</span></a></li></ol>
     </div>
   </div><div class="post-content"><h3 id="ngrok"><a href="#ngrok" class="headerlink" title="ngrok"></a>ngrok</h3><p>用 ssh 访问一台主机，如果和主机在一个局域网中或者主机拥有公网 IP，就可以使用 ssh 命令直接连接主机的 IP 地址，但是大部分公司和家庭内部都是局域网，并不能给局域网内的每一台主机都分配一个公网 IP，这时候就需要进行内网穿透，才能从外部连接到局域网内的主机。</p>
 <p>ngrok 是一个反向代理工具，可以实现将内网的端口暴露到公网，通过 ngrok，也能将 ssh 使用的端口暴露出去，以此实现 ssh 的内网穿透。</p>
@@ -124,7 +124,6 @@
 <h3 id="通过-ssh-访问内网机器"><a href="#通过-ssh-访问内网机器" class="headerlink" title="通过 ssh 访问内网机器"></a>通过 ssh 访问内网机器</h3><p>查看到转发地址后，就可以在外网通过 ssh 命令访问内网机器来。以上图为例，ssh 访问的命令是：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -p 10502 username@0.tcp.ap.ngrok.io</span><br></pre></td></tr></table></figure>
 <h3 id="需要注意的问题"><a href="#需要注意的问题" class="headerlink" title="需要注意的问题"></a>需要注意的问题</h3><p>由于所有流量都要经过 ngrok 服务器，而 ngrok 的服务节点又只有美国、新加坡等地，所以速度上还是比较慢的。另外，如果 ngrok 的服务节点存在安全隐患的话，存在敏感内容的泄漏的可能性。</p>
-<h3 id="关注Python私房菜"><a href="#关注Python私房菜" class="headerlink" title="关注Python私房菜"></a>关注Python私房菜</h3><p><img src="/upload/wechat-qrcode.jpg" alt></p>
 
       </div>
       <div class="post-copyright">

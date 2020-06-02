@@ -105,7 +105,7 @@
     <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#万物皆对象"><span class="toc-text">万物皆对象</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#可变对象和不可变对象"><span class="toc-text">可变对象和不可变对象</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参数传递时的表现"><span class="toc-text">参数传递时的表现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参数传递时的坑"><span class="toc-text">参数传递时的坑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#关注Python私房菜"><span class="toc-text">关注Python私房菜</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#万物皆对象"><span class="toc-text">万物皆对象</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#可变对象和不可变对象"><span class="toc-text">可变对象和不可变对象</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参数传递时的表现"><span class="toc-text">参数传递时的表现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参数传递时的坑"><span class="toc-text">参数传递时的坑</span></a></li></ol>
     </div>
   </div><div class="post-content"><p><img src="/upload/20180422_01.png" alt></p>
 <p>面试的时候，有没有被问到Python传参是传引用还是传值这种问题？有没有听到过Python传参既不是传值也不是传引用这种说法？一个小小的参数默认值也可能让代码出现难以查找的bug？</p>
@@ -132,7 +132,6 @@
 <p>再看一段代码。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">i = <span class="number">1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(a=i)</span>:</span></span><br><span class="line">	print(a)</span><br><span class="line"></span><br><span class="line">i = <span class="number">2</span></span><br><span class="line">test()  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
 <p>由于参数默认值是在函数定义时而不是函数执行时确定的，所以这段代码test方法的参数默认值时1而不是2。</p>
-<h1 id="关注Python私房菜"><a href="#关注Python私房菜" class="headerlink" title="关注Python私房菜"></a>关注Python私房菜</h1><p><img src="/upload/wechat-qrcode.jpg" alt></p>
 
       </div>
       <div class="post-copyright">

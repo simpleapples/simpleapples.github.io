@@ -105,7 +105,7 @@
     <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#准备工作"><span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实现主要逻辑"><span class="toc-text">实现主要逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#加入并行逻辑"><span class="toc-text">加入并行逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用uvloop加速"><span class="toc-text">使用uvloop加速</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#性能对比"><span class="toc-text">性能对比</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#扫码关注Python私房菜"><span class="toc-text">扫码关注Python私房菜</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#准备工作"><span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实现主要逻辑"><span class="toc-text">实现主要逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#加入并行逻辑"><span class="toc-text">加入并行逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用uvloop加速"><span class="toc-text">使用uvloop加速</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#性能对比"><span class="toc-text">性能对比</span></a></li></ol>
     </div>
   </div><div class="post-content"><p>asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。</p>
 <h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p><a href="https://chrome.google.com/webstore/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh" target="_blank" rel="noopener">Earth View from Google Earth</a>是一款Chrome插件，会在打开新标签页时自动加载一张来自Google Earth的背景图片。</p>
@@ -127,7 +127,6 @@
 <h1 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h1><p>为了验证aiohttp和uvloop的性能，笔者使用requests+concurrent库实现了一个多进程版的爬虫，分别爬取20个id，消耗的时间如图。</p>
 <p><img src="/upload/20180410_03.png" alt></p>
 <p>可以看到，耗时相差了大概7倍，aiohttp+uvloop的组合在爬虫这种I/O密集型的场景下，可以说具有压倒性优势。相信在不远的将来，基于asyncio的库会将无数爬虫工程师从加班中拯救出来。</p>
-<h1 id="扫码关注Python私房菜"><a href="#扫码关注Python私房菜" class="headerlink" title="扫码关注Python私房菜"></a>扫码关注Python私房菜</h1><p><img src="/upload/wechat-qrcode.jpg" alt="拯救加班的你"></p>
 
       </div>
       <div class="post-copyright">

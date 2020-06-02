@@ -105,7 +105,7 @@
     <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#栈空间管理的基本逻辑"><span class="toc-text">栈空间管理的基本逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分段栈-Segment-Stacks"><span class="toc-text">分段栈 Segment Stacks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#连续栈-Contiguous-Stacks"><span class="toc-text">连续栈 Contiguous Stacks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#点击关注知乎专栏Golang私房菜"><span class="toc-text">点击关注知乎专栏Golang私房菜</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#栈空间管理的基本逻辑"><span class="toc-text">栈空间管理的基本逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分段栈-Segment-Stacks"><span class="toc-text">分段栈 Segment Stacks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#连续栈-Contiguous-Stacks"><span class="toc-text">连续栈 Contiguous Stacks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
     </div>
   </div><div class="post-content"><p><img src="/upload/20181011_01.jpg" alt></p>
 <h3 id="栈空间管理的基本逻辑"><a href="#栈空间管理的基本逻辑" class="headerlink" title="栈空间管理的基本逻辑"></a>栈空间管理的基本逻辑</h3><p>go语言通过goroutine提供了并发编程支持，goroutine是go运行库的功能，而不是操作系统线程实现的，goroutine可以被理解成一个用户态的线程。</p>
@@ -118,7 +118,7 @@
 <h3 id="连续栈-Contiguous-Stacks"><a href="#连续栈-Contiguous-Stacks" class="headerlink" title="连续栈 Contiguous Stacks"></a>连续栈 Contiguous Stacks</h3><p>go 1.3推出了连续栈，连续栈使用了另外一种策略，不再把栈分成一段一段的，当栈空间不够时，直接new一个2倍大的栈空间，并将原先栈空间中的数据拷贝到新的栈空间中，而后销毁旧栈。这样当出现栈空间触及边界时，不会产生栈分裂的情况。</p>
 <p>继续假设当前栈空间即将用尽，并且需要在for循环中执行一个比较消耗空间的函数。当该函数执行时，栈空间发生了扩容，变成原先2倍大小，函数执行完成一次后，栈空间的使用量缩小回执行前的大小，但是栈空间的使用量并没有小于栈大小的1/4，不会触发栈收缩，所以在整个for循环执行过程中，不会反复触发栈空间的收缩扩容。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>相比于分段栈，连续栈避免了某些场景下栈空间的的频繁伸缩。有一点需要注意的是，连续栈的收缩也是需要重新申请一段空间（原先的1/2大小），并进行栈拷贝操作的。</p>
-<h3 id="点击关注知乎专栏Golang私房菜"><a href="#点击关注知乎专栏Golang私房菜" class="headerlink" title="点击关注知乎专栏Golang私房菜"></a>点击关注知乎专栏<a href="https://zhuanlan.zhihu.com/golang-fans" target="_blank" rel="noopener">Golang私房菜</a></h3>
+
       </div>
       <div class="post-copyright">
     <p class="copyright-item">

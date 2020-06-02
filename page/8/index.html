@@ -90,6 +90,88 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/11/12/thunder-link-decoder/">迅雷链接解密</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-12
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>经常在网上看到迅雷专有的以thunder://开头的连接链接，其它软件无法下载。</p>
+<p>其实迅雷连接链接是使用base64加密的结果，只要解密一下，就可以获取到原来的连接链接地址。</p>
+<p>拿百度logo图片的连接链接举个例子，原链接为</p>
+<blockquote>
+<p><a href="http://www.baidu.com/img/baidu_sylogo1.gif" target="_blank" rel="noopener">http://www.baidu.com/img/baidu_sylogo1.gif</a></p>
+</blockquote>
+<p>迅雷是在原链接前加AA，后加ZZ，行程一个新的字符串</p>
+<blockquote>
+<p>AA<a href="http://www.baidu.com/img/baidu_sylogo1.gifZZ" target="_blank" rel="noopener">http://www.baidu.com/img/baidu_sylogo1.gifZZ</a></p>
+</blockquote>
+<p>然后对字符串使用base64加密，再加上thunder://前缀，就完成了。感兴趣的童鞋可以在linux中使用</p>
+<pre><code>$echo AAhttp://www.baidu.com/img/baidu_sylogo1.gifZZ | base64
+</code></pre><p>来加密字符串。结果为：</p>
+<blockquote>
+<p>QUFodHRwOi8vd3d3LmJhaWR1LmNvbS9pbWcvYmFpZHVfc3lsb2dvMS5naWZaWg==</p>
+</blockquote>
+<p>其它的下载软件使用的方法也大同小异，FlashGet是在字符串前后加<code>[FLASHGET]</code> ，然后base64加密，而QQ旋风则直接对连接链接进行加密。</p>
+<p>这里有一个在线的迅雷链接解密程序：<a href="http://labs.simpleapples.com/thunderurl" target="_blank" rel="noopener">http://labs.simpleapples.com/thunderurl</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/11/10/a-lbs-web-app-based-on-html5/">使用javascript和html5制作的LBS类WebApp</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-10
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>使用javascript和html5+css3制作的一个可以显示目前位置以及行动路径的webapp。</p>
+<p>调用了百度地图的api，在地图上绿色的线画出了当天的路径。</p>
+<p>一个marker显示了当前的位置。</p>
+<p>首页的圆是用canvas画的，但是没能把文字画进去，还在研究。</p>
+<p>至于获取到的数据都存到了localStorage里，目前是每3s定位一次，不知道这样的数据量如何，如果数据量大，localStorage还是不太适合。</p>
+<p>还没有仔细测试，应该还有不少bug。</p>
+<p><img src="/upload/cellphonepreview.jpg" alt="Alt text"></p>
+<p>这是在我手机浏览器上运行的效果，定位有些不太准 = =!</p>
+<p>演示地址：<a href="http://labs.simpleapples.com/liner" target="_blank" rel="noopener">http://labs.simpleapples.com/liner</a></p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>修改了几个bug，发布到github了。</p>
+<p>github:<a href="https://github.com/simpleapples/liner" target="_blank" rel="noopener">https://github.com/simpleapples/liner</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/11/07/a-timer-based-on-canvas/">一个用canvas做的电子表</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-07
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>最近学习javascript，看到canvas绘图的部分，就做了一个电子表练练手。</p>
+<p>使用canvas绘制电子表的每一个线段，而后用js获取时间，每毫秒执行一次，更新canvas。</p>
+<p><img src="/upload/timer-300x69.png" alt="Alt text"></p>
+<p>演示地址：<a href="http://labs.simpleapples.com/timer/" target="_blank" rel="noopener">http://labs.simpleapples.com/timer/</a></p>
+<p>github：<a href="https://github.com/simpleapples/javascripttimer" target="_blank" rel="noopener">https://github.com/simpleapples/javascripttimer</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/11/01/the-first-offer-and-the-first-rejection-letter/">人生中的第一个offer和第一份拒信</a>
         </h1>
 

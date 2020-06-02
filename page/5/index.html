@@ -90,6 +90,110 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/06/lru-algorithm-implemented-in-python/">面试不再怕，20行Python代码帮你搞懂LRU算法</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-06
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180306_01.png" alt></p>
+<p>LRU算法在后端工程师面试中，是一个比较常出现的题目，这篇文章带大家一起，理解LRU算法，并最终用Python轻松实现一个基于LRU算法的缓存。</p>
+<h2 id="缓存是什么"><a href="#缓存是什么" class="headerlink" title="缓存是什么"></a>缓存是什么</h2><p><img src="/upload/20180306_02.jpg" alt></p>
+<p>先看一张图，当我们访问网页，浏览器会给服务器发请求，服务器会经过一系列的运算，把页面返回给浏览器。</p>
+<p><img src="/upload/20180306_03.jpg" alt></p>
+<p>当有多个浏览器同时访问的时候，就会在短时间内发起多个请求，而服务器对每一个请求都要进行一系列相同的操作。重复工作不仅浪费资源，还可能导致响应速度变慢。</p>
+<p><img src="/upload/20180306_04.jpg" alt></p>
+<p>而缓存则可以把服务器返回的页面保存下来，当有其他的浏览器再访问时候，就不必劳服务器大驾，直接由缓存返回页面。为了保证响应速度，缓存通常是基于比较昂贵的硬件，比如RAM，这就决定了我们很难用大量的缓存把所有的页面都存下来，当恰好没有缓存浏览器请求的页面时，依然需要请求服务器。由于缓存容量有限，而数据量无限（互联网每天新产生的页面数无法估计），就需要把好刚用在刀刃上，缓存那些最有用的信息。</p>
+<h2 id="LRU是什么"><a href="#LRU是什么" class="headerlink" title="LRU是什么"></a>LRU是什么</h2><p>LRU是一种缓存淘汰算法（在OS中也叫内存换页算法），由于缓存空间是有限的，所以要淘汰缓存中不常用的数据，留下常用的数据，达到缓存效率的最大化。LRU就是这样一种决定“淘汰谁留下谁”的算法，LRU是Least recently used的缩写，从字面意思“最近最少使用”，我们就可以理解LRU的淘汰规则。</p>
+<h2 id="LRU的淘汰逻辑"><a href="#LRU的淘汰逻辑" class="headerlink" title="LRU的淘汰逻辑"></a>LRU的淘汰逻辑</h2><p><img src="/upload/20180306_05.png" alt></p>
+<p>我们用一张图来描述LRU的淘汰逻辑，图中的缓存是一个列表结构，上面是头结点下面是尾节点，缓存容量为8（8个小格子）：</p>
+<ul>
+<li>有新数据（意味着数据之前没有被缓存过）时，加入到列表头</li>
+<li>缓存到达最大容量时，需要淘汰数据多出来的数据，此时淘汰列表尾部的数据</li>
+<li>当缓存中有数据被命中，则将数据移动到列表头部（相当于新加入缓存）</li>
+</ul>
+<p>按上面的逻辑我们可以看到，一个数据如果经常被访问就会不断地被移动到列表头部，不会被淘汰出缓存，而越不经常访问的数据，越容易被挤出缓存。</p>
+<h2 id="20行Python代码实践LRU"><a href="#20行Python代码实践LRU" class="headerlink" title="20行Python代码实践LRU"></a>20行Python代码实践LRU</h2><p>接下来我们用Python来实现一个采用LRU算法的缓存。</p>
+<p>从前面的文章中我们可以知道，缓存简化下来就两个功能，一个是往里装数据（缓存数据），一个是往外吐数据（命中缓存），所以我们的缓存对外只需要put和get两个接口就可以了。</p>
+<p>按照前面的示意图，缓存内部我们只需要有一个列表（list）就可以实现LRU逻辑，不过用列表虽然能实现逻辑，但是在判断是否命中缓存时，速度可能非常慢（列表需要遍历才能知道数据有没有在里面）。在Python中，我们可以用基于hash的结构，比如字典（dict）或集合（set），来快速判断数据是否存在，解决列表实现的性能问题。但是字典和集合又是没有顺序的，如果能有一种既能排序，又是基于hash存储的数据结构，就好了。</p>
+<p>在Python的collections包中，已经内置了这种实用的结构OrderedDict，OrderedDict是dict的子类，但是存储在内部的元素是有序的（列表的特点）。</p>
+<p>解决了数据结构的问题，我们可以直接上手写逻辑了，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, capacity)</span>:</span></span><br><span class="line">        self.capacity = capacity</span><br><span class="line">        self.queue = collections.OrderedDict()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.queue:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span> // 要找的数据不在缓存中返回<span class="number">-1</span></span><br><span class="line">        value = self.queue.pop(key) // 将命中缓存的数据移除</span><br><span class="line">        self.queue[key] = value // 将命中缓存的数据重新添加到头部</span><br><span class="line">        <span class="keyword">return</span> self.queue[key]</span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, key, value)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.queue: // 如果已经在缓存中，则先移除老的数据</span><br><span class="line">            self.queue.pop(key)</span><br><span class="line">        <span class="keyword">elif</span> len(self.queue.items()) == self.capacity:</span><br><span class="line">            self.queue.popitem(last=<span class="literal">False</span>) // 如果不在缓存中并且到达最大容量，则把最后的数据淘汰</span><br><span class="line">        self.queue[key] = value // 将新数据添加到头部</span><br></pre></td></tr></table></figure>
+<p>下次面试在遇到LRU的题目，是不是就胸有成竹了？</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/03/60-lines-code-to-convert-pdf-to-word/">60行Python代码，实现多线程PDF转Word</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-03
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>工作中经常会遇到需要提取PDF文件中文字的情况，一个PDF还好，复制粘贴一下也花不了太多时间，如果需要把大量PDF转为Word，怎么办呢？</p>
+<p><img src="/upload/cant-do-it.jpg" alt></p>
+<p>今天教大家用60行代码实现，多线程批量PDF转Word。没兴趣看具体过程可以直接拉到最后，有代码。</p>
+<h2 id="分解任务"><a href="#分解任务" class="headerlink" title="分解任务"></a>分解任务</h2><p>把PDF转为Word，分几步？两步，第一步读取PDF文件，第二步写入Word文件。</p>
+<p><img src="/upload/two-steps.jpg" alt></p>
+<p>是的，就是这么简单，借助Python第三方包，可以轻松实现上面两个过程，我们要用到pdfminer3k和python-docx这两个包。</p>
+<h2 id="读取PDF"><a href="#读取PDF" class="headerlink" title="读取PDF"></a>读取PDF</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> PDFResourceManager</span><br><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> process_pdf</span><br><span class="line"><span class="keyword">from</span> pdfminer.converter <span class="keyword">import</span> TextConverter</span><br><span class="line"><span class="keyword">from</span> pdfminer.layout <span class="keyword">import</span> LAParams</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">resource_manager = PDFResourceManager()</span><br><span class="line">return_str = StringIO()</span><br><span class="line">lap_params = LAParams()</span><br><span class="line"></span><br><span class="line">device = TextConverter(resource_manager, return_str, laparams=lap_params)</span><br><span class="line">process_pdf(resource_manager, device, file) // file是使用open方法打开的PDF文件句柄</span><br><span class="line">device.close()</span><br><span class="line"></span><br><span class="line">// 此处content就是转换为文字的PDF内容</span><br><span class="line">content = return_str.getvalue()</span><br></pre></td></tr></table></figure>
+<p>content变量存储的就是我们从PDF文件中读取出的文字内容，可以看到，使用pdfminer3k可以轻松完成这个任务。接下来我们需要把文字内容写入成一个word文件。</p>
+<h2 id="写入Word"><a href="#写入Word" class="headerlink" title="写入Word"></a>写入Word</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> docx <span class="keyword">import</span> Document</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">doc = Document()</span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> content.split(<span class="string">'\n'</span>):</span><br><span class="line">    paragraph = doc.add_paragraph()</span><br><span class="line">    paragraph.add_run(remove_control_characters(line))</span><br><span class="line">doc.save(file_path)</span><br><span class="line">content是我们前面读取出的文字内容，由于是讲整个PDF读成一个字符串，所以需要使用split方法将每一行分隔开，然后按行写入word，否则所有的文字会在同一行。同时这段代码使用了一个remove_control_characters函数，这个函数是需要自己实现的，目的是移除控制字符（换行符、制表符、转义符等），因为python-docx是不支持控制字符写入的。</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_control_characters</span><span class="params">(content)</span>:</span></span><br><span class="line">    mpa = dict.fromkeys(range(<span class="number">32</span>))</span><br><span class="line">    <span class="keyword">return</span> content.translate(mpa)</span><br></pre></td></tr></table></figure>
+<p>控制字符就是ASCII码在32以下的，所以我们使用str的translate方法，把32以下的字符移除就可以。</p>
+<h2 id="用是能用，但是太慢了！"><a href="#用是能用，但是太慢了！" class="headerlink" title="用是能用，但是太慢了！"></a>用是能用，但是太慢了！</h2><p><img src="/upload/too-slow.jpg" alt></p>
+<p>如果我们用上面代码去转换100个PDF文件，就会发现速度慢到难以接受，每个PDF都需要花很长时间才能转换好，怎么办？别急，接下来我们引入多线程，同时转换多个PDF，可以有效加快转换速度。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ProcessPoolExecutor</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> ProcessPoolExecutor(max_workers=int(config[<span class="string">'max_worker'</span>])) <span class="keyword">as</span> executor:</span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> os.listdir(config[<span class="string">'pdf_folder'</span>]):</span><br><span class="line">        extension_name = os.path.splitext(file)[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> extension_name != <span class="string">'.pdf'</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        file_name = os.path.splitext(file)[<span class="number">0</span>]</span><br><span class="line">        pdf_file = config[<span class="string">'pdf_folder'</span>] + <span class="string">'/'</span> + file</span><br><span class="line">        word_file = config[<span class="string">'word_folder'</span>] + <span class="string">'/'</span> + file_name + <span class="string">'.docx'</span></span><br><span class="line">        print(<span class="string">'正在处理: '</span>, file)</span><br><span class="line">        result = executor.submit(pdf_to_word, pdf_file, word_file)</span><br><span class="line">        tasks.append(result)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    exit_flag = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">for</span> task <span class="keyword">in</span> tasks:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> task.done():</span><br><span class="line">            exit_flag = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">if</span> exit_flag:</span><br><span class="line">        print(<span class="string">'完成'</span>)</span><br><span class="line">        exit(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>代码中config是包含存储PDF文件夹地址和word文件夹地址的字典，使用Python标准库中的concurrent包，实现多进程，pdf_to_word方法是对上面读取PDF和写入word逻辑的封装。后面的while循环是查询任务是否进行完成。</p>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><p>到这里，我们已经实现了多线程批量转换PDF为word文档。拿谋篇著名文章来试验一下，效果如图（左侧是转换后的word，右侧是PDF）：</p>
+<p><img src="/upload/pdf-and-word.jpg" alt></p>
+<h2 id="不想写代码？"><a href="#不想写代码？" class="headerlink" title="不想写代码？"></a>不想写代码？</h2><p>本文介绍的所有代码，已经打包成了一个独立可运行的项目，存放在github，如果不想自己写代码，可以直接clone或下载github项目运行。项目地址如下（记得点star）：</p>
+<p><a href="https://github.com/simpleapples/pdf2word" target="_blank" rel="noopener">https://github.com/simpleapples/pdf2word</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2016/08/28/snake-crack/">「贪吃蛇大作战」的刷分尝试</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2016-08-28
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>昨天同学推荐了一个最近比较火的游戏「贪吃蛇大作战」，今天已经到了AppStore总榜第二的位置。这两天一有空就会掏出手机玩几盘，不过无尽模式玩到3000分左右就遇到了瓶颈，于是怀着单纯的目的想研究下这个游戏的接口…</p>
+<p><img src="/upload/snake-1.png" alt="图1"></p>
+<h2 id="使用Charles抓取请求"><a href="#使用Charles抓取请求" class="headerlink" title="使用Charles抓取请求"></a>使用Charles抓取请求</h2><p>既然是研究接口，第一步就是看看接口的URL和参数返回都是什么了，请出神器Charles。</p>
+<p><img src="/upload/snake-2.png" alt="图2"></p>
+<p>通过Charles可以清楚地看到，游戏提交分数的接口和参数，至于返回，貌似没什么用。接下来仔细研究下请求，有几个参数能比较容易的判断他们的含义和作用。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">device_id:</span> <span class="string">设备ID</span></span><br><span class="line"><span class="attr">game_mode:</span> <span class="number">1</span><span class="string">是无尽模式</span> <span class="number">2</span><span class="string">是限时模式</span></span><br><span class="line"><span class="attr">kill:</span> <span class="string">击杀次数</span></span><br><span class="line"><span class="attr">length:</span> <span class="string">蛇的长度</span></span><br><span class="line"><span class="attr">market:</span> <span class="string">我抓的是iOS设备发的请求，所以这里是apple</span></span><br><span class="line"><span class="attr">platform:</span> <span class="string">抓到的请求里是1，还不太明白具体的意思</span></span><br><span class="line"><span class="attr">push_channel:</span> <span class="string">也是1，不明白意思</span></span><br><span class="line"><span class="attr">push_id:</span> <span class="string">固定值111111111222222223333333344444444，后面逆向apk也证明了这一点</span></span><br><span class="line"><span class="attr">sid:</span> <span class="string">每次登录都会更新</span></span><br><span class="line"><span class="attr">snake_sign:</span> <span class="string">签名</span></span><br><span class="line"><span class="attr">uid:</span> <span class="string">用户ID</span></span><br><span class="line"><span class="attr">version:</span> <span class="string">我使用的版本是固定值2.1</span></span><br></pre></td></tr></table></figure>
+<h2 id="通过逆向APK获取签名算法"><a href="#通过逆向APK获取签名算法" class="headerlink" title="通过逆向APK获取签名算法"></a>通过逆向APK获取签名算法</h2><p>明确了参数的意思，接下来就可以伪造请求了，不过在伪造请求之前，还有一个参数比较麻烦，那就是snake_sign，请求签名，从图中snake_sign的内容看，似乎有点像是一个base64过的东西，不过base64decode发现，根本不可读。与其猜签名算法，不如考虑一下其他办法。</p>
+<p>「贪吃蛇大作战」还有安卓版本，并且引导下载的页面提供了apk，于是下载apk，使用<a href="https://github.com/skylot/jadx" target="_blank" rel="noopener">jadx-gui</a>进行逆向，使用jadx-gui打开apk后，代码一览无余。</p>
+<p>通过查看代码，可以清楚的看到snake_sign字段的签名逻辑，首先将请求中所有参数按ASCII码顺序排列拼接成字符串，然后在字符串前添加<code>POST&amp; + [URL Path]</code>，添加后使用Key进行SHA1加密，key也可以在代码中获取到。对加密生成的结果，需要做一次base64，才是最终snake_sign字段的结果。</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST<span class="variable">&amp;top_list_v2</span>/update_score<span class="variable">&amp;device_id</span>=XXX<span class="variable">&amp;game_mode</span>=<span class="number">1</span><span class="variable">&amp;kill</span>=<span class="number">1</span><span class="variable">&amp;length</span>=<span class="number">35</span><span class="variable">&amp;market</span>=apple<span class="variable">&amp;platform</span>=<span class="number">1</span><span class="variable">&amp;push_channel</span>=<span class="number">1</span><span class="variable">&amp;push_id</span>=<span class="number">111111111222222223333333344444444</span><span class="variable">&amp;sid</span>=XXX<span class="variable">&amp;uid</span>=XXX<span class="variable">&amp;version</span>=<span class="number">2.1</span></span><br></pre></td></tr></table></figure>
+<p><img src="/upload/snake-3.png" alt="图3"></p>
+<h2 id="关于「贪吃蛇大作战」的一些猜测"><a href="#关于「贪吃蛇大作战」的一些猜测" class="headerlink" title="关于「贪吃蛇大作战」的一些猜测"></a>关于「贪吃蛇大作战」的一些猜测</h2><p>签名方法已经获取到，本以为可以安心刷分了，但是只成功刷了一次4000分160击杀。猜测可能进入排行版需要人工审核，一个理由是刷完后过了几分钟才显示到排行版，另一个理由是，刷完4000分169击杀后，很快刷了一个高的离谱的分，但是并没有显示在排行榜，后面无论刷多少分都再也没有显示出来过，怀疑可能被人工屏蔽。</p>
+<p>另外整个游戏和API的交互只有登录、获取用户信息、获取排行版最高分、提交分数等几种，所以游戏也不是真正的实时。</p>
+<p><img src="/upload/snake-4.png" alt="图4"></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目</a>
         </h1>
 
@@ -312,76 +416,6 @@
 <p>图中变量time和get方法time重名，而编译器对这种重名的处理在Flex SDK和Air SDK下是不一样的。</p>
 <p>Flex SDK下，会根据上下文将<code>var time:int = time;</code>中的第二个time作为get方法，而Air SDK中，这行两个time会被当作同一个变量，也就是自己等于自己，而int类型定义时候会被初始化为0，所以使用Air SDK输出结果为0，使用Flex SDK输出结果为1000。</p>
 <p>看来Air SDK不如Flex SDK智能啊 :)</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/">Eclipse 4.3安装Flash Builder Plugin</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2014-02-27
-        </span><span class="post-category">
-            <a href="/categories/Actionscript/">Actionscript</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>Flash Builder是一个基于Eclipse的IDE，在Flash Builder文件夹下的utilities目录下，官方已经为我们提供了插件版的安装程序，名为Adobe Flash Builder 4.7 Plug-in Utility，插件版可以将Flash Builder嵌入到已经安装好的Eclipse中，作为Eclipse的一个视图，这样就可以在Eclipse中开发AS程序。</p>
-<p>执行插件版安装程序后按提示进行，Eclipse目前的最新版是4.3，而Flash Builder 4.7的插件版只支持Eclipse 3.7或4.2版，无法安装在4.3中。</p>
-<p><img src="/upload/flashbuilder4.7plugin.png" alt="Alt text"></p>
-<p>解决办法是，下载Eclipse 4.2，现将Flash Builder插件版安装到4.2版的Eclipse中，再拷贝Eclipse文件夹下的dropins目录覆盖Eclipse 4.3的dropins。启动Eclipse 4.3，第一次启动速度会很慢，启动后，Flash Builder插件版就已经安装到Eclipse 4.3中了。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2014/01/08/the-key-of-object-in-javascript/">Javscript中Object的Key</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2014-01-08
-        </span><span class="post-category">
-            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>先来看一段代码：</p>
-<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span></span><br><span class="line"><span class="xml">	var c1 = document.getElementById("e1");</span></span><br><span class="line"><span class="xml">	var c2 = document.getElementById("e2");</span></span><br><span class="line"><span class="xml">	var obj = </span><span class="template-variable">&#123;&#125;</span><span class="xml">;</span></span><br><span class="line"><span class="xml">	obj[c1] = 1;</span></span><br><span class="line"><span class="xml">	obj[c2] = 2;</span></span><br><span class="line"><span class="xml">	console.log(obj);</span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
-<p>上面这段代码会输出什么结果呢？答案是：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Object</span> &#123;[<span class="class"><span class="keyword">object</span> <span class="title">HTMLDivElement</span>]</span>: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
-<p>为什么给了obj两个元素，输出出来却变成了一个呢？难道c1和c2指向同一个元素？首先c1和c2是两个不同的dom节点，并且通过输出<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
-<p>Object {[object HTMLDivElement]: 1, [object HTMLUListElement]: 2}<br><code>`</code></p>
-<p>当使用object时，需要注意key的类型会被转换为string。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/10/30/do-not-name-the-project-go-in-liteide/">不要将LiteIDE的项目文件夹命名为go</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-10-30
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>在LiteIDE中编写Go语言程序中，使用Ctrl+R编译运行，Console中每次都输出一样的内容，即使代码改了，也还是最初代码的内容，也就是说新的代码压根没有被编译。</p>
-<p>一开始怀疑是LiteIDE的问题，于是重启LiteIDE甚至是重启系统，不过重启后问题依旧。在其他位置新建项目后，能够正常编译执行，而当我把在其他地方创建的源文件拷贝到之前项目位置后，又出现了不能编译的问题。</p>
-<p>于是到项目文件夹里找问题，猛然发现编译出的可执行文件名竟然是go.exe！原来这就是问题所在。</p>
-<p><img src="/upload/liteide-go.png" alt="Alt text"></p>
-<p>解决问题之前首先需要了解一下LiteIDE在编译执行过程中做了什么。</p>
-<p>第一步：调用<figure class="highlight go"><figcaption><span>build```编译源文件，并以项目名称为可执行文件名称输出</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">第二步：执行输出的可执行文件</span><br><span class="line"></span><br><span class="line">问题主要出在LiteIDE将编译的可执行文件和项目文件夹同名，而我之前所建立的项目文件夹的名字刚好是<span class="string">``</span><span class="string">`go`</span><span class="string">``</span>，当文件第二次编译时，LiteIDE调用的<span class="keyword">go</span>程序实际上就成了刚才编译出的程序，导致即使代码改变，程序也还是根据最早的代码编译出来的。</span><br><span class="line"></span><br><span class="line">既然问题找到了，那么下面说说解决方法：</span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> LiteIDE应该通过完整路径调用<span class="string">``</span><span class="string">`go build`</span><span class="string">``</span>命令，例如<span class="string">``</span><span class="string">`C:/go/bin/go.exe build</span></span><br></pre></td></tr></table></figure></p>
-<ol start="2">
-<li>LiteIDE应该在编译之前删除之前编译好的文件</li>
-<li>不要将项目文件夹命名为<code>go</code></li>
-</ol>
-<p>前面两项都是LiteIDE层面的改进方法，而最后一项是在LiteIDE改进之前避免这种问题的方法。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/4/">

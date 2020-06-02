@@ -105,7 +105,7 @@
     <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#基于-Session-的会话管理"><span class="toc-text">基于 Session 的会话管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于-Token-的会话管理"><span class="toc-text">基于 Token 的会话管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JWT-介绍"><span class="toc-text">JWT 介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JWT-优势-amp-问题"><span class="toc-text">JWT 优势 &amp; 问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于-JWT-的实践"><span class="toc-text">基于 JWT 的实践</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关注Python私房菜"><span class="toc-text">关注Python私房菜</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#基于-Session-的会话管理"><span class="toc-text">基于 Session 的会话管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于-Token-的会话管理"><span class="toc-text">基于 Token 的会话管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JWT-介绍"><span class="toc-text">JWT 介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JWT-优势-amp-问题"><span class="toc-text">JWT 优势 &amp; 问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于-JWT-的实践"><span class="toc-text">基于 JWT 的实践</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
     </div>
   </div><div class="post-content"><p><img src="/upload/20181213_01.jpg" alt></p>
 <p>HTTP 是一个无状态的协议，一次请求结束后，下次在发送服务器就不知道这个请求是谁发来的了（同一个 IP 不代表同一个用户），在 Web 应用中，用户的认证和鉴权是非常重要的一环，实践中有多种可用方案，并且各有千秋。</p>
@@ -168,7 +168,6 @@
 <p>将生成的 Refresh Token 以及过期时间存储在服务端的数据库中，由于 Refresh Token 不会在客户端请求业务接口时验证，只有在申请新的 Access Token 时才会验证，所以将 Refresh Token 存储在数据库中，不会对业务接口的响应时间造成影响，也不需要像 Session 一样一直保持在内存中以应对大量的请求。</p>
 <p>上述的架构，提供了服务端禁用用户 Token 的方式，当用户需要登出或禁用用户时，只需要将服务端的 Refresh Token 禁用或删除，用户就会在 Access Token 过期后，由于无法获取到新的 Access Token 而再也无法访问需要认证的接口。这样的方式虽然会有一定的窗口期（取决于 Access Token 的失效时间），但是结合用户登出时客户端删除 Access Token 的操作，基本上可以适应常规情况下对用户认证鉴权的精度要求。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>JWT 的使用，提高了开发者开发用户认证鉴权功能的效率，降低了系统架构复杂度，避免了大量的数据库和缓存查询，降低了业务接口的响应延迟。然而 JWT 的这些优点也增加了 Token 管理上的难度，通过引入 Refresh Token，既能继续使用 JWT 所带来的优势，又能使得 Token 管理的精度符合业务的需求。</p>
-<h3 id="关注Python私房菜"><a href="#关注Python私房菜" class="headerlink" title="关注Python私房菜"></a>关注Python私房菜</h3><p><img src="/upload/wechat-qrcode.jpg" alt></p>
 
       </div>
       <div class="post-copyright">

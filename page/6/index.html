@@ -90,6 +90,76 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/">Eclipse 4.3安装Flash Builder Plugin</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-02-27
+        </span><span class="post-category">
+            <a href="/categories/Actionscript/">Actionscript</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>Flash Builder是一个基于Eclipse的IDE，在Flash Builder文件夹下的utilities目录下，官方已经为我们提供了插件版的安装程序，名为Adobe Flash Builder 4.7 Plug-in Utility，插件版可以将Flash Builder嵌入到已经安装好的Eclipse中，作为Eclipse的一个视图，这样就可以在Eclipse中开发AS程序。</p>
+<p>执行插件版安装程序后按提示进行，Eclipse目前的最新版是4.3，而Flash Builder 4.7的插件版只支持Eclipse 3.7或4.2版，无法安装在4.3中。</p>
+<p><img src="/upload/flashbuilder4.7plugin.png" alt="Alt text"></p>
+<p>解决办法是，下载Eclipse 4.2，现将Flash Builder插件版安装到4.2版的Eclipse中，再拷贝Eclipse文件夹下的dropins目录覆盖Eclipse 4.3的dropins。启动Eclipse 4.3，第一次启动速度会很慢，启动后，Flash Builder插件版就已经安装到Eclipse 4.3中了。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2014/01/08/the-key-of-object-in-javascript/">Javscript中Object的Key</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-01-08
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>先来看一段代码：</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"e2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span></span><br><span class="line"><span class="xml">	var c1 = document.getElementById("e1");</span></span><br><span class="line"><span class="xml">	var c2 = document.getElementById("e2");</span></span><br><span class="line"><span class="xml">	var obj = </span><span class="template-variable">&#123;&#125;</span><span class="xml">;</span></span><br><span class="line"><span class="xml">	obj[c1] = 1;</span></span><br><span class="line"><span class="xml">	obj[c2] = 2;</span></span><br><span class="line"><span class="xml">	console.log(obj);</span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>上面这段代码会输出什么结果呢？答案是：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Object</span> &#123;[<span class="class"><span class="keyword">object</span> <span class="title">HTMLDivElement</span>]</span>: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>为什么给了obj两个元素，输出出来却变成了一个呢？难道c1和c2指向同一个元素？首先c1和c2是两个不同的dom节点，并且通过输出<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>Object {[object HTMLDivElement]: 1, [object HTMLUListElement]: 2}<br><code>`</code></p>
+<p>当使用object时，需要注意key的类型会被转换为string。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2013/10/30/do-not-name-the-project-go-in-liteide/">不要将LiteIDE的项目文件夹命名为go</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-10-30
+        </span><span class="post-category">
+            <a href="/categories/Golang/">Golang</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在LiteIDE中编写Go语言程序中，使用Ctrl+R编译运行，Console中每次都输出一样的内容，即使代码改了，也还是最初代码的内容，也就是说新的代码压根没有被编译。</p>
+<p>一开始怀疑是LiteIDE的问题，于是重启LiteIDE甚至是重启系统，不过重启后问题依旧。在其他位置新建项目后，能够正常编译执行，而当我把在其他地方创建的源文件拷贝到之前项目位置后，又出现了不能编译的问题。</p>
+<p>于是到项目文件夹里找问题，猛然发现编译出的可执行文件名竟然是go.exe！原来这就是问题所在。</p>
+<p><img src="/upload/liteide-go.png" alt="Alt text"></p>
+<p>解决问题之前首先需要了解一下LiteIDE在编译执行过程中做了什么。</p>
+<p>第一步：调用<figure class="highlight go"><figcaption><span>build```编译源文件，并以项目名称为可执行文件名称输出</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">第二步：执行输出的可执行文件</span><br><span class="line"></span><br><span class="line">问题主要出在LiteIDE将编译的可执行文件和项目文件夹同名，而我之前所建立的项目文件夹的名字刚好是<span class="string">``</span><span class="string">`go`</span><span class="string">``</span>，当文件第二次编译时，LiteIDE调用的<span class="keyword">go</span>程序实际上就成了刚才编译出的程序，导致即使代码改变，程序也还是根据最早的代码编译出来的。</span><br><span class="line"></span><br><span class="line">既然问题找到了，那么下面说说解决方法：</span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> LiteIDE应该通过完整路径调用<span class="string">``</span><span class="string">`go build`</span><span class="string">``</span>命令，例如<span class="string">``</span><span class="string">`C:/go/bin/go.exe build</span></span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li>LiteIDE应该在编译之前删除之前编译好的文件</li>
+<li>不要将项目文件夹命名为<code>go</code></li>
+</ol>
+<p>前面两项都是LiteIDE层面的改进方法，而最后一项是在LiteIDE改进之前避免这种问题的方法。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/09/27/hack-google-doodle-game/">破解Google Doodle小游戏</a>
         </h1>
 
@@ -247,95 +317,6 @@
     </header>
 
     <div class="post-content"><p>工作中需要一个应用内的全局下载管理器，于是使用AS3实现了一个。<br>使用一个数组来存储下载列表，当向列表中添加一个新的下载项时，会检查列表，如果有未下载项，则下载该项，下载完成后再次检查列表，当目前有进行中的下载时，不添加新的下载进程，以保证同时只有一个下载进程。<br>github: <a href="https://github.com/simpleapples/AS3DownloadManager" target="_blank" rel="noopener">https://github.com/simpleapples/AS3DownloadManager</a></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/03/07/javascript-runtime-environment-for-vim/">为vim打造javascript运行环境</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-03-07
-        </span><span class="post-category">
-            <a href="/categories/Mac-Linux/">Mac&Linux</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>平时测试javascript代码都是写一个html页面，放到body里面，再在浏览器中执行网页，然后看javascript控制台。突然想到可以使用javascript引擎直接执行js。ok，说干就干。<br>google了一下，有Mozilla的引擎SpiderMonkey和google的v8引擎，嗯，既然公认v8引擎比较快，那就用v8吧。不过看了一下网上的文章，安装v8引擎好麻烦 = .=<br>忽然想起来nodeJS使用的好像是v8引擎，那么直接用nodeJS执行js就好了。<br>上<a href="http://nodejs.org" target="_blank" rel="noopener">nodeJS官网</a>下载最新版，有针对mac的pkg安装包，安装完成后就要让vim使用nodeJS执行js文件了。接下来修改.vimrc文件。<br>在.vimrc中为javascript文件添加编译命令：node filename.js，如图。  </p>
-<p><img src="/upload/javascript-enviroment.png" alt="图1"></p>
-<p>完成这些步骤，就可以在vim中直接运行javascript了。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/03/05/ios-6-text-alignment/">iOS6文字居中问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-03-05
-        </span><span class="post-category">
-            <a href="/categories/Mobile/">Mobile</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>升级Xcode之后一直没有用过，今天给一个label写居中属性，发现以前的文字居中属性UITextAlignment已经不推荐使用。如图。</p>
-<p><img src="/upload/ios6-text1.png" alt="Alt text"></p>
-<p>查看文档，原来在iOS6中已经有了新的属性NSTextAlignment。</p>
-<p><img src="/upload/ios6-text2.png" alt="Alt text"></p>
-<p><img src="/upload/ios6-text3.png" alt="Alt text"></p>
-<p>新属性增加了Justified和Natural，于是好奇在label中尝试了一下Natural属性。报错。</p>
-<p><img src="/upload/ios6-text4.png" alt="Alt text"></p>
-<p>提示textAlignment中不能使用NSTextAlignmentNatural，当然，Justified也不能用（= .=），也就是说，对于label标签中的文字，只能使用center、left、right三种属性，和UITextAlignment一样。ok，那么，什么情况下可以使用Justified和Natural呢？</p>
-<p>搜了一下，没有发现问题的解答，不过从苹果的文档来看，Justified和Natural可能是针对大段文字的，没有尝试，只是推测。(⊙o⊙)…</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/01/06/classes-and-inheritance-in-javascript/">Javascript学习笔记--伪类和继承</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-01-06
-        </span><span class="post-category">
-            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>Javascript中继承可以分为两大类（非构造函数的继承和构造函数的继承），先从简单的说起，了解一下基于构造函数的继承。<br>Javascript是一门基于原形的的语言，本身并没有类的概念，所以只能用模拟基于类的模式来实现类和类的继承。用构造函数来模拟类的概念。例如，我们定义一个Person类。  </p>
-<pre><code>function Person(name, age) {
-    this.name = name;
-    this.age = age;
-}
-</code></pre><p>上面就定义了一个Person类，包含name和age属性，下面来调用这个类。</p>
-<pre><code>var somebody = new Person(&quot;John&quot;, 18);
-alert(somebody.name);  // John
-alert(somebody.age);  // 18
-</code></pre><p>OK,到这里就完成了一个简单的类的构造函数和调用方法。接下来，进一步了解类的继承，比如需要一个Developer的类，Developer类需要继承Person类，此外还要包含工程师所会的语言（lang）和性别（sex）。还是用构造函数的方法来写这个类。</p>
-<pre><code>function Developer(name, age, sex, lang) {
-    this.person = Person;
-    this.person(name, age);
-    delete this.person;
-    this.sex = sex;
-    this.lang = lang;
-}
-</code></pre><p>Developer类就可以继承Person中的属性了，尝试调用一下。</p>
-<pre><code>var coder = new Developer(&quot;Bill&quot;, 22, &quot;Male&quot;, &quot;Javascript&quot;);
-alert(coder.name);  // Bill
-alert(coder.age);  // 22
-alert(coder.sex);  // Male
-alert(coder.lang);  // Javascript
-</code></pre><p>Developer类中对于Person类的继承方法非常好理解，由于Javascript是基于函数的，而Person这个构造函数本质上也是函数，那么就可以用调用Person的方法继承它。看到这里可能有人会问，既然通过对构造函数的调用可以实现继承，那么为什么不直接使用</p>
-<pre><code>Person(name, age);
-</code></pre><p>来调用呢？这里要考虑this的作用域了，当直接调用Person时候，this会指向全局，而不是Developer。直接调用Person，可以试试在全局中输出this.name。<br>好，既然明白这种继承的调用方法的原理，那么就可以扩展开了，因为函数的调用方式有很多种，举几个例子。</p>
-<pre><code>Person.call(this, name, age);
-Person.apply(this, [name, age]);
-</code></pre><p>到这里就完成了Javascript中最简单的类的构造和继承。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/5/">
