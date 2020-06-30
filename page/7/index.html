@@ -98,6 +98,23 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2013/04/24/actionscript3-download-manager/">AS3下载管理器</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-04-24
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>工作中需要一个应用内的全局下载管理器，于是使用AS3实现了一个。<br>使用一个数组来存储下载列表，当向列表中添加一个新的下载项时，会检查列表，如果有未下载项，则下载该项，下载完成后再次检查列表，当目前有进行中的下载时，不添加新的下载进程，以保证同时只有一个下载进程。<br>github: <a href="https://github.com/simpleapples/AS3DownloadManager" target="_blank" rel="noopener">https://github.com/simpleapples/AS3DownloadManager</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/03/07/javascript-runtime-environment-for-vim/">为vim打造javascript运行环境</a>
         </h1>
 
@@ -346,37 +363,6 @@ timeInter = setInterval(timer, 3000);  //设置定时器3000ms
 <p>Interval层第一帧为计时器代码，Interval最后一帧代码非常重要：</p>
 <pre><code>ClearInterval(timeInter);
 </code></pre><p>最后一帧清除掉计时器，是防止循环播放后重复添加多个计时器。<br>Stop层每一帧添加stop();命令。Content层为具体内容。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/11/14/compass-web-app/">指南针WebApp</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-11-14
-        </span><span class="post-category">
-            <a href="/categories/Idea-Demo/">Idea&Demo</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>使用javascript制作了一个指南针的WebApp。</p>
-<p>监听了DeviceOrientation事件，设备在变换方位时会产生alpha、beta、gamma三个值，而其中的alpha值就是目前的角度值。</p>
-<pre><code>window.addEventListener(&apos;deviceorientation&apos;,function(event) {
-    target.style.transform = &apos;rotate(&apos; + event.alpha + &apos;)&apos;;
-},false);
-</code></pre><p>alpha值以正北为0°，顺时针增加到360°，对应的就是指南针指针的旋转角度。</p>
-<p>使用css3的transfrom属性就可以旋转指针。</p>
-<p>最后对指南针的度数进行判断，计算出方向（如北偏东XX度，南偏西XX度等）。</p>
-<p>只能在支持DeviceOrientation的浏览器上正常使用（mobile safari、android 4.0+ browser、mobile ）</p>
-<p>演示地址: <a href="http://labs.simpleapples.com/compass" target="_blank" rel="noopener">http://labs.simpleapples.com/compass</a></p>
-<p>GitHub: <a href="http://github.com/simpleapples/compass" target="_blank" rel="noopener">http://github.com/simpleapples/compass</a></p>
-<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>发现这个应用在iPhone下会出现将手机初始方向认成正北的问题。= =!</p>
-<p>解决方法是使用webkitCompassHeading来获取角度，而不是alpha值。webkitCompassHeading的值是设备方向和地磁北极的角度差，而alpha值是设备转动的角度。参见苹果文档：</p>
-<p><a href="http://developer.apple.com/library/safari/#documentation/SafariDOMAdditions/Reference/DeviceOrientationEventClassRef/DeviceOrientationEvent/DeviceOrientationEvent.html" target="_blank" rel="noopener">http://developer.apple.com/library/safari/#documentation/SafariDOMAdditions/Reference/DeviceOrientationEventClassRef/DeviceOrientationEvent/DeviceOrientationEvent.html</a></p>
-<p>在安卓平台的Opera浏览器下alpha值就是设备和北极的角度差，可能是Opera对html5的支持比较好。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/6/">

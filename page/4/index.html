@@ -98,6 +98,197 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/06/11/things-you-dont-know-about-python/">你所不知道的Python | 字符串格式化的演进之路</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-06-11
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180611_01.jpg" alt></p>
+<p>字符串格式化对于每个语言来说都是一个非常基础和常用的功能，学习Python的同学大概都知道可以用%语法来格式化字符串。然而为了让我们更方便的使用这个常用功能，语言本身也在对字符串格式化方法进行迭代。</p>
+<h1 id="Python-2-6以前：-操作符"><a href="#Python-2-6以前：-操作符" class="headerlink" title="Python 2.6以前：%操作符"></a>Python 2.6以前：%操作符</h1><p>在Python 2.6出现之前，字符串迭代只有一种方法，就是%（也是取模）操作符，%操作符支持unicode和str类型的Python字符串，效果和C语言中的sprintf()方法相似，下面是一个使用%格式化字符串的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">"I'm %s. I'm %d year old"</span> % (<span class="string">'Tom'</span>, <span class="number">27</span>))</span><br></pre></td></tr></table></figure>
+<p>%符号前面使用一个字符串作为模板，模板中有标记格式的占位符号，%后面是一个tuple或者dict，用来传递需要格式化的值。占位符控制着显示的格式，下面列表展示了占位符的种类：</p>
+<table>
+<thead>
+<tr>
+<th>占位符</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%d</td>
+<td>十进制整数</td>
+</tr>
+<tr>
+<td>%i</td>
+<td>十进制整数</td>
+</tr>
+<tr>
+<td>%o</td>
+<td>八进制整数</td>
+</tr>
+<tr>
+<td>%u</td>
+<td>无符号整数</td>
+</tr>
+<tr>
+<td>%x</td>
+<td>无符号十六进制（小写）</td>
+</tr>
+<tr>
+<td>%X</td>
+<td>无符号十六进制（大写）</td>
+</tr>
+<tr>
+<td>%e</td>
+<td>浮点型（科学记数法，小写）</td>
+</tr>
+<tr>
+<td>%E</td>
+<td>浮点型（科学记数法，大写）</td>
+</tr>
+<tr>
+<td>%f</td>
+<td>浮点数</td>
+</tr>
+<tr>
+<td>%F</td>
+<td>浮点数</td>
+</tr>
+<tr>
+<td>%g</td>
+<td>浮点型，如果小数位数超过4位，使用科学记数法表示（小写）</td>
+</tr>
+<tr>
+<td>%G</td>
+<td>浮点型，如果小数位数超过4位，使用科学记数法表示（大写）</td>
+</tr>
+<tr>
+<td>%c</td>
+<td>单个字符</td>
+</tr>
+<tr>
+<td>%r</td>
+<td>字符串（调用repr()方法生成）</td>
+</tr>
+<tr>
+<td>%s</td>
+<td>字符串（调用str()方法生成）</td>
+</tr>
+</tbody>
+</table>
+<p>除了对数据类型的指定，%操作符还支持更复杂的格式控制：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%[<span class="string">数据名称</span>][<span class="symbol">对齐标志</span>][<span class="string">宽度</span>].[精度]类型</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据名称</td>
+<td>数据名称用于字典赋值，如果%符号后面传递的数组就不需要填写了</td>
+</tr>
+<tr>
+<td>对齐标志</td>
+<td>有+、-、0、‘ ’四种，+表示显示正负数符号，-表示左对齐，空格表示在左侧填充一个空格，0表示用0填充</td>
+</tr>
+<tr>
+<td>宽度</td>
+<td>表示格式化后的字符串长度，位数不足用0或空格补齐</td>
+</tr>
+<tr>
+<td>精度</td>
+<td>小数点后的位数</td>
+</tr>
+<tr>
+<td>类型</td>
+<td>数据类型（参考占位符种类）</td>
+</tr>
+</tbody>
+</table>
+<p>例如print(‘%053f’ % ‘12.34’)会输出0012.340</p>
+<h1 id="Python-2-6：format函数"><a href="#Python-2-6：format函数" class="headerlink" title="Python 2.6：format函数"></a>Python 2.6：format函数</h1><p>到Python2.6时，出现了一种新的字符串格式化方式，str.format()函数，相比于%操作符，format函数使用{}和:代替了%，威力更加强大，在映射关系方面，format函数支持位置映射、关键字映射、对象属性映射、下标映射等多种方式，不仅参数可以不按顺序，也可以不用参数或者一个参数使用多次，下面通过几个例子来说明。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'&#123;1&#125; &#123;0&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 可以不按顺序进行位置映射，输出'123 abc'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;&#125; &#123;&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 可以不指定参数名称，输出'abc 123'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;1&#125; &#123;0&#125; &#123;1&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 参数可以使用多次，输出'123 abc 123'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;name&#125; &#123;age&#125;'</span>.format(name=<span class="string">'tom'</span>, age=<span class="number">27</span>)  <span class="comment"># 可以按关键字映射，输出'tom 27'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;person.name&#125; &#123;person.age&#125;'</span>.format(person=person)  <span class="comment"># 可以按对象属性映射，输出'tom 27'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;0[1]&#125; &#123;0[0]&#125;'</span>.format(lst)  <span class="comment"># 通过下标映射</span></span><br></pre></td></tr></table></figure>
+<p>可以看到，format函数比%操作符使用起来更加方便，不需要记住太多各种占位符代表的意义，代码可读性也更高。在复杂格式控制方面，format函数也提供了更加强大的控制方式：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">[填充字符</span>]对齐方式][<span class="string">符号标志</span>][<span class="symbol">#</span>][<span class="string">宽度</span>][<span class="symbol">,</span>][<span class="string">.精度</span>][<span class="symbol">类型</span>]</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'&#123;:S^+#016,.2f&#125;'</span>.format(<span class="number">1234</span>)  <span class="meta"># 输出<span class="string">'SSS+1,234.00SSSS'</span></span></span><br></pre></td></tr></table></figure>
+<p>我们以上面的代码为例，通过表格说明一下format格式控制参数：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型</th>
+<th>说明</th>
+<th>示例说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">填充字符</td>
+<td>不填时默认用空格填充</td>
+<td>S表示用S填充</td>
+</tr>
+<tr>
+<td style="text-align:left">对齐方式</td>
+<td>^表示居中对齐、&lt;表示左对齐、&gt;表示右对齐</td>
+<td>^表示居中对齐，左右位数不足部分会用填充字符填充</td>
+</tr>
+<tr>
+<td style="text-align:left">符号标志</td>
+<td>+表示有符号（正数前显示+，负数前显示-），空格表示整数前加一个空格以和负数对齐</td>
+<td>+表示正数前显示空格</td>
+</tr>
+<tr>
+<td style="text-align:left">#</td>
+<td>表示是否在二进制、八进制、十六进制前显示0b、0o、0x等符号</td>
+<td>#表示显示进制符号，由于是十进制，所以不显示</td>
+</tr>
+<tr>
+<td style="text-align:left">宽度</td>
+<td>表示输出字符串的宽度</td>
+<td>16表示字符串宽度为16，不足部分会补齐</td>
+</tr>
+<tr>
+<td style="text-align:left">,</td>
+<td>表示使用,作为千位分隔符</td>
+<td>,表示使用千位分隔符</td>
+</tr>
+<tr>
+<td style="text-align:left">精度</td>
+<td>表示小数点后数字位数</td>
+<td>.2表示精度为2为</td>
+</tr>
+<tr>
+<td style="text-align:left">类型</td>
+<td>s表示字符串类型，c表示字符类型，b\o\d分别表示二八十进制，x\X表示小写和大写十六进制，e\E表示小写和大写的科学记数法，f表示浮点型</td>
+<td>f表示浮点型数字</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到format函数在%基础上丰富了格式控制种类，并且使输出更容易。</p>
+<h1 id="Python-3-6：f-string"><a href="#Python-3-6：f-string" class="headerlink" title="Python 3.6：f-string"></a>Python 3.6：f-string</h1><p>不少使用过ES6的小伙伴会知道其中的模板字符串，采用直接在字符串中内嵌变量的方式进行字符串格式化操作，Python在3.6版本中也为我们带来了类似的功能：Formatted String Literals（字面量格式化字符串），简称f-string。</p>
+<p>f-string就是以f’’开头的字符串，类似u’’和b’’，字符串内容和format方法中的格式一样，但是可以直接将变量带入到字符串中，可读性进一步增加，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">amount = <span class="number">1234</span></span><br><span class="line"><span class="string">f'请转账给我<span class="subst">&#123;amount:,<span class="number">.2</span>f&#125;</span>元'</span>  <span class="comment"># '请转账给我1,234.00元'</span></span><br></pre></td></tr></table></figure>
+<p>同时，f-string的性能是比%和format都有提升的，我们做一个简单的测试，分别使用%操作符、format和f-string将下面语句执行10000次：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'My name is %s and i'</span>m %s years old.<span class="string">' % (name, age)</span></span><br><span class="line"><span class="string">'</span>My name <span class="keyword">is</span> &#123;&#125; <span class="keyword">and</span> i<span class="string">'m &#123;&#125; years old.'</span>.format(name, age)</span><br><span class="line"><span class="string">f'My name is <span class="subst">&#123;name&#125;</span> and i'</span>m &#123;age&#125; years old.<span class="string">'</span></span><br></pre></td></tr></table></figure>
+<p>用时结果如下：</p>
+<p><img src="/upload/20180611_02.png" alt></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>如果你的项目使用的Python版本已经提升到3.6，f-string格式化是首选方式，不仅在保持功能强大的同时语义上更容易理解，而且性能也有较大的提升。如果项目还没有提升到3.6或者使用的2.7，更建议使用format，虽然性能上没有优势，但是语义上还是比%操作符更加便于理解的，功能也更加强大。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/05/31/python-cheat-sheet/">初学者必备 | Python Cheat Sheet 中文版</a>
         </h1>
 
@@ -457,46 +648,6 @@
 <p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
 <p>接下来看代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenBucket</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, rate, capacity)</span>:</span></span><br><span class="line">        self._rate = rate</span><br><span class="line">        self._capacity = capacity</span><br><span class="line">        self._current_amount = <span class="number">0</span></span><br><span class="line">        self._last_consume_time = int(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">consume</span><span class="params">(self, token_amount)</span>:</span></span><br><span class="line">        increment = (int(time.time()) - self._last_consume_time) * self._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        self._current_amount = min(</span><br><span class="line">            increment + self._current_amount, self._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; self._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        self._last_consume_time = int(time.time())</span><br><span class="line">        self._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/03/14/understanding-blockchain/">最爱你的人，会让你不费脑细胞的理解区块链原理</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-03-14
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20180314_01.png" alt></p>
-<p>区块链是一个近期非常火的概念，随便走进一个写字楼的电梯，都会听到有人谈论区块链，或者炒币: ) 希望通过这篇文章，能让你对区块链的概念有一个整体的认识，在理解概念后，<strong>下一篇文章将用大约300行Python代码，实现一个区块链网络。</strong></p>
-<h1 id="区块-和-链"><a href="#区块-和-链" class="headerlink" title="区块 和 链"></a>区块 和 链</h1><p>所谓区块，就是一个块咯（要不然还是什么？），把这些块一个一个连在一起，像链条一样，就称为区块链（别急着打我，先往下看）。</p>
-<p><img src="/upload/20180314_02.jpg" alt="区块和区块链"></p>
-<p>这是一些链条，链条的价值更多的体现在锁楼下小电动车的时候，不过我们再仔细看一下这个链条是不是有点像那什么？⛓</p>
-<p><img src="/upload/20180314_03.gif" alt="脱氧核糖核酸"></p>
-<p>很聪明，高中生物老师在冲你微笑！这就是传说中的脱氧核糖核酸（DNA），DNA也是一种链式结构，<strong>携带了遗传信息</strong>。区块链中的“区块”，就好比DNA分子中的脱氧核糖核苷酸（我也不知道自己在说什么），而区块链中的“链”，就好比DNA分子的链式结构。</p>
-<p>DNA和链条的价值差异，关键在于DNA携带了大量遗传<strong>信息</strong>，而链条什么都没有携带。对于区块链来说，携带信息也是它的一个重要特点（不携带信息连锁电动车的作用都没有）。</p>
-<p>当区块链携带的是账务信息的时候，它就变成了一个特别厉害的东西——账本（我们给他起了个00后的名字——比特币）。</p>
-<h1 id="Peer-to-Peer"><a href="#Peer-to-Peer" class="headerlink" title="Peer-to-Peer"></a>Peer-to-Peer</h1><p>为了显得专业一些，我们祭出比特币的创造者，中本聪的论文<a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">《Bitcoin: A Peer-to-Peer Electronic Cash System》</a>，从这篇论文的题目我们可以看到，区块链是基于<strong>Peer-to-Peer</strong>的，下面就来了解一下什么是Peer-to-Peer。</p>
-<p>Peer-to-Peer，简称P2P（不是互联网借贷的那个P2P），它是一种点对点网络，看图（我也不知道该怎么讲）。</p>
-<p><img src="/upload/20180314_04.jpg" alt="P2P网络"></p>
-<p>图中每一个方脑袋就是一个Peer（节点），注意一下，这些方脑袋有一个共同点，他们都一毛一样（不仅长得一样，每一个脑袋都跟其它脑袋相连）。这也是P2P网络的最大特点——<strong>去中心化</strong>，P2P网络中不存在中心节点，所有节点都是平等的，任何一个节点，想跟谁说话就跟谁说话，并且谁（节点）都不能说了算。</p>
-<h1 id="共识机制"><a href="#共识机制" class="headerlink" title="共识机制"></a>共识机制</h1><p>你和好基友老王，还有你们共同喜欢的一个姑娘阿圆（对，就是圆滚滚的圆），组成了一个三节点的P2P网络，根据P2P网络定义你们三个人谁都不能说了算。这一天，阿圆生日，你和老王同时给阿圆送了一个大蛋糕，那么问题来了，阿圆先吃哪个呢？</p>
-<p>既然没有人能说了算，也不能让你和老王决斗（计算机这么做恐怕人类会毁灭），那么就需要采用一个文明的办法决定——商量。既然商量，就要有规矩，这个规矩叫<strong>共识机制</strong>。</p>
-<p><img src="/upload/20180314_05.png" alt></p>
-<h1 id="Proof-of-work"><a href="#Proof-of-work" class="headerlink" title="Proof-of-work"></a>Proof-of-work</h1><p>区块链共识机制有很多种，Proof-of-work（POW，工作量证明）是其中一种，所谓工作量证明，有点像是比武招亲。你和老王对阿圆都很好，阿圆也很难抉择到底先吃谁的蛋糕，于是她请了两位武力相当的武林高手，让你和老王分别与高手过招，谁赢了高手，就先吃谁的蛋糕，如果你们都赢了高手，那么谁先赢算数。</p>
-<p><img src="/upload/20180314_06.jpg" alt></p>
-<h1 id="把这些捏在一起"><a href="#把这些捏在一起" class="headerlink" title="把这些捏在一起"></a>把这些捏在一起</h1><p>了解了POW、共识机制、P2P、区块、链的概念，我们就可以把他们拼在一起，看看会发生什么了。</p>
-<p><img src="/upload/20180314_07.jpeg" alt="区块链诞生了！"></p>
-<p>我们把P2P网络中的每一个节点，赋予一条链，这样网络中所有的链都是平等的了，接下来在其中一条链上增加一个带有信息的区块，P2P网络会将这个区块同步到所有的链上，也就是这条信息会被存储在所有节点。</p>
-<p>把上面的一段话缩成一句（会显得比较厉害）：</p>
-<p><strong>区块链是用分布式数据库识别、传播和记载信息的智能化对等网络, 也称为价值互联网。</strong></p>
-<p>看到这里是不是对区块链略知一二了？</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/3/">

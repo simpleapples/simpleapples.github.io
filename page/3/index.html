@@ -98,6 +98,87 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/10/08/faster-python-part-1/">翻译 | 更快的Python（一）</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-10-08
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20181008_11.png" alt></p>
+<p>更快的Python（<a href="http://pythonfasterway.org" target="_blank" rel="noopener">Python Faster Way</a>）使用代码示例来说明如何书写Python代码能带来更高的性能。本文对代码进行了讲解，从性能和可读性等角度来选择出最适合的写法。</p>
+<h3 id="例子1：字符串格式化"><a href="#例子1：字符串格式化" class="headerlink" title="例子1：字符串格式化"></a>例子1：字符串格式化</h3><p><img src="/upload/20181008_01.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.95</strong></li>
+<li>使用建议：Python 3.7或以上推荐使用f-string，其他版本推荐使用format方法。</li>
+<li>说明：字符串格式化是代码中最常遇到的情况，虽然在连接少量字符串的情景中，使用+号的性能最优，但是使用+号的代码可读性最差。如果使用Python 3.7或优以上版本，可以使用f-string来解决这个问题，f-string的性能比format方法和%操作符的性能都要高，可读性也比+号好。</li>
+</ul>
+<h3 id="例子2：字典的初始化"><a href="#例子2：字典的初始化" class="headerlink" title="例子2：字典的初始化"></a>例子2：字典的初始化</h3><p><img src="/upload/20181008_02.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.83</strong></li>
+<li>使用建议：使用字面量初始化字典（以及其他集合类型）。</li>
+<li>说明：Python中初始化集合类型时使用字面量的方式，解释器会直接调用BUILD_MAP等字节码来创建，如果用构造函数的方式来创建，则需要先查询构造方法，再执行构造方法。使用字面量初始化，Python代码也更简洁。</li>
+</ul>
+<h3 id="例子3：内置排序方法"><a href="#例子3：内置排序方法" class="headerlink" title="例子3：内置排序方法"></a>例子3：内置排序方法</h3><p><img src="/upload/20181008_03.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.26</strong></li>
+<li>使用建议：根据是否需要修改原始值来决定使用哪个方法。</li>
+<li>说明：sorted和list.sort方法是Python中内置的排序方法，sorted方法不会修改原始值，list.sort方法在原始值上直接排序，会修改原始值。比较这两个方法的性能差异，意义不大。</li>
+</ul>
+<h3 id="例子4：初始化多个变量"><a href="#例子4：初始化多个变量" class="headerlink" title="例子4：初始化多个变量"></a>例子4：初始化多个变量</h3><p><img src="/upload/20181008_04.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.01</strong></li>
+<li>使用建议：推荐使用第二种。</li>
+<li>说明：从字节码中可以看出两种方式出了执行顺序之外，基本一致，所以性能上也非常接近。</li>
+</ul>
+<h3 id="例子5：多个变量的比较"><a href="#例子5：多个变量的比较" class="headerlink" title="例子5：多个变量的比较"></a>例子5：多个变量的比较</h3><p><img src="/upload/20181008_05.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.11</strong></li>
+<li>使用建议：推荐使用第二种。</li>
+<li>说明：使用第一种方法能带来一定的性能提升，但是提升有限，在实际情况中也很少出现多个变量连续比较大小的情况，并且第一种方法非常不Pythonic，所以推荐使用第二种。</li>
+</ul>
+<h3 id="例子6：if-true的条件判断"><a href="#例子6：if-true的条件判断" class="headerlink" title="例子6：if true的条件判断"></a>例子6：if true的条件判断</h3><p><img src="/upload/20181008_06.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.17</strong></li>
+<li>使用建议：推荐使用第一种。</li>
+<li>说明：从字节码上看，第一种方法的性能最高，并且语法上也更加简洁。</li>
+</ul>
+<h3 id="例子7：if-false的条件判断"><a href="#例子7：if-false的条件判断" class="headerlink" title="例子7：if false的条件判断"></a>例子7：if false的条件判断</h3><p><img src="/upload/20181008_07.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.10</strong></li>
+<li>使用建议：推荐使用第一种。</li>
+<li>说明：从字节码上看，第一种方法的性能最高，语法角度上，if not写成第二种和第三种都是不推荐的。</li>
+</ul>
+<h3 id="例子8：判断list是否为空"><a href="#例子8：判断list是否为空" class="headerlink" title="例子8：判断list是否为空"></a>例子8：判断list是否为空</h3><p><img src="/upload/20181008_08.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.55</strong></li>
+<li>使用建议：根据具体需求，优先使用前两种。</li>
+<li>说明：前两种代码性能更高，代码更简洁。同时，空列表a并不等于None，所以使用if a is None无法实现对空列表的判断。</li>
+</ul>
+<h3 id="例子9：判断object是否为空"><a href="#例子9：判断object是否为空" class="headerlink" title="例子9：判断object是否为空"></a>例子9：判断object是否为空</h3><p><img src="/upload/20181008_09.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.00</strong></li>
+<li>使用建议：根据具体需求，优先使用前两种。</li>
+<li>说明：理由同上一个例子。</li>
+</ul>
+<h3 id="例子10：遍历可迭代对象"><a href="#例子10：遍历可迭代对象" class="headerlink" title="例子10：遍历可迭代对象"></a>例子10：遍历可迭代对象</h3><p><img src="/upload/20181008_10.png" alt></p>
+<ul>
+<li>最差/最优时间比：<strong>1.12</strong></li>
+<li>使用建议：根据具体情况选择。</li>
+<li>说明：两者性能差别不大，使用enumerate方法，可以不需要取对象的长度，可以直接获取到对象的index。</li>
+</ul>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><ul>
+<li><a href="http://pythonfasterway.org" target="_blank" rel="noopener">Python Faster Way</a></li>
+</ul>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/09/14/how-to-use-defer-in-go/">Go语言中defer的一些坑</a>
         </h1>
 
@@ -516,197 +597,6 @@
 <p>WinDbg使用说明：<a href="https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html" target="_blank" rel="noopener">https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html</a></p>
 <p>知乎用户<a href="https://www.zhihu.com/people/weasley-frank" target="_blank" rel="noopener">Weasley Frank</a>的专栏文章<a href="https://zhuanlan.zhihu.com/p/33723838" target="_blank" rel="noopener">TGP/WeGame驱动导致WSL网络服务异常
 </a>对这个问题进行了简单分析</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/06/11/things-you-dont-know-about-python/">你所不知道的Python | 字符串格式化的演进之路</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-06-11
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20180611_01.jpg" alt></p>
-<p>字符串格式化对于每个语言来说都是一个非常基础和常用的功能，学习Python的同学大概都知道可以用%语法来格式化字符串。然而为了让我们更方便的使用这个常用功能，语言本身也在对字符串格式化方法进行迭代。</p>
-<h1 id="Python-2-6以前：-操作符"><a href="#Python-2-6以前：-操作符" class="headerlink" title="Python 2.6以前：%操作符"></a>Python 2.6以前：%操作符</h1><p>在Python 2.6出现之前，字符串迭代只有一种方法，就是%（也是取模）操作符，%操作符支持unicode和str类型的Python字符串，效果和C语言中的sprintf()方法相似，下面是一个使用%格式化字符串的例子：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">"I'm %s. I'm %d year old"</span> % (<span class="string">'Tom'</span>, <span class="number">27</span>))</span><br></pre></td></tr></table></figure>
-<p>%符号前面使用一个字符串作为模板，模板中有标记格式的占位符号，%后面是一个tuple或者dict，用来传递需要格式化的值。占位符控制着显示的格式，下面列表展示了占位符的种类：</p>
-<table>
-<thead>
-<tr>
-<th>占位符</th>
-<th>内容</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>%d</td>
-<td>十进制整数</td>
-</tr>
-<tr>
-<td>%i</td>
-<td>十进制整数</td>
-</tr>
-<tr>
-<td>%o</td>
-<td>八进制整数</td>
-</tr>
-<tr>
-<td>%u</td>
-<td>无符号整数</td>
-</tr>
-<tr>
-<td>%x</td>
-<td>无符号十六进制（小写）</td>
-</tr>
-<tr>
-<td>%X</td>
-<td>无符号十六进制（大写）</td>
-</tr>
-<tr>
-<td>%e</td>
-<td>浮点型（科学记数法，小写）</td>
-</tr>
-<tr>
-<td>%E</td>
-<td>浮点型（科学记数法，大写）</td>
-</tr>
-<tr>
-<td>%f</td>
-<td>浮点数</td>
-</tr>
-<tr>
-<td>%F</td>
-<td>浮点数</td>
-</tr>
-<tr>
-<td>%g</td>
-<td>浮点型，如果小数位数超过4位，使用科学记数法表示（小写）</td>
-</tr>
-<tr>
-<td>%G</td>
-<td>浮点型，如果小数位数超过4位，使用科学记数法表示（大写）</td>
-</tr>
-<tr>
-<td>%c</td>
-<td>单个字符</td>
-</tr>
-<tr>
-<td>%r</td>
-<td>字符串（调用repr()方法生成）</td>
-</tr>
-<tr>
-<td>%s</td>
-<td>字符串（调用str()方法生成）</td>
-</tr>
-</tbody>
-</table>
-<p>除了对数据类型的指定，%操作符还支持更复杂的格式控制：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%[<span class="string">数据名称</span>][<span class="symbol">对齐标志</span>][<span class="string">宽度</span>].[精度]类型</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>内容</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>数据名称</td>
-<td>数据名称用于字典赋值，如果%符号后面传递的数组就不需要填写了</td>
-</tr>
-<tr>
-<td>对齐标志</td>
-<td>有+、-、0、‘ ’四种，+表示显示正负数符号，-表示左对齐，空格表示在左侧填充一个空格，0表示用0填充</td>
-</tr>
-<tr>
-<td>宽度</td>
-<td>表示格式化后的字符串长度，位数不足用0或空格补齐</td>
-</tr>
-<tr>
-<td>精度</td>
-<td>小数点后的位数</td>
-</tr>
-<tr>
-<td>类型</td>
-<td>数据类型（参考占位符种类）</td>
-</tr>
-</tbody>
-</table>
-<p>例如print(‘%053f’ % ‘12.34’)会输出0012.340</p>
-<h1 id="Python-2-6：format函数"><a href="#Python-2-6：format函数" class="headerlink" title="Python 2.6：format函数"></a>Python 2.6：format函数</h1><p>到Python2.6时，出现了一种新的字符串格式化方式，str.format()函数，相比于%操作符，format函数使用{}和:代替了%，威力更加强大，在映射关系方面，format函数支持位置映射、关键字映射、对象属性映射、下标映射等多种方式，不仅参数可以不按顺序，也可以不用参数或者一个参数使用多次，下面通过几个例子来说明。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'&#123;1&#125; &#123;0&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 可以不按顺序进行位置映射，输出'123 abc'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;&#125; &#123;&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 可以不指定参数名称，输出'abc 123'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;1&#125; &#123;0&#125; &#123;1&#125;'</span>.format(<span class="string">'abc'</span>, <span class="number">123</span>)  <span class="comment"># 参数可以使用多次，输出'123 abc 123'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;name&#125; &#123;age&#125;'</span>.format(name=<span class="string">'tom'</span>, age=<span class="number">27</span>)  <span class="comment"># 可以按关键字映射，输出'tom 27'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;person.name&#125; &#123;person.age&#125;'</span>.format(person=person)  <span class="comment"># 可以按对象属性映射，输出'tom 27'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'&#123;0[1]&#125; &#123;0[0]&#125;'</span>.format(lst)  <span class="comment"># 通过下标映射</span></span><br></pre></td></tr></table></figure>
-<p>可以看到，format函数比%操作符使用起来更加方便，不需要记住太多各种占位符代表的意义，代码可读性也更高。在复杂格式控制方面，format函数也提供了更加强大的控制方式：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">[填充字符</span>]对齐方式][<span class="string">符号标志</span>][<span class="symbol">#</span>][<span class="string">宽度</span>][<span class="symbol">,</span>][<span class="string">.精度</span>][<span class="symbol">类型</span>]</span><br></pre></td></tr></table></figure>
-<p>例如：</p>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'&#123;:S^+#016,.2f&#125;'</span>.format(<span class="number">1234</span>)  <span class="meta"># 输出<span class="string">'SSS+1,234.00SSSS'</span></span></span><br></pre></td></tr></table></figure>
-<p>我们以上面的代码为例，通过表格说明一下format格式控制参数：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">类型</th>
-<th>说明</th>
-<th>示例说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">填充字符</td>
-<td>不填时默认用空格填充</td>
-<td>S表示用S填充</td>
-</tr>
-<tr>
-<td style="text-align:left">对齐方式</td>
-<td>^表示居中对齐、&lt;表示左对齐、&gt;表示右对齐</td>
-<td>^表示居中对齐，左右位数不足部分会用填充字符填充</td>
-</tr>
-<tr>
-<td style="text-align:left">符号标志</td>
-<td>+表示有符号（正数前显示+，负数前显示-），空格表示整数前加一个空格以和负数对齐</td>
-<td>+表示正数前显示空格</td>
-</tr>
-<tr>
-<td style="text-align:left">#</td>
-<td>表示是否在二进制、八进制、十六进制前显示0b、0o、0x等符号</td>
-<td>#表示显示进制符号，由于是十进制，所以不显示</td>
-</tr>
-<tr>
-<td style="text-align:left">宽度</td>
-<td>表示输出字符串的宽度</td>
-<td>16表示字符串宽度为16，不足部分会补齐</td>
-</tr>
-<tr>
-<td style="text-align:left">,</td>
-<td>表示使用,作为千位分隔符</td>
-<td>,表示使用千位分隔符</td>
-</tr>
-<tr>
-<td style="text-align:left">精度</td>
-<td>表示小数点后数字位数</td>
-<td>.2表示精度为2为</td>
-</tr>
-<tr>
-<td style="text-align:left">类型</td>
-<td>s表示字符串类型，c表示字符类型，b\o\d分别表示二八十进制，x\X表示小写和大写十六进制，e\E表示小写和大写的科学记数法，f表示浮点型</td>
-<td>f表示浮点型数字</td>
-</tr>
-</tbody>
-</table>
-<p>可以看到format函数在%基础上丰富了格式控制种类，并且使输出更容易。</p>
-<h1 id="Python-3-6：f-string"><a href="#Python-3-6：f-string" class="headerlink" title="Python 3.6：f-string"></a>Python 3.6：f-string</h1><p>不少使用过ES6的小伙伴会知道其中的模板字符串，采用直接在字符串中内嵌变量的方式进行字符串格式化操作，Python在3.6版本中也为我们带来了类似的功能：Formatted String Literals（字面量格式化字符串），简称f-string。</p>
-<p>f-string就是以f’’开头的字符串，类似u’’和b’’，字符串内容和format方法中的格式一样，但是可以直接将变量带入到字符串中，可读性进一步增加，例如：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">amount = <span class="number">1234</span></span><br><span class="line"><span class="string">f'请转账给我<span class="subst">&#123;amount:,<span class="number">.2</span>f&#125;</span>元'</span>  <span class="comment"># '请转账给我1,234.00元'</span></span><br></pre></td></tr></table></figure>
-<p>同时，f-string的性能是比%和format都有提升的，我们做一个简单的测试，分别使用%操作符、format和f-string将下面语句执行10000次：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'My name is %s and i'</span>m %s years old.<span class="string">' % (name, age)</span></span><br><span class="line"><span class="string">'</span>My name <span class="keyword">is</span> &#123;&#125; <span class="keyword">and</span> i<span class="string">'m &#123;&#125; years old.'</span>.format(name, age)</span><br><span class="line"><span class="string">f'My name is <span class="subst">&#123;name&#125;</span> and i'</span>m &#123;age&#125; years old.<span class="string">'</span></span><br></pre></td></tr></table></figure>
-<p>用时结果如下：</p>
-<p><img src="/upload/20180611_02.png" alt></p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>如果你的项目使用的Python版本已经提升到3.6，f-string格式化是首选方式，不仅在保持功能强大的同时语义上更容易理解，而且性能也有较大的提升。如果项目还没有提升到3.6或者使用的2.7，更建议使用format，虽然性能上没有优势，但是语义上还是比%操作符更加便于理解的，功能也更加强大。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/2/">

@@ -98,6 +98,27 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/">Air SDK和Flex SDK的区别</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-03-27
+        </span><span class="post-category">
+            <a href="/categories/Actionscript/">Actionscript</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>最近将AS开发的SDK从Flex SDK 4.9.1升级到了Air SDK 4.0，导致之前写的一个FLV播放器不能播放视频了，最后发现bug是一个方法内的变量名和类中的一个get方法重名了。类似下图中所示情况：</p>
+<p><img src="/upload/air-and-flex-sdk.png" alt="Alt text"></p>
+<p>图中变量time和get方法time重名，而编译器对这种重名的处理在Flex SDK和Air SDK下是不一样的。</p>
+<p>Flex SDK下，会根据上下文将<code>var time:int = time;</code>中的第二个time作为get方法，而Air SDK中，这行两个time会被当作同一个变量，也就是自己等于自己，而int类型定义时候会被初始化为0，所以使用Air SDK输出结果为0，使用Flex SDK输出结果为1000。</p>
+<p>看来Air SDK不如Flex SDK智能啊 :)</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/">Eclipse 4.3安装Flash Builder Plugin</a>
         </h1>
 
@@ -309,23 +330,6 @@
     return YES;
 }
 </code></pre>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/04/24/actionscript3-download-manager/">AS3下载管理器</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-04-24
-        </span><span class="post-category">
-            <a href="/categories/Idea-Demo/">Idea&Demo</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>工作中需要一个应用内的全局下载管理器，于是使用AS3实现了一个。<br>使用一个数组来存储下载列表，当向列表中添加一个新的下载项时，会检查列表，如果有未下载项，则下载该项，下载完成后再次检查列表，当目前有进行中的下载时，不添加新的下载进程，以保证同时只有一个下载进程。<br>github: <a href="https://github.com/simpleapples/AS3DownloadManager" target="_blank" rel="noopener">https://github.com/simpleapples/AS3DownloadManager</a></p>
-
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/5/">
         <i class="iconfont icon-left"></i>

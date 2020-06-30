@@ -98,6 +98,37 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/11/14/compass-web-app/">指南针WebApp</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-14
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>使用javascript制作了一个指南针的WebApp。</p>
+<p>监听了DeviceOrientation事件，设备在变换方位时会产生alpha、beta、gamma三个值，而其中的alpha值就是目前的角度值。</p>
+<pre><code>window.addEventListener(&apos;deviceorientation&apos;,function(event) {
+    target.style.transform = &apos;rotate(&apos; + event.alpha + &apos;)&apos;;
+},false);
+</code></pre><p>alpha值以正北为0°，顺时针增加到360°，对应的就是指南针指针的旋转角度。</p>
+<p>使用css3的transfrom属性就可以旋转指针。</p>
+<p>最后对指南针的度数进行判断，计算出方向（如北偏东XX度，南偏西XX度等）。</p>
+<p>只能在支持DeviceOrientation的浏览器上正常使用（mobile safari、android 4.0+ browser、mobile ）</p>
+<p>演示地址: <a href="http://labs.simpleapples.com/compass" target="_blank" rel="noopener">http://labs.simpleapples.com/compass</a></p>
+<p>GitHub: <a href="http://github.com/simpleapples/compass" target="_blank" rel="noopener">http://github.com/simpleapples/compass</a></p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>发现这个应用在iPhone下会出现将手机初始方向认成正北的问题。= =!</p>
+<p>解决方法是使用webkitCompassHeading来获取角度，而不是alpha值。webkitCompassHeading的值是设备方向和地磁北极的角度差，而alpha值是设备转动的角度。参见苹果文档：</p>
+<p><a href="http://developer.apple.com/library/safari/#documentation/SafariDOMAdditions/Reference/DeviceOrientationEventClassRef/DeviceOrientationEvent/DeviceOrientationEvent.html" target="_blank" rel="noopener">http://developer.apple.com/library/safari/#documentation/SafariDOMAdditions/Reference/DeviceOrientationEventClassRef/DeviceOrientationEvent/DeviceOrientationEvent.html</a></p>
+<p>在安卓平台的Opera浏览器下alpha值就是设备和北极的角度差，可能是Opera对html5的支持比较好。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/11/12/thunder-link-decoder/">迅雷链接解密</a>
         </h1>
 
@@ -377,34 +408,13 @@ ONBOOT=&quot;yes&quot; //使设备启动
 </code></pre><p>查看设备eth0是否分配到正确ip，网络是否可以ping通。</p>
 
         </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/10/19/ios-push-notification-certificate/">iOS 推送证书制作 （JAVA/PHP）</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-10-19
-        </span><span class="post-category">
-            <a href="/categories/Mobile/">Mobile</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>在使用Java或者PHP制作iOS推送服务器的时候，需要自己从开发者网站上导出的aps_developer_identity证书和Apple Development Push Services证书进行合成，生成可以供Java使用的p12证书或供PHP使用的pem证书。</p>
-<p>aps_developer_identity证书和Apple Development Push Services证书的申请过程可以参考：</p>
-<p><a href="http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html" target="_blank" rel="noopener">http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html</a></p>
-<p>本文着重讨论如何合成证书</p>
-<p>1.将aps_developer_identity.cer转换成pem<br><figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">$openssl</span> x509 -in aps_developer_identity.cer -inform der -out PushChatCert.pem</span></span><br></pre></td></tr></table></figure></p>
-<p>2.将Apple Development Push Services证书转换成pem<br><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$openssl pkcs12 -nocerts -<span class="keyword">out</span> PushChatKey.pem -<span class="keyword">in</span> <span class="keyword">Push</span>.p12</span><br></pre></td></tr></table></figure></p>
-<p>3.合成两个pem证书</p>
-<p>1)Java服务器所需的证书为p12格式<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">$openssl</span> pkcs12 -<span class="meta">export</span> -in <span class="keyword">PushChatCert.pem </span>-inkey <span class="keyword">PushChatKey.pem </span>-out <span class="keyword">pushCert.p12 </span>-name “apns-cert”</span><br></pre></td></tr></table></figure></p>
-<p>2）PHP服务器所需证书为pem格式<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$cat</span> PushChatCert<span class="selector-class">.pem</span> PushChatKey<span class="selector-class">.pem</span> &gt; pushCert.pem</span><br></pre></td></tr></table></figure></p>
-
-        </div></article>
       <nav class="pagination"><a class="prev" href="/page/7/">
         <i class="iconfont icon-left"></i>
         <span class="prev-text">上一页</span>
+      </a>
+    <a class="next" href="/page/9/">
+        <span class="next-text">下一页</span>
+        <i class="iconfont icon-right"></i>
       </a>
     </nav></section></div></div>
       </main>
