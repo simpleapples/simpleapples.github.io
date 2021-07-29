@@ -6,13 +6,6 @@ comments: true
 categories: MySQL
 ---
 
-# MySQL 子查询中order by不生效问题
-
-Created: July 29, 2021 5:56 PM
-Created By: Zhiya Zang
-Last Edited By: Zhiya Zang
-Last Edited Time: July 29, 2021 9:16 PM
-
 一个偶然的机会，发现一条SQL语句在不同的MySQL实例上执行得到了不同的结果。
 
 # 问题描述
