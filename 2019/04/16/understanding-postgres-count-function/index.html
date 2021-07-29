@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="理解 PostgreSQL 的 count 函数的行为"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2019/04/16/understanding-postgres-count-function/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>理解 PostgreSQL 的 count 函数的行为 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">理解 PostgreSQL 的 count 函数的行为
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-04-16
+        </span><span class="post-category">
+            <a href="/categories/DevOps/">DevOps</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>关于 count 函数的使用一直存在争议，尤其是在 MySQL 中，作为流行度越来越高的 PostgreSQL 是否也有类似的问题呢，我们通过实践来理解一下 PostgreSQL 中 count 函数的行为。</p>
+<span id="more"></span>
+
+<h3 id="构建测试数据库"><a href="#构建测试数据库" class="headerlink" title="构建测试数据库"></a>构建测试数据库</h3><p>创建测试数据库，并创建测试表。测试表中有自增 ID、创建时间、内容三个字段，自增 ID 字段是主键。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> database performance_test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test_tbl (id serial <span class="keyword">primary</span> key, created_at <span class="type">timestamp</span>, content <span class="type">varchar</span>(<span class="number">512</span>));</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成测试数据"><a href="#生成测试数据" class="headerlink" title="生成测试数据"></a>生成测试数据</h3><p>使用 generate_series 函数生成自增 ID，使用 now() 函数生成 created_at 列，对于 content 列，使用了 repeat(md5(random()::text), 10) 生成 10 个 32 位长度的 md5 字符串。使用下列语句，插入 1000w 条记录用于测试。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">performance_test<span class="operator">=</span># <span class="keyword">insert</span> <span class="keyword">into</span> test_tbl <span class="keyword">select</span> generate_series(<span class="number">1</span>,<span class="number">10000000</span>),now(),repeat(md5(random()::text),<span class="number">10</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="number">0</span> <span class="number">10000000</span></span><br><span class="line"><span class="type">Time</span>: <span class="number">212184.223</span> ms (<span class="number">03</span>:<span class="number">32.184</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="由-count-语句引发的思考"><a href="#由-count-语句引发的思考" class="headerlink" title="由 count 语句引发的思考"></a>由 count 语句引发的思考</h3><p>默认情况下 PostgreSQL 不开启 SQL 执行时间的显示，所以需要手动开启一下，方便后面的测试对比。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\timing <span class="keyword">on</span></span><br></pre></td></tr></table></figure>
+
+<p>count(*) 和 count(1) 的性能区别是经常被讨论的问题，分别使用 count(*) 和 count(1) 执行一次查询。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">performance_test<span class="operator">=</span># <span class="keyword">select</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> <span class="number">10000000</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">115090.380</span> ms (<span class="number">01</span>:<span class="number">55.090</span>)</span><br><span class="line"></span><br><span class="line">performance_test<span class="operator">=</span># <span class="keyword">select</span> <span class="built_in">count</span>(<span class="number">1</span>) <span class="keyword">from</span> test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> <span class="number">10000000</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">738.502</span> ms</span><br></pre></td></tr></table></figure>
+
+<p>可以看到两次查询的速度差别非常大，count(1) 真的有这么大的性能提升？接下来再次运行查询语句。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">performance_test<span class="operator">=</span># <span class="keyword">select</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> <span class="number">10000000</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">657.831</span> ms</span><br><span class="line"></span><br><span class="line">performance_test<span class="operator">=</span># <span class="keyword">select</span> <span class="built_in">count</span>(<span class="number">1</span>) <span class="keyword">from</span> test_tbl;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> <span class="number">10000000</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">682.157</span> ms</span><br></pre></td></tr></table></figure>
+
+<p>可以看到第一次查询时候会非常的慢，后面三次速度非常快并且时间相近，这里就有两个问题出现了：</p>
+<ul>
+<li>为什么第一次查询速度这么慢？</li>
+<li>count(*) 和 count(1) 到底存不存在性能差别？</li>
+</ul>
+<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><p>使用 explain 语句重新执行查询语句</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain (analyze,buffers,verbose) <span class="keyword">select</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> test_tbl;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到如下输出：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (<span class="attribute">cost</span>=529273.69..529273.70 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=882.569..882.570 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1)</span><br><span class="line">  Output: count(*)</span><br><span class="line">  Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">  -&gt;  Gather  (<span class="attribute">cost</span>=529273.48..529273.69 <span class="attribute">rows</span>=2 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=882.492..884.170 <span class="attribute">rows</span>=3 <span class="attribute">loops</span>=1)</span><br><span class="line">        Output: (PARTIAL count(*))</span><br><span class="line">        Workers Planned: 2</span><br><span class="line">        Workers Launched: 2</span><br><span class="line">        Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">        -&gt;  Partial Aggregate  (<span class="attribute">cost</span>=528273.48..528273.49 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=881.014..881.014 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=3)</span><br><span class="line">              Output: PARTIAL count(*)</span><br><span class="line">              Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">              Worker 0: actual <span class="attribute">time</span>=880.319..880.319 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">hit</span>=34 <span class="attribute">read</span>=158206</span><br><span class="line">              Worker 1: actual <span class="attribute">time</span>=880.369..880.369 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">hit</span>=29 <span class="attribute">read</span>=156424</span><br><span class="line">              -&gt;  Parallel Seq Scan on public.test_tbl  (<span class="attribute">cost</span>=0.00..517856.98 <span class="attribute">rows</span>=4166598 <span class="attribute">width</span>=0) (actual <span class="attribute">time</span>=0.029..662.165 <span class="attribute">rows</span>=3333333 <span class="attribute">loops</span>=3)</span><br><span class="line">                    Buffers: shared <span class="attribute">hit</span>=96 <span class="attribute">read</span>=476095</span><br><span class="line">                    Worker 0: actual <span class="attribute">time</span>=0.026..661.807 <span class="attribute">rows</span>=3323029 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">hit</span>=34 <span class="attribute">read</span>=158206</span><br><span class="line">                    Worker 1: actual <span class="attribute">time</span>=0.030..660.197 <span class="attribute">rows</span>=3285513 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">hit</span>=29 <span class="attribute">read</span>=156424</span><br><span class="line">Planning time: 0.043 ms</span><br><span class="line">Execution time: 884.207 ms</span><br></pre></td></tr></table></figure>
+
+<p>注意里面的 shared hit，表示命中了内存中缓存的数据，这就可以解释为什么后面的查询会比第一次快很多。接下来去掉缓存，并重启 PostgreSQL。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service postgresql stop</span><br><span class="line"><span class="built_in">echo</span> 1 &gt; /proc/sys/vm/drop_caches</span><br><span class="line">service postgresql start</span><br></pre></td></tr></table></figure>
+
+<p>重新执行 SQL 语句，速度慢了很多。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (<span class="attribute">cost</span>=529273.69..529273.70 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=50604.564..50604.564 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1)</span><br><span class="line">  Output: count(*)</span><br><span class="line">  Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">  -&gt;  Gather  (<span class="attribute">cost</span>=529273.48..529273.69 <span class="attribute">rows</span>=2 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=50604.508..50606.141 <span class="attribute">rows</span>=3 <span class="attribute">loops</span>=1)</span><br><span class="line">        Output: (PARTIAL count(*))</span><br><span class="line">        Workers Planned: 2</span><br><span class="line">        Workers Launched: 2</span><br><span class="line">        Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">        -&gt;  Partial Aggregate  (<span class="attribute">cost</span>=528273.48..528273.49 <span class="attribute">rows</span>=1 <span class="attribute">width</span>=8) (actual <span class="attribute">time</span>=50591.550..50591.551 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=3)</span><br><span class="line">              Output: PARTIAL count(*)</span><br><span class="line">              Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">              Worker 0: actual <span class="attribute">time</span>=50585.182..50585.182 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">read</span>=158122</span><br><span class="line">              Worker 1: actual <span class="attribute">time</span>=50585.181..50585.181 <span class="attribute">rows</span>=1 <span class="attribute">loops</span>=1</span><br><span class="line">                Buffers: shared <span class="attribute">read</span>=161123</span><br><span class="line">              -&gt;  Parallel Seq Scan on public.test_tbl  (<span class="attribute">cost</span>=0.00..517856.98 <span class="attribute">rows</span>=4166598 <span class="attribute">width</span>=0) (actual <span class="attribute">time</span>=92.491..50369.691 <span class="attribute">rows</span>=3333333 <span class="attribute">loops</span>=3)</span><br><span class="line">                    Buffers: shared <span class="attribute">read</span>=476191</span><br><span class="line">                    Worker 0: actual <span class="attribute">time</span>=122.170..50362.271 <span class="attribute">rows</span>=3320562 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">read</span>=158122</span><br><span class="line">                    Worker 1: actual <span class="attribute">time</span>=14.020..50359.733 <span class="attribute">rows</span>=3383583 <span class="attribute">loops</span>=1</span><br><span class="line">                      Buffers: shared <span class="attribute">read</span>=161123</span><br><span class="line">Planning time: 11.537 ms</span><br><span class="line">Execution time: 50606.215 ms</span><br></pre></td></tr></table></figure>
+<p>shared read 表示没有命中缓存，通过这个现象可以推断出，上一小节的四次查询中，第一次查询没有命中缓存，剩下三次查询都命中了缓存。</p>
+<h4 id="count-1-和-count-的区别"><a href="#count-1-和-count-的区别" class="headerlink" title="count(1) 和 count(*) 的区别"></a>count(1) 和 count(*) 的区别</h4><p>接下来探究 count(1) 和 count(*) 的区别是什么，继续思考最开始的四次查询，第一次查询使用了 count(*)，第二次查询使用了 count(1) ，却依然命中了缓存，不正是说明 count(1) 和 count(*) 是一样的吗？</p>
+<p>事实上，PostgreSQL 官方对于 is there a difference performance-wise between select count(1) and select count(*)? 问题的回复也证实了这一点：</p>
+<blockquote>
+<p>Nope. In fact, the latter is converted to the former during parsing.[2]</p>
+</blockquote>
+<p>既然 count(1) 在性能上没有比 count(*) 更好，那么使用 count(*) 就是更好的选择。</p>
+<h3 id="sequence-scan-和-index-scan"><a href="#sequence-scan-和-index-scan" class="headerlink" title="sequence scan 和 index scan"></a>sequence scan 和 index scan</h3><p>接下来测试一下，在不同数据量大小的情况下 count(*) 的速度，将查询语句写在 count.sql 文件中，使用 pgbench 进行测试。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pgbench -c 5 -t 20 performance_test -r -f count.sql</span><br></pre></td></tr></table></figure>
+
+<p>分别测试 200w - 1000w 数据量下的 count 语句耗时</p>
+<table>
+<thead>
+<tr>
+<th>数据大小</th>
+<th>count耗时(ms)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>200w</td>
+<td>738.758</td>
+</tr>
+<tr>
+<td>300w</td>
+<td>1035.846</td>
+</tr>
+<tr>
+<td>400w</td>
+<td>1426.183</td>
+</tr>
+<tr>
+<td>500w</td>
+<td>1799.866</td>
+</tr>
+<tr>
+<td>600w</td>
+<td>2117.247</td>
+</tr>
+<tr>
+<td>700w</td>
+<td>2514.691</td>
+</tr>
+<tr>
+<td>800w</td>
+<td>2526.441</td>
+</tr>
+<tr>
+<td>900w</td>
+<td>2568.240</td>
+</tr>
+<tr>
+<td>1000w</td>
+<td>2650.434</td>
+</tr>
+</tbody></table>
+<p>绘制成耗时曲线</p>
+<p><img src="/upload/20190416_01.png"></p>
+<p>曲线的趋势在 600w - 700w 数据量之间出现了转折，200w - 600w 是线性增长，600w 之后 count 的耗时就基本相同了。使用 explain 语句分别查看 600w 和 700w 数据时的 count 语句执行。</p>
+<p>700w：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (cost<span class="operator">=</span><span class="number">502185.93</span>.<span class="number">.502185</span><span class="number">.94</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> width<span class="operator">=</span><span class="number">8</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">894.361</span>.<span class="number">.894</span><span class="number">.361</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">1</span>)</span><br><span class="line">  Output: <span class="built_in">count</span>(<span class="operator">*</span>)</span><br><span class="line">  Buffers: shared hit<span class="operator">=</span><span class="number">16344</span> read<span class="operator">=</span><span class="number">352463</span></span><br><span class="line">  <span class="operator">-</span><span class="operator">&gt;</span>  Gather  (cost<span class="operator">=</span><span class="number">502185.72</span>.<span class="number">.502185</span><span class="number">.93</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2</span> width<span class="operator">=</span><span class="number">8</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">894.232</span>.<span class="number">.899</span><span class="number">.763</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">3</span> loops<span class="operator">=</span><span class="number">1</span>)</span><br><span class="line">        Output: (PARTIAL <span class="built_in">count</span>(<span class="operator">*</span>))</span><br><span class="line">        Workers Planned: <span class="number">2</span></span><br><span class="line">        Workers Launched: <span class="number">2</span></span><br><span class="line">        Buffers: shared hit<span class="operator">=</span><span class="number">16344</span> read<span class="operator">=</span><span class="number">352463</span></span><br><span class="line">        <span class="operator">-</span><span class="operator">&gt;</span>  Partial Aggregate  (cost<span class="operator">=</span><span class="number">501185.72</span>.<span class="number">.501185</span><span class="number">.73</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> width<span class="operator">=</span><span class="number">8</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">889.371</span>.<span class="number">.889</span><span class="number">.371</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">3</span>)</span><br><span class="line">              Output: PARTIAL <span class="built_in">count</span>(<span class="operator">*</span>)</span><br><span class="line">              Buffers: shared hit<span class="operator">=</span><span class="number">16344</span> read<span class="operator">=</span><span class="number">352463</span></span><br><span class="line">              Worker <span class="number">0</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">887.112</span>.<span class="number">.887</span><span class="number">.112</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                Buffers: shared hit<span class="operator">=</span><span class="number">5459</span> read<span class="operator">=</span><span class="number">118070</span></span><br><span class="line">              Worker <span class="number">1</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">887.120</span>.<span class="number">.887</span><span class="number">.120</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                Buffers: shared hit<span class="operator">=</span><span class="number">5601</span> read<span class="operator">=</span><span class="number">117051</span></span><br><span class="line">              <span class="operator">-</span><span class="operator">&gt;</span>  Parallel Index <span class="keyword">Only</span> Scan <span class="keyword">using</span> test_tbl_pkey <span class="keyword">on</span> public.test_tbl  (cost<span class="operator">=</span><span class="number">0.43</span>.<span class="number">.493863</span><span class="number">.32</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2928960</span> width<span class="operator">=</span><span class="number">0</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">0.112</span>.<span class="number">.736</span><span class="number">.376</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2333333</span> loops<span class="operator">=</span><span class="number">3</span>)</span><br><span class="line">                    Index Cond: (test_tbl.id <span class="operator">&lt;</span> <span class="number">7000000</span>)</span><br><span class="line">                    Heap Fetches: <span class="number">2328492</span></span><br><span class="line">                    Buffers: shared hit<span class="operator">=</span><span class="number">16344</span> read<span class="operator">=</span><span class="number">352463</span></span><br><span class="line">                    Worker <span class="number">0</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">0.107</span>.<span class="number">.737</span><span class="number">.180</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2344479</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                      Buffers: shared hit<span class="operator">=</span><span class="number">5459</span> read<span class="operator">=</span><span class="number">118070</span></span><br><span class="line">                    Worker <span class="number">1</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">0.133</span>.<span class="number">.737</span><span class="number">.960</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2327028</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                      Buffers: shared hit<span class="operator">=</span><span class="number">5601</span> read<span class="operator">=</span><span class="number">117051</span></span><br><span class="line">Planning <span class="type">time</span>: <span class="number">0.165</span> ms</span><br><span class="line">Execution <span class="type">time</span>: <span class="number">899.857</span> ms</span><br></pre></td></tr></table></figure>
+
+<p>600w：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Finalize Aggregate  (cost<span class="operator">=</span><span class="number">429990.94</span>.<span class="number">.429990</span><span class="number">.95</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> width<span class="operator">=</span><span class="number">8</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">765.575</span>.<span class="number">.765</span><span class="number">.575</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">1</span>)</span><br><span class="line">  Output: <span class="built_in">count</span>(<span class="operator">*</span>)</span><br><span class="line">  Buffers: shared hit<span class="operator">=</span><span class="number">13999</span> read<span class="operator">=</span><span class="number">302112</span></span><br><span class="line">  <span class="operator">-</span><span class="operator">&gt;</span>  Gather  (cost<span class="operator">=</span><span class="number">429990.72</span>.<span class="number">.429990</span><span class="number">.93</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2</span> width<span class="operator">=</span><span class="number">8</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">765.557</span>.<span class="number">.770</span><span class="number">.889</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">3</span> loops<span class="operator">=</span><span class="number">1</span>)</span><br><span class="line">        Output: (PARTIAL <span class="built_in">count</span>(<span class="operator">*</span>))</span><br><span class="line">        Workers Planned: <span class="number">2</span></span><br><span class="line">        Workers Launched: <span class="number">2</span></span><br><span class="line">        Buffers: shared hit<span class="operator">=</span><span class="number">13999</span> read<span class="operator">=</span><span class="number">302112</span></span><br><span class="line">        <span class="operator">-</span><span class="operator">&gt;</span>  Partial Aggregate  (cost<span class="operator">=</span><span class="number">428990.72</span>.<span class="number">.428990</span><span class="number">.73</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> width<span class="operator">=</span><span class="number">8</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">763.821</span>.<span class="number">.763</span><span class="number">.821</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">3</span>)</span><br><span class="line">              Output: PARTIAL <span class="built_in">count</span>(<span class="operator">*</span>)</span><br><span class="line">              Buffers: shared hit<span class="operator">=</span><span class="number">13999</span> read<span class="operator">=</span><span class="number">302112</span></span><br><span class="line">              Worker <span class="number">0</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">762.742</span>.<span class="number">.762</span><span class="number">.742</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                Buffers: shared hit<span class="operator">=</span><span class="number">4638</span> read<span class="operator">=</span><span class="number">98875</span></span><br><span class="line">              Worker <span class="number">1</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">763.308</span>.<span class="number">.763</span><span class="number">.308</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                Buffers: shared hit<span class="operator">=</span><span class="number">4696</span> read<span class="operator">=</span><span class="number">101570</span></span><br><span class="line">              <span class="operator">-</span><span class="operator">&gt;</span>  Parallel Index <span class="keyword">Only</span> Scan <span class="keyword">using</span> test_tbl_pkey <span class="keyword">on</span> public.test_tbl  (cost<span class="operator">=</span><span class="number">0.43</span>.<span class="number">.422723</span><span class="number">.16</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2507026</span> width<span class="operator">=</span><span class="number">0</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">0.053</span>.<span class="number">.632</span><span class="number">.199</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2000000</span> loops<span class="operator">=</span><span class="number">3</span>)</span><br><span class="line">                    Index Cond: (test_tbl.id <span class="operator">&lt;</span> <span class="number">6000000</span>)</span><br><span class="line">                    Heap Fetches: <span class="number">2018490</span></span><br><span class="line">                    Buffers: shared hit<span class="operator">=</span><span class="number">13999</span> read<span class="operator">=</span><span class="number">302112</span></span><br><span class="line">                    Worker <span class="number">0</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">0.059</span>.<span class="number">.633</span><span class="number">.156</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">1964483</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                      Buffers: shared hit<span class="operator">=</span><span class="number">4638</span> read<span class="operator">=</span><span class="number">98875</span></span><br><span class="line">                    Worker <span class="number">1</span>: actual <span class="type">time</span><span class="operator">=</span><span class="number">0.038</span>.<span class="number">.634</span><span class="number">.271</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">2017026</span> loops<span class="operator">=</span><span class="number">1</span></span><br><span class="line">                      Buffers: shared hit<span class="operator">=</span><span class="number">4696</span> read<span class="operator">=</span><span class="number">101570</span></span><br><span class="line">Planning <span class="type">time</span>: <span class="number">0.055</span> ms</span><br><span class="line">Execution <span class="type">time</span>: <span class="number">770.921</span> ms</span><br></pre></td></tr></table></figure>
+
+<p>根据以上现象推断，PostgreSQL 似乎在 count 的数据量小于数据表长度的某一比例时，才使用 index scan，通过查看官方 wiki 也可以看到相关描述：</p>
+<blockquote>
+<p>It is important to realise that the planner is concerned with minimising the total cost of the query. With databases, the cost of I/O typically dominates. For that reason, “count(*) without any predicate” queries will only use an index-only scan if the index is significantly smaller than its table. This typically only happens when the table’s row width is much wider than some indexes’.[3]</p>
+</blockquote>
+<p>根据 Stackoverflow 上的回答，count 语句查询的数量大于表大小的 3/4 时候就会用使用全表扫描代替索引扫描[4]。</p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><ol>
+<li>不要用 count(1) 或 count(列名) 代替 count(*)</li>
+<li>count 本身是非常耗时的</li>
+<li>count 可能是 index scan 也可能是 sequence scan，取决于 count 数量占表大小的比例</li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1] <a target="_blank" rel="noopener" href="https://www.cnblogs.com/flying-tiger/p/7885478.html">深入理解Postgres中的cache</a></p>
+<p>[2] <a target="_blank" rel="noopener" href="https://www.postgresql.org/message-id/11471.1027875769%40sss.pgh.pa.us">Re: performance difference in count(1) vs. count(*)?</a></p>
+<p>[3] <a target="_blank" rel="noopener" href="https://wiki.postgresql.org/wiki/Index-only_scans#Is_.22count.28.2A.29.22_much_faster_now.3F">Is “count(*)” much faster now?</a></p>
+<p>[4] <a target="_blank" rel="noopener" href="https://dba.stackexchange.com/questions/126997/postgresql-not-using-index-during-count">PostgreSQL not using index during count(*)</a></p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2019/04/18/building-docker-image-behind-proxy/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">使用代理进行 docker build 问题的解决思路</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">
+        <span class="next-text nav-default">JWT 避坑指南：nbf 验签失效问题的解决</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

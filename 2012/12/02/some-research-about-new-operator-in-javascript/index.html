@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="Javascript中new操作符的探究"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>Javascript中new操作符的探究 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">Javascript中new操作符的探究
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-12-02
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>Javascript中有一个很有意思的new操作符，在<a target="_blank" rel="noopener" href="http://book.douban.com/subject/3590768/">《Javascript语言精粹》（Javascript:The Good Parts）</a>中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。<br>先来一段代码：<br>    function test() {<br>        var foo1 = new function () {<br>            this.i = 1;<br>        }<br>        var foo2 = function () {<br>            this.i = 2;<br>        }<br>        M.dis(foo1.i);        //1<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //undefined<br>        foo2();<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //2<br>        M.dis(foo1.prototype);    //undefined<br>        M.dis(foo2.prototype);    //[object Object]<br>    }<br>*代码中的<code>M.dis() = document.writeln()</code><br>上面代码很能说明使用new操作符和不使用new操作符的区别。<br>以下是本人根据以上结果对使用new操作符和不使用new操作符的一些理解。    </p>
+<ol>
+<li><p>使用new操作符函数会被立刻执行。不使用new操作符，函数会在被调用时执行。<br>foo1在定义的时候就被执行了，所以输出<code>foo1.i = 1</code>，而<code>foo2</code>在定义时未被执行，所以输出<code>foo2</code>的结果为<code>undefined</code>，<br><code>foo2</code>中<code>var foo2 = function () &#123;&#125;</code>的定义形式和<code> function foo2 () &#123;&#125;</code>的效果是一样的。</p>
+</li>
+<li><p>使用new操作符后<code>this</code>会被绑定到函数本身。  </p>
+</li>
+</ol>
+<p>这一点很好理解，首先<code>foo1</code>的定义方式中，<code>foo1</code>是立刻执行的，那么为了方便理解可以看成<code>foo1</code>是function的执行空间，<code>this</code>自然就会绑定到<code>foo1</code>上，也就是绑定到function自身上。于是输出<code>foo1.i</code>可以得到结果。而不使用new操作符时，函数没有立即执行，当调用该函数（即<code>foo2</code>）时，执行空间是<code>test()</code>函数，所以在<code>test()</code>中输出this.i才能得到结果。至于<code>foo2.i</code>为    <code>undefined</code>的情况也好理解，这样的执行方式相当于执行<code>foo2().i</code>，显然，没有这种用法。</p>
+<p>3.使用new操作符和不使用new操作符的原型差异。</p>
+<p>使用new操作符时，相当于讲一个构造函数实例化了，那么它的prototype自然是<code>undefined</code>的。<br>而不使用new操作符时，<code>foo2</code>就是一个function，<code>foo2</code>的prototype就是function的prototype。<br>关于使用new和不使用new的原型问题，请参考淘宝UED团队的一篇文章：</p>
+<p><a target="_blank" rel="noopener" href="http://ued.taobao.com/blog/2007/05/15/">http://ued.taobao.com/blog/2007/05/15/</a>你真的会写javascript吗？</p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>对于new操作符的探究目前仅限于new function，而对于new Array()和[] 的区别以及new Object()和{}的区别，本人认为并没有new function和function的区别这么大，但也有人说new Array()和[]是有区别的（见《你真的会写javascript吗？》评论）。</p>
+<h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>new Array()和字面量定义Array还有一个很重要的区别，比如想定义一个只有一个元素3的数组，看代码：  </p>
+<pre><code>var a = new Array(3); //这样只能定义一个长度为3的数组
+var b = [3]; //正确！
+</code></pre>
+<p>可见，只有字面量可以定义一个元素的数组。</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2012/12/03/a-test-about-javascript/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">一个关于Javascript的小测试</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2012/12/01/magic-search/">
+        <span class="next-text nav-default">MagicSearch</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

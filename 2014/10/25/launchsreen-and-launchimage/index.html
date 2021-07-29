@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="iOS8中LaunchImage和LaunchScreen的完美结合"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2014/10/25/launchsreen-and-launchimage/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>iOS8中LaunchImage和LaunchScreen的完美结合 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">iOS8中LaunchImage和LaunchScreen的完美结合
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-10-25
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>Apple在iOS8中推出了LaunchScreen.xib来代替之前的LaunchImage作为程序的启动界面，相比与LaunchImage，在iOS设备屏幕尺寸越来越多样的情况下，LaunchScreen.xib依托AutoLayout无疑更方便，否则，对于一个兼容iPhone5-iPhone6Plus的应用，就需要有4长不同尺寸的LaunchImage。</p>
+<p>但是LaunchScreen只有在iOS8中才能被支持，所以一些开发者还是选择用传统的LaunchImage方式。不过，还有一种方式是将LaunchImage和LaunchScreen结合，在大尺寸iPhone中使用LaunchScreen（iPhone6和iPhone6Plus都是iOS8系统），在iOS7中使用LaunchImage（使用iOS7的手机只有4寸和5.5寸的iPhone，所以只需要两张图）。</p>
+<p>首先进入Target配置，找到App Icons and Launch Images，Xcode6中默认使用了LaunchScreen.xib，而LaunchImage则没有使用。</p>
+<p><img src="/upload/launch-screen-1.png" alt="图1"></p>
+<p>接下来点击Use Assets Catelog，这时Xcode会在Images.xcassets中生成LaunchImage，这里我们只需要给4寸Retina屏和3.5寸2x屏放两张LaunchImage就好了。</p>
+<p>在iOS8中系统会优先调用LaunchScreen作为启动界面，而iOS7不支持LaunchScreen则会使用LaunchImage中的图片作为启动界面。</p>
+<p><img src="/upload/launch-screen-2.png" alt="图2"></p>
+<p>项目在iOS7模拟器中运行效果（使用LaunchImage）</p>
+<p><img src="/upload/launch-screen-3.png" alt="图3"></p>
+<p>项目在iOS8模拟器中运行效果（使用默认的LaunchScreen.xib）</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2014/10/30/beta-testing-with-testflight/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">使用TestFlight进行应用的Beta测试</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2014/10/23/build-a-safari-extension/">
+        <span class="next-text nav-default">创建一个简单的Safari扩展</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

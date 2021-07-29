@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="指南针WebApp"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2012/11/14/compass-web-app/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>指南针WebApp - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">指南针WebApp
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-14
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>使用javascript制作了一个指南针的WebApp。</p>
+<p>监听了DeviceOrientation事件，设备在变换方位时会产生alpha、beta、gamma三个值，而其中的alpha值就是目前的角度值。</p>
+<pre><code>window.addEventListener(&#39;deviceorientation&#39;,function(event) &#123;
+    target.style.transform = &#39;rotate(&#39; + event.alpha + &#39;)&#39;;
+&#125;,false);
+</code></pre>
+<p>alpha值以正北为0°，顺时针增加到360°，对应的就是指南针指针的旋转角度。</p>
+<p>使用css3的transfrom属性就可以旋转指针。</p>
+<p>最后对指南针的度数进行判断，计算出方向（如北偏东XX度，南偏西XX度等）。</p>
+<p>只能在支持DeviceOrientation的浏览器上正常使用（mobile safari、android 4.0+ browser、mobile ）</p>
+<p>演示地址: <a target="_blank" rel="noopener" href="http://labs.simpleapples.com/compass">http://labs.simpleapples.com/compass</a></p>
+<p>GitHub: <a target="_blank" rel="noopener" href="http://github.com/simpleapples/compass">http://github.com/simpleapples/compass</a></p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>发现这个应用在iPhone下会出现将手机初始方向认成正北的问题。= =!</p>
+<p>解决方法是使用webkitCompassHeading来获取角度，而不是alpha值。webkitCompassHeading的值是设备方向和地磁北极的角度差，而alpha值是设备转动的角度。参见苹果文档：</p>
+<p><a target="_blank" rel="noopener" href="http://developer.apple.com/library/safari/#documentation/SafariDOMAdditions/Reference/DeviceOrientationEventClassRef/DeviceOrientationEvent/DeviceOrientationEvent.html">http://developer.apple.com/library/safari/#documentation/SafariDOMAdditions/Reference/DeviceOrientationEventClassRef/DeviceOrientationEvent/DeviceOrientationEvent.html</a></p>
+<p>在安卓平台的Opera浏览器下alpha值就是设备和北极的角度差，可能是Opera对html5的支持比较好。</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">在Flash中载入swf文件并逐帧播放</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2012/11/12/thunder-link-decoder/">
+        <span class="next-text nav-default">迅雷链接解密</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

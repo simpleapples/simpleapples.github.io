@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="理解Golang的Time结构"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2018/10/26/understand-time-struct-in-go/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>理解Golang的Time结构 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">理解Golang的Time结构
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-10-26
+        </span><span class="post-category">
+            <a href="/categories/Golang/">Golang</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20181026_01.png"></p>
+<p>在golang中创建并打印一个时间对象，会看到如下输出</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">50</span>.<span class="number">306558969</span> +<span class="number">0800</span> CST m=+<span class="number">0</span>.<span class="number">000401093</span></span><br></pre></td></tr></table></figure>
+
+<p>前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？</p>
+<span id="more"></span> 
+
+<h3 id="Monotonic-Clocks-和-Wall-Clocks"><a href="#Monotonic-Clocks-和-Wall-Clocks" class="headerlink" title="Monotonic Clocks 和 Wall Clocks"></a>Monotonic Clocks 和 Wall Clocks</h3><p>根据golang的time包的文档可以知道，golang的time结构中存储了两种时钟，一种是Wall Clocks，一种是Monotonic Clocks。</p>
+<p>Wall Clocks，顾名思义，表示墙上挂的钟，在这里表示我们平时理解的时间，存储的形式是自 1970 年 1 月 1 日 0 时 0 分 0 秒以来的时间戳，当系统和授时服务器进行校准时间时间操作时，有可能造成这一秒是2018-1-1 00:00:00，而下一秒变成了2017-12-31 23:59:59的情况。Monotonic Clocks，意思是单调时间的，所谓单调，就是只会不停的往前增长，不受校时操作的影响，这个时间是自进程启动以来的秒数。</p>
+<p>如果每隔一秒生成一个Time并打印出来，就会看到如下输出。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">50</span>.<span class="number">306558969</span> +<span class="number">0800</span> CST m=+<span class="number">0</span>.<span class="number">000401093</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">51</span>.<span class="number">310559881</span> +<span class="number">0800</span> CST m=+<span class="number">1</span>.<span class="number">004425285</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">52</span>.<span class="number">311822486</span> +<span class="number">0800</span> CST m=+<span class="number">2</span>.<span class="number">005711106</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">53</span>.<span class="number">314599457</span> +<span class="number">0800</span> CST m=+<span class="number">3</span>.<span class="number">008511329</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">54</span>.<span class="number">31882248</span> +<span class="number">0800</span> CST m=+<span class="number">4</span>.<span class="number">012757636</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">55</span>.<span class="number">320059921</span> +<span class="number">0800</span> CST m=+<span class="number">5</span>.<span class="number">014018292</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">56</span>.<span class="number">323814998</span> +<span class="number">0800</span> CST m=+<span class="number">6</span>.<span class="number">017796644</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">57</span>.<span class="number">324858749</span> +<span class="number">0800</span> CST m=+<span class="number">7</span>.<span class="number">018863606</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">58</span>.<span class="number">325164174</span> +<span class="number">0800</span> CST m=+<span class="number">8</span>.<span class="number">019192224</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">59</span>.<span class="number">329058535</span> +<span class="number">0800</span> CST m=+<span class="number">9</span>.<span class="number">023109863</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">16</span>:<span class="number">00</span>.<span class="number">329591268</span> +<span class="number">0800</span> CST m=+<span class="number">10</span>.<span class="number">023665796</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到m=+后面所显示的数字，就是文档中所说的Monotonic Clocks。</p>
+<h3 id="Time结构"><a href="#Time结构" class="headerlink" title="Time结构"></a>Time结构</h3><p>那么Monotonic Clock和Wall Clock在Time中是怎么存储的呢？来看一下Time结构体。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Time <span class="keyword">struct</span> &#123;</span><br><span class="line">	wall <span class="keyword">uint64</span></span><br><span class="line">	ext  <span class="keyword">int64</span></span><br><span class="line">	loc *Location</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Time结构体中由三部分组成，loc比较明了，表示时区，wall和ext所存储的信息规则相对复杂，根据文档的介绍总结成了下图：</p>
+<p><img src="/upload/20181026_02.jpg"></p>
+<p>golang中的Time结构，不像很多语言保存Unix时间戳（也就是最早只能表示到1970年1月1日），而是至少可以安全的表示1885年以来的时间。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t, _ := time.Parse(time.RFC3339, <span class="string">&quot;1890-01-02T15:04:05Z&quot;</span>)</span><br><span class="line">fmt.Println(t) <span class="comment">// 1890-01-02 15:04:05 +0000 UTC</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="实践中需要注意的问题"><a href="#实践中需要注意的问题" class="headerlink" title="实践中需要注意的问题"></a>实践中需要注意的问题</h3><p>既然Time结构所表示的时间，有可能有Monotonic Clock也可能没有，那么在使用中就有可能遇到一些问题，例如下面这种情况。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">now := time.Now()</span><br><span class="line">encodeNow, _ := json.Marshal(now)</span><br><span class="line"></span><br><span class="line">decodeNow := time.Time&#123;&#125;</span><br><span class="line">json.Unmarshal(encodeNow, &amp;decodeNow)</span><br><span class="line"></span><br><span class="line">fmt.Println(now)  <span class="comment">// 2018-10-26 16:04:55.230121766 +0800 CST m=+0.000520419</span></span><br><span class="line">fmt.Println(decodeNow)  <span class="comment">// 2018-10-26 16:04:55.230121766 +0800 CST</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，经过JSON转码之后，Time结构体会被表示成不带Monotonic Clock的字符串，丢失了Monotonic Clock信息，而将字符串转码回Time结构时，自然也就和转码之前的不一样了。同样的情况，也发生在数据库存储中，存储到数据库里的Time结构和从数据库取出来的也是不一样的。</p>
+<p>当调用Equal比较两个Time时，只有两个Time都含有Monotonic Clock时，才会根据Monotonic Clock比较大小，其他情况只比较Wall Clock部分。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">timeA := time.Now()</span><br><span class="line">timeB := time.Unix(<span class="number">0</span>, timeA.UnixNano())</span><br><span class="line"></span><br><span class="line">fmt.Println(timeA)  <span class="comment">// 2018-10-26 16:37:02.216165074 +0800 CST m=+0.000363156</span></span><br><span class="line">fmt.Println(timeB)  <span class="comment">// 2018-10-26 16:37:02.216165074 +0800 CST</span></span><br><span class="line"></span><br><span class="line">r := timeA.Equal(timeB)</span><br><span class="line">fmt.Println(r)  <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<p>上面两个时间的Wall Clock部分相同，一个有Monotonic Clock一个没有，但是比较的结果是两个时间是相同的。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">timeA := time.Now()</span><br><span class="line">timeB := time.Unix(timeA.Unix(), <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">fmt.Println(timeA)  <span class="comment">// 2018-10-26 16:38:25.653953438 +0800 CST m=+0.000364851</span></span><br><span class="line">fmt.Println(timeB)  <span class="comment">// 2018-10-26 16:38:25 +0800 CST</span></span><br><span class="line"></span><br><span class="line">r := timeA.Equal(timeB)</span><br><span class="line">fmt.Println(r)  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是Wall Clock并不是秒之前的部分，Wall Clock本身也可以精确到纳秒级别，所以一个精确到纳秒的时间和一个精确到秒的时间也是不同的。</p>
+<p>对于Time中的Monotonic Clock，我们可以使用<code>time.Round(0)</code>方法将其消除掉，以实现和其他语言一致的行为。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">timeA := time.Now()</span><br><span class="line">timeB := timeA.Round(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">fmt.Println(timeA)  <span class="comment">// 2018-10-26 16:43:03.799263739 +0800 CST m=+0.000357758</span></span><br><span class="line">fmt.Println(timeB)  <span class="comment">// 2018-10-26 16:43:03.799263739 +0800 CST</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a target="_blank" rel="noopener" href="https://golang.org/pkg/time/">https://golang.org/pkg/time/</a></p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2018/12/07/unicode-and-utf-8/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">Unicode 和 UTF-8</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2018/10/25/faster-python-part-2/">
+        <span class="next-text nav-default">翻译 | 更快的Python（二）</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

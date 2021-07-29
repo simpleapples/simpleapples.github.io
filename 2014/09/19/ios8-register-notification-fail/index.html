@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="iOS8注册推送失败的探究"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>iOS8注册推送失败的探究 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">iOS8注册推送失败的探究
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-09-19
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>Apple在9月18日正式发布了iOS8，在收到更新的同时，也发现自己的应用在iOS8下无法启动。<br>并且在Console中收到如下提示：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">2014</span>-<span class="number">09</span>-<span class="number">19</span> <span class="number">16</span>:<span class="number">26</span>:<span class="number">20</span>.<span class="number">369</span> demo[<span class="number">379</span>:<span class="number">30506</span>] registerForRemoteNotificationTypes: is not supported in iOS <span class="number">8</span>.<span class="number">0</span> and later.</span><br></pre></td></tr></table></figure>
+
+<p>查询文档可以知道，在iOS8中注册推送的方法<code>registerForRemoteNotificationTypes</code>已经被废弃，文档中是这样描述的：</p>
+<p><img src="/upload/ios8-registerForRemoteNotificationTypes.png" alt="Alt text"></p>
+<p>按照文档中的提示，使用<code>registerForRemoteNotifications</code>方法代替，这个方法不接受参数。紧接着问题就来了，<strong>程序在安装过这个应用的iOS8机器上可以成功注册，而在新安装的iOS8机器上则无法注册</strong>，<code>application:didRegisterForRemoteNotificationsWithDeviceToken:</code>和<code>application:didFailToRegisterForRemoteNotificationsWithError:</code>都无法响应，并且在成功注册的机器上，收到的推送消息也没有声音提示。再次查看文档后发现这么一段话：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">If</span> you want your app’s push notifications <span class="keyword">to</span> display alerts, play sounds, <span class="keyword">or</span> <span class="keyword">perform</span> other <span class="keyword">user</span>-facing actions, you must <span class="keyword">call</span> the registerUserNotificationSettings: <span class="keyword">method</span> <span class="keyword">to</span> request the <span class="keyword">types</span> <span class="keyword">of</span> notifications you want <span class="keyword">to</span> use.</span><br></pre></td></tr></table></figure>
+
+<p>换句话说，如果要使用推送服务，还需要再调用<code>registerUserNotificationSettings</code>方法，而这个方法是和iOS7上的<code>registerForRemoteNotificationTypes</code>方法一样接受参数的。为什么iOS8下要把一个方法变成两个方法呢？<code>registerForRemoteNotifications</code>方法的文档中有这么一句话：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Call this <span class="function"><span class="keyword">method</span> <span class="title">to</span> <span class="title">initiate</span> <span class="title">the</span> <span class="title">registration</span> <span class="title">process</span> <span class="title">with</span> <span class="title">Apple</span> <span class="title">Push</span> <span class="title">Service</span>. <span class="title">If</span> <span class="title">registration</span> <span class="title">succeeds</span>, <span class="title">the</span> <span class="title">app</span> <span class="title">calls</span> <span class="title">your</span> <span class="title">app</span> <span class="title">delegate</span> <span class="title">object</span>’<span class="title">s</span> <span class="title">application</span>:</span>didRegisterForRemoteNotificationsWithDeviceToken: <span class="function"><span class="keyword">method</span> <span class="title">and</span> <span class="title">passes</span> <span class="title">it</span> <span class="title">a</span> <span class="title">device</span> <span class="title">token</span>.</span></span><br></pre></td></tr></table></figure>
+
+<p>苹果可能考虑到一些应用注册提醒可能只是为了获取deviceToken，所以将获取deviceToken单独提成一个方法，而要接收推送还需要单独调用别的方法，这样就细化了逻辑，方便不用的开发需求。不过在真机调试中，一台刚重置过的搭载iOS8系统的iPhone5c，调用registerForRemoteNotifications方法后，并没有收到任何失败或成功的回调，和Apple文档中描述的不符，怀疑是SDK在这部分也有bug。</p>
+<p>下面贴一下兼容iOS7和iOS8的注册推送代码：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IS_OS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0)</span></span><br><span class="line"><span class="keyword">if</span> (IS_OS_8_OR_LATER) &#123;</span><br><span class="line">    [[<span class="built_in">UIApplication</span> sharedApplication] registerForRemoteNotifications];</span><br><span class="line">    <span class="built_in">UIUserNotificationSettings</span> *settings = [<span class="built_in">UIUserNotificationSettings</span> settingsForTypes: (<span class="built_in">UIRemoteNotificationTypeBadge</span> | <span class="built_in">UIRemoteNotificationTypeAlert</span> | <span class="built_in">UIRemoteNotificationTypeSound</span>) categories:<span class="literal">nil</span>];</span><br><span class="line">    [[<span class="built_in">UIApplication</span> sharedApplication] registerUserNotificationSettings:settings];</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    [application registerForRemoteNotificationTypes:</span><br><span class="line">     <span class="built_in">UIRemoteNotificationTypeBadge</span> |</span><br><span class="line">     <span class="built_in">UIRemoteNotificationTypeAlert</span> |</span><br><span class="line">     <span class="built_in">UIRemoteNotificationTypeSound</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2014/10/23/build-a-safari-extension/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">创建一个简单的Safari扩展</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/">
+        <span class="next-text nav-default">Air SDK和Flex SDK的区别</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

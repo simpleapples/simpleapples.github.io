@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="你所不知道的Python | 字符串连接的秘密"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2018/06/28/the-secret-of-string-concatenation/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>你所不知道的Python | 字符串连接的秘密 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">你所不知道的Python | 字符串连接的秘密
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-06-28
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180628_04.jpg"></p>
+<p>字符串连接，就是将2个或以上的字符串合并成一个，看上去连接字符串是一个非常基础的小问题，但是在Python中，我们可以用多种方式实现字符串的连接，稍有不慎就有可能因为选择不当而给程序带来性能损失。</p>
+<h1 id="方法1：加号连接"><a href="#方法1：加号连接" class="headerlink" title="方法1：加号连接"></a>方法1：加号连接</h1><p>很多语言都支持使用加号连接字符串，Python也不例外，只需要简单的将2个或多个字符串相加就可以完成拼接。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = a + b  <span class="comment"># 输出&#x27;Python私房菜&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="方法2：使用-操作符"><a href="#方法2：使用-操作符" class="headerlink" title="方法2：使用%操作符"></a>方法2：使用%操作符</h1><p>在Python 2.6以前，%操作符是唯一一种格式化字符串的方法，它也可以用于连接字符串。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">&#x27;%s%s&#x27;</span> % (a, b)  <span class="comment"># 输出&#x27;Python私房菜&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="方法3：使用format方法"><a href="#方法3：使用format方法" class="headerlink" title="方法3：使用format方法"></a>方法3：使用format方法</h1><p>format方法是Python 2.6中出现的一种代替%操作符的字符串格式化方法，同样可以用来连接字符串。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">&#x27;&#123;&#125;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(a, b)</span><br></pre></td></tr></table></figure>
+
+<h1 id="方法4：使用f-string"><a href="#方法4：使用f-string" class="headerlink" title="方法4：使用f-string"></a>方法4：使用f-string</h1><p>Python 3.6中引入了Formatted String Literals（字面量格式化字符串），简称f-string，f-string是%操作符和format方法的进化版，使用f-string连接字符串的方法和使用%操作符、format方法类似。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">f&#x27;<span class="subst">&#123;a&#125;</span><span class="subst">&#123;b&#125;</span>&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="方法5：使用str-join-方法"><a href="#方法5：使用str-join-方法" class="headerlink" title="方法5：使用str.join()方法"></a>方法5：使用str.join()方法</h1><p>字符串有一个内置方法join，其参数是一个序列类型，例如数组或者元组等。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">&#x27;&#x27;</span>.join([a, b])</span><br></pre></td></tr></table></figure>
+
+<h1 id="对比测试"><a href="#对比测试" class="headerlink" title="对比测试"></a>对比测试</h1><p>既然连接字符串有这么多方法，那么使用时到底选择哪种呢？我们从代码可读性和性能两个层面来评估一下上面5种方法。</p>
+<p>使用timeit模块，分别执行上述5种方法的示例代码100000次，执行时间如图。</p>
+<p><img src="/upload/20180628_05.png"></p>
+<p>可以看到，%操作符、format和f-string都是字符串格式化方法，性能依次递增，加号连接的性能和f-string不相上下。</p>
+<p>有一点需要注意的是，字符串类型是不可变的，所以每一次应用加号连接字符串都会生成一个新的字符串，连接多个字符串时，效率低下就是必然的了，我们将一次连接的字符串提升到10个和20个，再来进行2轮测试，下面是连接20个字符串时的耗时情况。</p>
+<p><img src="/upload/20180628_06.png"></p>
+<p>和连接两个字符串时的结果出现了一些不同，首先使用加号连接的方式在字符串数量较多时（大于10个），性能会急剧下降，str.join()方法在连接大量字符串时性能最好。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>连接少量字符串时</strong><br>使用<strong>加号</strong>连接符在性能和可读性上都是明智的，如果对可读性有更高的要求，并且使用的Python 3.6以上版本，<strong>f-string</strong>也是一个非常好的选择，例如下面这种情况，f-string的可读性显然比加号连接好得多。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">f&#x27;姓名：<span class="subst">&#123;name&#125;</span> 年龄：<span class="subst">&#123;age&#125;</span> 性别：<span class="subst">&#123;gender&#125;</span>&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;姓名：&#x27;</span> + name + <span class="string">&#x27;年龄：&#x27;</span> + age + <span class="string">&#x27;性别：&#x27;</span> + gender</span><br></pre></td></tr></table></figure>
+
+<p><strong>连接大量字符串时</strong><br><strong>join</strong>和<strong>f-string</strong>都是性能最好的选择，选择时依然取决于你使用的Python版本以及对可读性的要求，f-string在连接大量字符串时可读性并不一定好。切记不要使用加号连接，尤其是在for循环中。</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2018/07/10/transition-of-parameters-of-functions-in-python/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">你所不知道的Python | 函数参数的演进之路</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2018/06/28/install-kvm-on-ubuntu-18.04-lts/">
+        <span class="next-text nav-default">Ubuntu 18.04 LTS安装KVM虚拟机</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

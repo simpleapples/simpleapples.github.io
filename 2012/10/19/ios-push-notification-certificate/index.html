@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="iOS 推送证书制作 （JAVA/PHP）"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2012/10/19/ios-push-notification-certificate/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>iOS 推送证书制作 （JAVA/PHP） - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">iOS 推送证书制作 （JAVA/PHP）
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-10-19
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在使用Java或者PHP制作iOS推送服务器的时候，需要自己从开发者网站上导出的aps_developer_identity证书和Apple Development Push Services证书进行合成，生成可以供Java使用的p12证书或供PHP使用的pem证书。</p>
+<p>aps_developer_identity证书和Apple Development Push Services证书的申请过程可以参考：</p>
+<p><a target="_blank" rel="noopener" href="http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html">http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html</a></p>
+<p>本文着重讨论如何合成证书</p>
+<p>1.将aps_developer_identity.cer转换成pem</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">$openssl</span> x509 -in aps_developer_identity.cer -inform der -out PushChatCert.pem</span></span><br></pre></td></tr></table></figure>
+<p>2.将Apple Development Push Services证书转换成pem</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$openssl pkcs12 -nocerts -out <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem -<span class="keyword">in</span> <span class="module-access"><span class="module"><span class="identifier">Push</span>.</span></span>p12</span><br></pre></td></tr></table></figure>
+<p>3.合成两个pem证书</p>
+<p>1)Java服务器所需的证书为p12格式</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$openssl pkcs12 -export -<span class="keyword">in</span> <span class="module-access"><span class="module"><span class="identifier">PushChatCert</span>.</span></span>pem -inkey <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem -out pushCert.p12 -name “apns-cert”</span><br></pre></td></tr></table></figure>
+<p>2）PHP服务器所需证书为pem格式</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$cat <span class="module-access"><span class="module"><span class="identifier">PushChatCert</span>.</span></span>pem <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem &gt; pushCert.pem</span><br></pre></td></tr></table></figure>
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2012/10/19/macos-vmware-fusion-centos-network-setting/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">MacOS+VMware Fusion安装CentOS网络设置</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

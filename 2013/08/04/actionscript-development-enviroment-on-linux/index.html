@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="在Linux上搭建Actionscript开发环境"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2013/08/04/actionscript-development-enviroment-on-linux/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>在Linux上搭建Actionscript开发环境 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">在Linux上搭建Actionscript开发环境
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-08-04
+        </span><span class="post-category">
+            <a href="/categories/Mac-Linux/">Mac&Linux</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>Actionscript的开发通常使用Flash Pro和Flash Builder完成，但这两款软件都没有Linux版本，在Linux下我们可以自己手动搭建一个Actionscript的开发环境。<br>Actionscript的开发环境主要有三个方面，分别是IDE、SDK和Flash Player Debugger。  </p>
+<h3 id="IDE"><a href="#IDE" class="headerlink" title="IDE"></a>IDE</h3><p>Adobe为Actionscript的开发专门提供了Flash Builder，Flash Builder是基于Eclipse开发的，而Eclipse提供了Linux版本，所以我们只要在Eclipse上安装Actionscript插件就可以在Linux上实现Flash Builder的功能。<br>首先在Eclipse官网下载Eclipse IDE，目前的最新版为4.3。安装过程不再赘述。Eclipse的运行需要Java环境，没有预装Java的Linux发行版用户可以访问Oracle网站下载对应安装包。<br>Eclipse安装完成后，就要安装Flash Builder的插件了，官方没有为Linux提供插件，所以我们使用一个名为fb4linux的开源Flash Builder 4.5的Lniux插件，项目地址：<a target="_blank" rel="noopener" href="http://code.google.com/p/fb4linux/">http://code.google.com/p/fb4linux/</a>。访问该地址下载FB4.5ForLinuxaa和FB4.5ForLinuxab两个安装包。下载完成后使用命令<code>cat FB45ForLinux* &gt;FB45ForLinux.tar.bz2</code>将两个包和成为一个压缩包，并将其解压。<br>接下来在Eclipse中安装FB45ForLinux插件，在Eclipse中选择Help-&gt;Install New Software，点击Add，在弹出窗口中选择Local，定位到FB45Forinux.tar.bz2解压后的目录后，点击OK，此时列表中并没有出现可以安装的插件，将Group items by category选项去掉，即可显示出可安装的软件。全选所有可安装的项目，点击Next进行安装。<br>插件安装完成后，IDE部分的配置就结束了。接下来是SDK的安装。  </p>
+<h3 id="SDK"><a href="#SDK" class="headerlink" title="SDK"></a>SDK</h3><p>SDK的配置和在Windows下基本一样，首先在Adobe或Apache官网上下载Flex SDK安装包，将包解压，在Eclipse中选择Window-&gt;Preference-&gt;Flash Builder-&gt;Installed Flex SDKs，点击Add添加解压好的SDK目录。</p>
+<h3 id="Flash-Player-Debugger"><a href="#Flash-Player-Debugger" class="headerlink" title="Flash Player Debugger"></a>Flash Player Debugger</h3><p>Flash Player 的Debugger版本的安装最为复杂，Adobe已经停止对Linux平台Flash Player的开发，目前Linux平台最新版的Flash Player是11.2。所以Debug版的Flash Player最新版也是11.2，Adobe在<a target="_blank" rel="noopener" href="http://www.adobe.com/support/flashplayer/downloads.html">http://www.adobe.com/support/flashplayer/downloads.html</a>上提供了Linux版的下载。<br>这里需要注意的是，Adobe提供的Debug版Flash Player只有32位版本，而64的Linux中的Firefox是无法直接使用该插件的。<br>在64位Firefox下使用Flash Player debugger，需要通过nspluginwrapper将其转换为可在64位Firefox下使用的插件。使用apt-get或yum等安装nspluginwrapper，并将Flash Player debugger压缩包中的libflashplugin.so拷贝到<code>/usr/lib/mozilla/plugin</code>下，启动Firefox，nspluginwrapper会自动将libflashplugin.so转换为64位插件，保存在<code>/usr/lib64/mozilla/plugin-wrapped</code>下。打开Firefox在地址栏中输入<code>about:plugins</code>，查看flash player是否安装正确。<br>在Eclipse中新建一个Actionscript Project，编译运行，如果能够编译并debug，表明配置正确，如果Firefox出现播放Flash就崩溃的情况，可能由于转换后的Flash Player造成的，Firefox默认开启了插件的防崩溃机制，导致debug版本崩溃。在Firefox地址栏中输入<code>about:config</code>搜索<code>dom.ipc.plugins.enabled</code>，将其值设置为false，重启Firefox，Flash Player debugger即可正常运行。</p>
+<p><img src="/upload/linux-as-env.png" alt="Alt text"></p>
+<p>至此，Linux上Actionscript开发环境就搭建完成了。</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">升级到Flex SDK 4.9.1后无法找到基类BitmapAsset的问题</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2013/06/27/bye-buct/">
+        <span class="next-text nav-default">Bye,BUCT</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

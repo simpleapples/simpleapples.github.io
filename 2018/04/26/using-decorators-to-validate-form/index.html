@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="用装饰器封装Flask-WTF表单验证逻辑"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2018/04/26/using-decorators-to-validate-form/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>用装饰器封装Flask-WTF表单验证逻辑 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">用装饰器封装Flask-WTF表单验证逻辑
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-04-26
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><blockquote>
+<p>Don’t repeat yourself</p>
+</blockquote>
+<p>在使用Flask-WTF的时候，常会用下面这样的代码来验证表单数据的合法性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">	form = TestForm()</span><br><span class="line">	<span class="comment"># 判断是否合法</span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit():</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&#x27;err&#x27;</span>, <span class="number">400</span></span><br><span class="line">	<span class="comment"># 主要逻辑</span></span><br></pre></td></tr></table></figure>
+
+<p>对于有很多提交接口的项目来说，需要在每个路由下写相同的的逻辑，造成了大量的代码重复。在Flask-Login中，要把一个路由设置为登录后才能访问，只需要在路由上加一个@login_required装饰器，不需要额外的代码。能不能像Flask-Login一样，用装饰器来封装对表单的验证逻辑呢？</p>
+<h1 id="实现表单验证装饰器"><a href="#实现表单验证装饰器" class="headerlink" title="实现表单验证装饰器"></a>实现表单验证装饰器</h1><p>由于不同路由使用的表单类不一样，所以需要为装饰器传入一个表单类参数，并且在路由函数中需要用到表单中的值，所以还需要将验证通过的表单传给路由函数。</p>
+<p>上代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">        @wraps(<span class="params">fn</span>)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit():</span><br><span class="line">                <span class="keyword">return</span> <span class="string">&#x27;error&#x27;</span>, <span class="number">400</span></span><br><span class="line">            <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br></pre></td></tr></table></figure>
+
+<p>使用方式如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@validate_form(<span class="params">TestForm</span>)  </span><span class="comment"># 需要传入要验证的表单类</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">form</span>):</span></span><br><span class="line">    <span class="comment"># 执行到这里说明表单验证通过</span></span><br></pre></td></tr></table></figure>
+
+<p>经过在项目中的应用，发现装饰器还是有一些缺陷：</p>
+<ul>
+<li>无法自定义处理非法表单的逻辑</li>
+<li>不支持get方式提交的表单（查看validate_on_submit()源码可知其只支持对post和put方式提交的表单进行验证）</li>
+</ul>
+<h1 id="丰富一下"><a href="#丰富一下" class="headerlink" title="丰富一下"></a>丰富一下</h1><p>要自定义处理非法表单的逻辑，需要增加一个可以传入自定义逻辑的接口。表单非法时接口的返回往往是一致的，所以我们为所有应用装饰器的路由传入一个统一的处理逻辑。将装饰器封装在一个类中，在类中添加一个配置处理逻辑的方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FormValidator</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, error_handler=<span class="literal">None</span></span>):</span></span><br><span class="line">        self._error_handler = error_handler</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">            @wraps(<span class="params">fn</span>)</span></span><br><span class="line">            <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit() <span class="keyword">and</span> self._error_handler:</span><br><span class="line">                    <span class="keyword">return</span> self._error_handler(form.errors)</span><br><span class="line">                <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">            <span class="keyword">return</span> wrapper</span><br><span class="line">        <span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">error_handler</span>(<span class="params">self, fn</span>):</span></span><br><span class="line">        self._error_handler = fn</span><br><span class="line">        <span class="keyword">return</span> fn</span><br></pre></td></tr></table></figure>
+
+<p>error_handler也是一个装饰器，被它修饰的方法就是处理非法表单的方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@form_validator.error_handler</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">error_handler</span>(<span class="params">errors</span>):</span></span><br><span class="line">    <span class="keyword">return</span> jsonify(&#123;<span class="string">&#x27;errors&#x27;</span>: errors&#125;), <span class="number">400</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来支持get方法，在flask中，我们可以通过request.args来获取到get方法提交的参数。思路是用获取到的参数生成一个表单类的实例，然后就可以通过调用表单类的validate()方法来判断是否合法了。修改validate_form装饰器：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">        @wraps(<span class="params">fn</span>)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">            <span class="keyword">if</span> request.method == <span class="string">&#x27;GET&#x27;</span>:</span><br><span class="line">                form = form_cls(formdata=request.args)</span><br><span class="line">            <span class="keyword">elif</span> request.method <span class="keyword">in</span> (<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;PUT&#x27;</span>):</span><br><span class="line">                form = form_cls()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> fn(*args, **kwargs)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> form.validate() <span class="keyword">and</span> self._error_handler:</span><br><span class="line">                <span class="keyword">return</span> self._error_handler(form.errors)</span><br><span class="line">            <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br></pre></td></tr></table></figure>
+
+<p>大功告成！使用上面的装饰器，就可以免除在路由函数中重复写表单验证逻辑，并且同时支持put、post和get方法提交的表单。</p>
+<h1 id="开箱即用"><a href="#开箱即用" class="headerlink" title="开箱即用"></a>开箱即用</h1><p>笔者已经把上面的代码封装成了一个库发布到了PyPI，想直接用的朋友可以使用<code>pip install flask-wtf-decorators</code>安装，项目源码也已经发布到Github。</p>
+<p><a target="_blank" rel="noopener" href="https://pypi.org/project/Flask-WTF-Decorators/">查看PyPI</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/simpleapples/flask-wtf-decorators">查看Github</a></p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2018/05/07/right-way-to-use-assert-in-python/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">你真的会正确使用断言吗？</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2018/04/22/python-parameter-passing/">
+        <span class="next-text nav-default">Python参数传递，既不是传值也不是传引用</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

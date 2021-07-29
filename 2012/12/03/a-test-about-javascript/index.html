@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="一个关于Javascript的小测试"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2012/12/03/a-test-about-javascript/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>一个关于Javascript的小测试 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">一个关于Javascript的小测试
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-12-03
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在SAE的微博上看到一个叫《你是否真的了解javascript？》的小测试，虽然只有几段代码，但却很能说明一些容易忽视的问题。<br>先贴下原微博的图：  </p>
+<p><img src="/upload/weibocode.jpg" alt="Alt text"></p>
+<p>第一段代码执行结果：1<br>Javascript没有提供块级作用域，所以if语句{}中的a，在外部是可见的。<br>第二段代码执行结果：1<br>这里function 的名字和变量的名字一样，但是  </p>
+<pre><code>var b = function a () &#123;&#125;;
+</code></pre>
+<p>这样的用法中，a是被忽略的。也就是funciton a并不影响变量a的值。<br>第三段代码执行结果：输出函数本身<br>应该说，大家不会这么写代码 = =！，但是呢，既然这么写了，那么首先</p>
+<pre><code>function a() &#123;&#125;;
+</code></pre>
+<p>执行后，a的值就是function本身，</p>
+<pre><code>var a;
+</code></pre>
+<p>执行后，实际上没有给a赋值，那么a还是本身，如果执行</p>
+<pre><code>var a = 1;
+</code></pre>
+<p>再输出a就是1了。<br>第四段代码执行结果：10<br>函数接收到参数的时候，是存入到arguments数组里的，而参数的定义x,y,a则分别指向arguments的0,1,2三个位置。<br>所以改argument自然输出a也会变。<br>第五段代码执行结果：window<br>使用</p>
+<pre><code>function.call(null);
+</code></pre>
+<p>或</p>
+<pre><code>function.call(undefined);
+</code></pre>
+<p>时，function的this会被绑定为window。于是输出this就是window。</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2012/12/11/browser-js/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">browser.js-浏览器和操作系统识别</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2012/12/02/some-research-about-new-operator-in-javascript/">
+        <span class="next-text nav-default">Javascript中new操作符的探究</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

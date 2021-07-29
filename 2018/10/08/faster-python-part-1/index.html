@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="翻译 | 更快的Python（一）"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2018/10/08/faster-python-part-1/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>翻译 | 更快的Python（一） - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">翻译 | 更快的Python（一）
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-10-08
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20181008_11.png"></p>
+<p>更快的Python（<a target="_blank" rel="noopener" href="http://pythonfasterway.org/">Python Faster Way</a>）使用代码示例来说明如何书写Python代码能带来更高的性能。本文对代码进行了讲解，从性能和可读性等角度来选择出最适合的写法。</p>
+<h3 id="例子1：字符串格式化"><a href="#例子1：字符串格式化" class="headerlink" title="例子1：字符串格式化"></a>例子1：字符串格式化</h3><p><img src="/upload/20181008_01.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.95</strong></li>
+<li>使用建议：Python 3.7或以上推荐使用f-string，其他版本推荐使用format方法。</li>
+<li>说明：字符串格式化是代码中最常遇到的情况，虽然在连接少量字符串的情景中，使用+号的性能最优，但是使用+号的代码可读性最差。如果使用Python 3.7或优以上版本，可以使用f-string来解决这个问题，f-string的性能比format方法和%操作符的性能都要高，可读性也比+号好。</li>
+</ul>
+<h3 id="例子2：字典的初始化"><a href="#例子2：字典的初始化" class="headerlink" title="例子2：字典的初始化"></a>例子2：字典的初始化</h3><p><img src="/upload/20181008_02.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.83</strong></li>
+<li>使用建议：使用字面量初始化字典（以及其他集合类型）。</li>
+<li>说明：Python中初始化集合类型时使用字面量的方式，解释器会直接调用BUILD_MAP等字节码来创建，如果用构造函数的方式来创建，则需要先查询构造方法，再执行构造方法。使用字面量初始化，Python代码也更简洁。</li>
+</ul>
+<h3 id="例子3：内置排序方法"><a href="#例子3：内置排序方法" class="headerlink" title="例子3：内置排序方法"></a>例子3：内置排序方法</h3><p><img src="/upload/20181008_03.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.26</strong></li>
+<li>使用建议：根据是否需要修改原始值来决定使用哪个方法。</li>
+<li>说明：sorted和list.sort方法是Python中内置的排序方法，sorted方法不会修改原始值，list.sort方法在原始值上直接排序，会修改原始值。比较这两个方法的性能差异，意义不大。</li>
+</ul>
+<h3 id="例子4：初始化多个变量"><a href="#例子4：初始化多个变量" class="headerlink" title="例子4：初始化多个变量"></a>例子4：初始化多个变量</h3><p><img src="/upload/20181008_04.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.01</strong></li>
+<li>使用建议：推荐使用第二种。</li>
+<li>说明：从字节码中可以看出两种方式出了执行顺序之外，基本一致，所以性能上也非常接近。</li>
+</ul>
+<h3 id="例子5：多个变量的比较"><a href="#例子5：多个变量的比较" class="headerlink" title="例子5：多个变量的比较"></a>例子5：多个变量的比较</h3><p><img src="/upload/20181008_05.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.11</strong></li>
+<li>使用建议：推荐使用第二种。</li>
+<li>说明：使用第一种方法能带来一定的性能提升，但是提升有限，在实际情况中也很少出现多个变量连续比较大小的情况，并且第一种方法非常不Pythonic，所以推荐使用第二种。</li>
+</ul>
+<h3 id="例子6：if-true的条件判断"><a href="#例子6：if-true的条件判断" class="headerlink" title="例子6：if true的条件判断"></a>例子6：if true的条件判断</h3><p><img src="/upload/20181008_06.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.17</strong></li>
+<li>使用建议：推荐使用第一种。</li>
+<li>说明：从字节码上看，第一种方法的性能最高，并且语法上也更加简洁。</li>
+</ul>
+<h3 id="例子7：if-false的条件判断"><a href="#例子7：if-false的条件判断" class="headerlink" title="例子7：if false的条件判断"></a>例子7：if false的条件判断</h3><p><img src="/upload/20181008_07.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.10</strong></li>
+<li>使用建议：推荐使用第一种。</li>
+<li>说明：从字节码上看，第一种方法的性能最高，语法角度上，if not写成第二种和第三种都是不推荐的。</li>
+</ul>
+<h3 id="例子8：判断list是否为空"><a href="#例子8：判断list是否为空" class="headerlink" title="例子8：判断list是否为空"></a>例子8：判断list是否为空</h3><p><img src="/upload/20181008_08.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.55</strong></li>
+<li>使用建议：根据具体需求，优先使用前两种。</li>
+<li>说明：前两种代码性能更高，代码更简洁。同时，空列表a并不等于None，所以使用if a is None无法实现对空列表的判断。</li>
+</ul>
+<h3 id="例子9：判断object是否为空"><a href="#例子9：判断object是否为空" class="headerlink" title="例子9：判断object是否为空"></a>例子9：判断object是否为空</h3><p><img src="/upload/20181008_09.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.00</strong></li>
+<li>使用建议：根据具体需求，优先使用前两种。</li>
+<li>说明：理由同上一个例子。</li>
+</ul>
+<h3 id="例子10：遍历可迭代对象"><a href="#例子10：遍历可迭代对象" class="headerlink" title="例子10：遍历可迭代对象"></a>例子10：遍历可迭代对象</h3><p><img src="/upload/20181008_10.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.12</strong></li>
+<li>使用建议：根据具体情况选择。</li>
+<li>说明：两者性能差别不大，使用enumerate方法，可以不需要取对象的长度，可以直接获取到对象的index。</li>
+</ul>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://pythonfasterway.org/">Python Faster Way</a></li>
+</ul>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2018/10/11/stacks-in-go/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">Go的栈空间管理</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2018/09/14/how-to-use-defer-in-go/">
+        <span class="next-text nav-default">Go语言中defer的一些坑</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

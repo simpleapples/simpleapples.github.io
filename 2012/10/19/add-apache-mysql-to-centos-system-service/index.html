@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="将Apache和Mysql添加为CentOS服务"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2012/10/19/add-apache-mysql-to-centos-system-service/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>将Apache和Mysql添加为CentOS服务 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">将Apache和Mysql添加为CentOS服务
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-10-19
+        </span><span class="post-category">
+            <a href="/categories/Mac-Linux/">Mac&Linux</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>当安装自己编译的Apache和Mysql后，默认是不添加为系统服务的，所以我们需要手动将其添加为服务。</p>
+<p>添加Apache为系统服务</p>
+<p>1.将apachectl拷贝到init.d下</p>
+<pre><code>#cp /usr/local/apache/bin/apachectl /etc/rc.d/init.d/httpd
+</code></pre>
+<p>2.修改httpd</p>
+<pre><code>#vi /etc/rc.d/init.d/httpd
+</code></pre>
+<p>添加以下注释内容</p>
+<pre><code>#chkconfig: 345 85 15
+#decription: apache server
+</code></pre>
+<p>3.向系统服务添加apache</p>
+<pre><code>#chkconfig --add httpd
+</code></pre>
+<p>添加Mysql为系统服务</p>
+<ol>
+<li><p>将mysql拷贝到init.d下</p>
+<pre><code> #cp /usr/local/mysql5/share/mysql/mysql.server /etc/init.d/mysqld
+</code></pre>
+</li>
+<li><p>将mysqld添加到系统服务</p>
+<pre><code> #chkconfig --add mysqld
+</code></pre>
+</li>
+</ol>
+<p>完成上述步骤，就可以使用</p>
+<pre><code>#service httpd/mysqld restart/start/stop
+</code></pre>
+<p>来控制apache/mysql的启动停止重启了</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2012/10/20/fix-the-outline-of-link/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">解决超链接点击后周围有虚线框的问题</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2012/10/19/macos-vmware-fusion-centos-network-setting/">
+        <span class="next-text nav-default">MacOS+VMware Fusion安装CentOS网络设置</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

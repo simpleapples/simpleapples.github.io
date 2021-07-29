@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2015/06/11/configure-nginx-supervisor-gunicorn-flask/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-06-11
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。</p>
+<h2 id="配置Centos7"><a href="#配置Centos7" class="headerlink" title="配置Centos7"></a>配置Centos7</h2><p>root登录后，首先新建一个普通用户并设置密码</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser <span class="keyword">user</span></span><br><span class="line"><span class="title">passwd</span> user</span><br></pre></td></tr></table></figure>
+
+<p>接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Port</span> <span class="number">65535</span></span><br><span class="line">PasswordAuthentication <span class="literal">no</span></span><br><span class="line">PermitRootLogin <span class="literal">no</span></span><br></pre></td></tr></table></figure>
+
+<p>配置完成后重启ssh服务</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">restart</span> sshd.service</span><br></pre></td></tr></table></figure>
+
+<p>CentOS7中用firewalld替换了iptables，需要手动将80端口和修改后的ssh端口添加到firewalld中</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">80/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">65535/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">reload</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><p>yum中可以直接安装nginx</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> nginx</span><br></pre></td></tr></table></figure>
+
+<p>安装好后在/etc/nginx/default.d中添加location的配置，并指向8001端口，以后Flask会监听8001端口</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">location</span> <span class="title">/ &#123;</span></span><br><span class="line"><span class="title">	proxy_pass</span> http://<span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">8001</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置好后重新载入nginx配置</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="keyword">reload</span> nginx.service</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装Python"><a href="#安装Python" class="headerlink" title="安装Python"></a>安装Python</h2><p>CentOS自带Python2.7，如果使用Python3，需要单独安装。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https:<span class="regexp">//</span>www.python.org<span class="regexp">/ftp/</span>python<span class="regexp">/3.4.3/</span>Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line">tar xf Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line">cd Python-<span class="number">3.4</span>.<span class="number">3</span></span><br><span class="line">.<span class="regexp">/configure --prefix=/u</span>sr/local --enable-shared</span><br><span class="line">make</span><br><span class="line">make altinstall</span><br></pre></td></tr></table></figure>
+
+<p>接下来在项目中搭建虚拟环境，Python2虚拟环境使用virtualenv安装（使用pip install virtualenv命令安装），Python3环境使用pyvenv安装（Python3自带pyvenv），以Python3环境为例，在Web项目中，建立虚拟环境文件夹venv</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pyvenv venv</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来在项目路径下启用虚拟环境</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">source</span> venv<span class="regexp">/bin/</span>active</span><br></pre></td></tr></table></figure>
+
+<p>退出虚拟环境使用Ctrl+C或deactive命令</p>
+<h2 id="安装配置Gunicorn"><a href="#安装配置Gunicorn" class="headerlink" title="安装配置Gunicorn"></a>安装配置Gunicorn</h2><p>Gunicorn使用pip install gunicorn安装，注意需要在虚拟环境中使用pip安装，这样才对应虚拟环境中的Python版本。安装好后，新建一个Gunicorn的配置文件，比如deploy_config.py，加入内容如下</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line"><span class="attribute">bind</span>=<span class="string">&#x27;127.0.0.1:8001&#x27;</span> #绑定的端口</span><br><span class="line"><span class="attribute">workers</span>=4	#worker数量</span><br><span class="line"><span class="attribute">backlog</span>=2048</span><br><span class="line"><span class="attribute">debug</span>=<span class="literal">True</span></span><br><span class="line"><span class="attribute">proc_name</span>=<span class="string">&#x27;gunicorn.pid&#x27;</span></span><br><span class="line"><span class="attribute">pidfile</span>=<span class="string">&#x27;/var/log/gunicorn/debug.log&#x27;</span></span><br><span class="line"><span class="attribute">loglevel</span>=<span class="string">&#x27;debug&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>保存文件后在虚拟环境中使用Gunicorn尝试启动</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gunicorn -c <span class="keyword">deploy</span>_config.py myapp<span class="function">:app</span></span><br></pre></td></tr></table></figure>
+
+<p>myapp是入口Python文件名，app是函数名。如果输出worker相关信息，表明启动成功。</p>
+<h2 id="安装配置Supervisor"><a href="#安装配置Supervisor" class="headerlink" title="安装配置Supervisor"></a>安装配置Supervisor</h2><p>yum可以直接安装Supervisor，需要注意的是Supervisor只支持Python2，所以不要在虚拟环境中使用pip安装supervisor。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> supervisor</span><br></pre></td></tr></table></figure>
+
+<p>安装后，在/etc/supervisord.d中建立配置文件xxx.ini，内容如下</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[program:xxx]</span><br><span class="line">command=<span class="regexp">/var/</span>proj<span class="regexp">/xxx/</span>venv<span class="regexp">/bin/</span>python <span class="regexp">/usr/</span>bin<span class="regexp">/gunicorn -c /</span>var<span class="regexp">/proj/</span>xxx/deploy_config.py myapp:app</span><br><span class="line">autorstart=<span class="keyword">true</span></span><br><span class="line">directory=<span class="regexp">/var/</span>proj/xxx</span><br><span class="line">autorestart=<span class="keyword">true</span></span><br><span class="line">startsecs=<span class="number">10</span></span><br><span class="line">startretries=<span class="number">20</span></span><br></pre></td></tr></table></figure>
+
+<p>xxx是项目名称，注意command中最好都写全路径，以区别系统环境和项目虚拟环境。完成后启动supervisord，使配置生效</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisord -c <span class="regexp">/etc/</span>supervisord.conf</span><br></pre></td></tr></table></figure>
+
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2016/08/28/snake-crack/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">「贪吃蛇大作战」的刷分尝试</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/">
+        <span class="next-text nav-default">在viewDidAppear中PushViewController失败的问题</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

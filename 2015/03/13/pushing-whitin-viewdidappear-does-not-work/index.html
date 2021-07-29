@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="在viewDidAppear中PushViewController失败的问题"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2015/03/13/pushing-whitin-viewdidappear-does-not-work/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>在viewDidAppear中PushViewController失败的问题 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">在viewDidAppear中PushViewController失败的问题
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-03-13
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+&#123;
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    [self.navigationController pushViewController:secondViewController animated:YES];
+&#125;
+</code></pre>
+<p>在iOS8中，这段代码工作良好，当FirstViewController出现时，由于立刻Push了SecondViewController，即使animated参数是YES，Push的动画都没有显示出来。但是在iOS7中却出现了不一样的情况，pushViewController方法似乎没有执行，SecondViewController也没有被推出。打断点可以发现pushViewController方法是被执行了的，但是界面上没有任何效果。</p>
+<p>由于pushViewController方法是在viewDidAppear中被调用的，会不会是因为viewDidAppear时FirstViewController还有什么UI上的动作没有处理完，导致立即调用pushViewController失败？那么将pushViewController放入dispatch_async中应该就能解决这个问题。使用如下代码实现：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+&#123;
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    dispatch_async(dispatch_get_main_queue(), ^&#123;
+        [self.navigationController pushViewController:secondViewController animated:YES];
+       &#125;);
+&#125;
+</code></pre>
+<p>使用GCD后，SecondViewController被成功的Push了出来。虽然不能确定，但是也在一定程度上印证了上面的猜测。</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2014/10/30/beta-testing-with-testflight/">
+        <span class="next-text nav-default">使用TestFlight进行应用的Beta测试</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

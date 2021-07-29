@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="在Flash中载入swf文件并逐帧播放"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>在Flash中载入swf文件并逐帧播放 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">在Flash中载入swf文件并逐帧播放
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-22
+        </span><span class="post-category">
+            <a href="/categories/Actionscript/">Actionscript</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在Flash中导入swf并且播放，使用ActionScript中的loadMovie()函数就可以完成，但是如果要逐帧播放就比较麻烦了。因为逐帧播放时，要么给每帧定一个播放时间，要么然手动设置按钮控制。</p>
+<p>这里以按时间逐帧播放为例，介绍一下如何使用ActionScript控制。</p>
+<p>控制逐帧播放的代码如下：</p>
+<pre><code>var currentPage = _root._currentframe;  //设定当前页变量
+var i = 0;
+function timer() &#123;
+    if(currentPage == _root._currentframe) &#123;  //如果播放到当前页则跳到下一页
+        gotoAndPlay(currentPage + 1);
+        currentPage = _root._currentframe;
+    &#125;
+&#125;
+timeInter = setInterval(timer, 3000);  //设置定时器3000ms
+</code></pre>
+<p>载入影片代码：</p>
+<pre><code>loadMovie(&quot;XXX.swf&quot;,_root);
+</code></pre>
+<p>具体效果图：</p>
+<p><img src="/upload/flash.png" alt="Alt text"></p>
+<p>Interval层第一帧为计时器代码，Interval最后一帧代码非常重要：</p>
+<pre><code>ClearInterval(timeInter);
+</code></pre>
+<p>最后一帧清除掉计时器，是防止循环播放后重复添加多个计时器。<br>Stop层每一帧添加stop();命令。Content层为具体内容。</p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2012/12/01/magic-search/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">MagicSearch</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2012/11/14/compass-web-app/">
+        <span class="next-text nav-default">指南针WebApp</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>

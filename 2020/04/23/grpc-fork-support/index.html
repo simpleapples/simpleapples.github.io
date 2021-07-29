@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="gRPC 跨进程使用引发的问题"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<link rel="canonical" href="http://www.simpleapples.com/2020/04/23/grpc-fork-support/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+</script>
+
+    <title>gRPC 跨进程使用引发的问题 - simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">gRPC 跨进程使用引发的问题
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2020-04-23
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>在 Python 项目中使用 gRPC 进行通信，跨进程使用时，会出现阻塞或报错的情况（根据 gRPC.io 的版本不同，现象不同）。下面代码展示了一个跨进程使用的 DEMO，主进程向 30001 端口上的 gRPC 服务器发送请求，子进程也向相同的服务器发送请求。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send</span>():</span></span><br><span class="line">    channel = grpc.insecure_channel(<span class="string">&#x27;localhost:30001&#x27;</span>)</span><br><span class="line">    stub = message_pb2_grpc.GreeterStub(channel)</span><br><span class="line">    response = stub.SayHello(message_pb2.HelloRequest(name=<span class="string">&#x27;you&#x27;</span>))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Greeter client received 1: &quot;</span> + response.message)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    channel = grpc.insecure_channel(<span class="string">&#x27;localhost:30001&#x27;</span>)</span><br><span class="line">    stub = message_pb2_grpc.GreeterStub(channel)</span><br><span class="line">    response = stub.SayHello2(message_pb2.HelloRequest(name=<span class="string">&#x27;you&#x27;</span>))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Greeter client received 2: &quot;</span> + response.message)</span><br><span class="line">    p = multiprocessing.Process(target=send)</span><br><span class="line">    p.start()</span><br><span class="line">    p.join()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p>使用 gRPC.io 1.28.1 的情况下，会发生报错，主进程可以正常收到服务器的返回，但是子进程报 <code>Socket operation on non-socket</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">raise _InactiveRpcError(state)</span><br><span class="line">grpc._channel._InactiveRpcError: &lt;_InactiveRpcError of RPC that terminated with:</span><br><span class="line">        status = StatusCode.UNAVAILABLE</span><br><span class="line">        details = <span class="string">&quot;Socket operation on non-socket&quot;</span></span><br><span class="line">        debug_error_string = <span class="string">&quot;&#123;&quot;</span>created<span class="string">&quot;:&quot;</span>@1587481625.192071231<span class="string">&quot;,&quot;</span>description<span class="string">&quot;:&quot;</span>Error received from peer ipv6:[::1]:50051<span class="string">&quot;,&quot;</span>file<span class="string">&quot;:&quot;</span>src/core/lib/surface/call.cc<span class="string">&quot;,&quot;</span>file_line<span class="string">&quot;:1056,&quot;</span>grpc_message<span class="string">&quot;:&quot;</span>Socket operation on non-socket<span class="string">&quot;,&quot;</span>grpc_status<span class="string">&quot;:14&#125;&quot;</span></span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="排查过程"><a href="#排查过程" class="headerlink" title="排查过程"></a>排查过程</h3><p>根据代码，主进程和子进程分别创建了自己的 Channel，看上去逻辑没什么问题，没有什么思路，所以多尝试几种情况先测试一下吧。首先尝试了一下主进程和子进程请求不同的server，在 30001 和 30002 端口分别启动两个 gRPC Server，然后将客户端代码改为主进程请求 30001 端口，子进程请求 30002 端口，代码可以正常运行。测试到这里就更摸不着头脑了，代码明明写的是主进程子进程分别创建 Channel，现在的现象看上去<strong>像是在请求相同服务器的情况下，子进程复用了主进程的socket连接</strong>。gRPC 底层使用的是 HTTP2，而 HTTP2 使用了长连接，会不会是这个原因？</p>
+<blockquote>
+<p>有了新的分帧机制后，HTTP/2 不再依赖多个 TCP 连接去并行复用数据流；每个数据流都拆分成很多帧，而这些帧可以交错，还可以分别设定优先级。 因此，所有 HTTP/2 连接都是永久的，而且仅需要每个来源一个连接，随之带来诸多性能优势。 —— <a target="_blank" rel="noopener" href="https://developers.google.com/web/fundamentals/performance/http2?hl=zh-cn">HTTP/2 简介</a></p>
+</blockquote>
+<p>从 HTTP2 原理上来看还是说的过去的，恰好 gRPC 项目中有 Issue 提到了跨进程使用的问题，参见 <a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/issues/18321">Failed to run grpc python on multiprocessing #18321</a>，开发者在其中说明了像 Demo 那样使用报错的原因。</p>
+<blockquote>
+<p><strong>gRPC Core’s API for fork support</strong><br>A process may fork after invoking grpc_init() and use gRPC in the child if and only if the child process first destroys all gRPC resources inherited from the parent process and invokes grpc_shutdown().<br>Subsequent to this, the child will be able to re-initialize and use gRPC. After fork, the parent process will be able to continue to use existing gRPC resources such as channels and calls without interference<br>from the child process.</p>
+</blockquote>
+<blockquote>
+<p><strong>gRPC Python behavior at fork()</strong><br>To facilitate gRPC Python applications meeting the above constraints, gRPC Python will automatically destroy and shutdown all gRPC Core resources in the child’s post-fork handler, including cancelling in-flight calls. From the client’s perspective, the child process is now free to create new channels and use gRPC.</p>
+</blockquote>
+<p>简化的说，在 gRPC Core API 的层面，子进程使用 gRPC 需要先销毁掉从父进程 fork 过来的 gRPC 资源，重新创建连接才可以正常使用，否则可能陷入死锁。</p>
+<p>同时，gRPC 对于 fork 行为的支持也有一个专门的文档。<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/doc/fork_support.md">https://github.com/grpc/grpc/blob/master/doc/fork_support.md</a></p>
+<blockquote>
+<p>The background Python thread was removed entirely. This allows forking after creating a channel. However, the channel must not have issued any RPCs prior to the fork. Attempting to fork with an active channel that has been used can result in deadlocks/corrupted wire data.</p>
+</blockquote>
+<p>从文档和 Issue 的描述看，当主进程有活动状态的 gRPC 连接时，是不可以 fork 的，会引发死锁或者报错（可能和 HTTP2 的长连接机制有关系），如果要 fork，需要先关闭掉活动的连接，在 fork 出的子进程中重新建立 gRPC 连接（也就是主子进程各自持有各自的 HTTP2 连接）。</p>
+<h3 id="实践方案"><a href="#实践方案" class="headerlink" title="实践方案"></a>实践方案</h3><p>综合文档和开发者在 Issue 中提到的方法，要想让 Demo 可以运行有如下三种方法。</p>
+<ul>
+<li><p>在环境变量中设置 <code>GRPC_ENABLE_FORK_SUPPORT=1</code>（参见<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/doc/fork_support.md#111">https://github.com/grpc/grpc/blob/master/doc/fork_support.md#111</a>）</p>
+</li>
+<li><p>在 fork 子进程前使用 <code>channel.close()</code> 关闭活动的 gRPC 连接（参见<a target="_blank" rel="noopener" href="https://grpc.github.io/grpc/python/grpc.html#grpc.Channel.close">https://grpc.github.io/grpc/python/grpc.html#grpc.Channel.close</a>）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    channel = grpc.insecure_channel(<span class="string">&#x27;localhost:30001&#x27;</span>)</span><br><span class="line">    stub = message_pb2_grpc.GreeterStub(channel)</span><br><span class="line">    response = stub.SayHello2(message_pb2.HelloRequest(name=<span class="string">&#x27;you&#x27;</span>))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Greeter client received 2: &quot;</span> + response.message)</span><br><span class="line">    channel.close() <span class="comment"># 关闭 channel，再 fork</span></span><br><span class="line">    </span><br><span class="line">    p = multiprocessing.Process(target=send)</span><br><span class="line">    p.start()</span><br><span class="line">    p.join()</span><br></pre></td></tr></table></figure></li>
+<li><p>使用 <code>with</code> 语句，语句结束后会自动关闭活动的 gRPC 连接（参见<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/examples/python/helloworld/greeter_client.py#L29">https://github.com/grpc/grpc/blob/master/examples/python/helloworld/greeter_client.py#L29</a>)</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="comment"># 使用 with 语句</span></span><br><span class="line">    <span class="keyword">with</span> grpc.insecure_channel(<span class="string">&#x27;localhost:30001&#x27;</span>) <span class="keyword">as</span> channel:</span><br><span class="line">        stub = message_pb2_grpc.GreeterStub(channel)</span><br><span class="line">        response = stub.SayHello2(message_pb2.HelloRequest(name=<span class="string">&#x27;you&#x27;</span>))</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Greeter client received 2: &quot;</span> + response.message)</span><br><span class="line">   </span><br><span class="line">    p = multiprocessing.Process(target=send)</span><br><span class="line">    p.start()</span><br><span class="line">    p.join()</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a target="_blank" rel="noopener" href="https://grpc.github.io/grpc/python/grpc.html#channel-object">https://grpc.github.io/grpc/python/grpc.html#channel-object</a></p>
+<p><a target="_blank" rel="noopener" href="https://developers.google.com/web/fundamentals/performance/http2?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/http2?hl=zh-cn</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/issues/18321">https://github.com/grpc/grpc/issues/18321</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/pull/16264">https://github.com/grpc/grpc/pull/16264</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/doc/fork_support.md#111">https://github.com/grpc/grpc/blob/master/doc/fork_support.md#111</a></p>
+<p><a target="_blank" rel="noopener" href="https://grpc.github.io/grpc/python/grpc.html#grpc.Channel.close">https://grpc.github.io/grpc/python/grpc.html#grpc.Channel.close</a></p>
+
+      </div>
+      
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/2020/06/01/wsl2-guideline-for-developers/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">面向开发者的 WSL2 安装指南</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/2020/04/20/vscode-cant-run-go-project/">
+        <span class="next-text nav-default">探究vscode debug流程，解决无法运行go程序的问题</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v="></script>
+</body>
+</html>
