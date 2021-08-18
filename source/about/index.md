@@ -5,7 +5,7 @@ date: 2020-05-09 08:56:03
 
 ### 个人简介
 
-网名 simpleapples：Go程序员、Python程序员、iOS程序员、（伪）前端程序员、技术总监。曾供职于多贝网、创新工场AI工程院等，有一段创业经历[靠谱投](https://www.kaoputou.com)。
+网名 simpleapples，目前在字节跳动任职资深研发工程师，曾供职于多贝网、创新工场AI工程院等，有一段创业经历[靠谱投](https://www.kaoputou.com)。
 
 ### 开源贡献
 
