@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 <link rel="alternate" href="/default" title="simpleapples" ><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/page/4/"/>
+<link rel="canonical" href="http://www.simpleapples.com/page/17/"/>
 
 <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
 <link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
@@ -98,114 +98,116 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/12/24/practice-in-json-with-go/">go json 实践中遇到的坑</a>
+      <h1 class="post-title"><a class="post-link" href="/2012/10/19/add-apache-mysql-to-centos-system-service/">将Apache和Mysql添加为CentOS服务</a>
         </h1>
 
       <div class="post-meta">
         <span class="post-time">
-          2018-12-24
+          2012-10-19
         </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
+            <a href="/categories/Mac-Linux/">Mac&Linux</a>
             </span>
         </div>
     </header>
 
-    <div class="post-content"><p><img src="/upload/20181224_01.png"></p>
-<p>在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。</p>
-          <div class="read-more">
-            <a href="/2018/12/24/practice-in-json-with-go/" class="read-more-link">阅读更多</a>
-          </div>
+    <div class="post-content"><p>当安装自己编译的Apache和Mysql后，默认是不添加为系统服务的，所以我们需要手动将其添加为服务。</p>
+<p>添加Apache为系统服务</p>
+<p>1.将apachectl拷贝到init.d下</p>
+<pre><code>#cp /usr/local/apache/bin/apachectl /etc/rc.d/init.d/httpd
+</code></pre>
+<p>2.修改httpd</p>
+<pre><code>#vi /etc/rc.d/init.d/httpd
+</code></pre>
+<p>添加以下注释内容</p>
+<pre><code>#chkconfig: 345 85 15
+#decription: apache server
+</code></pre>
+<p>3.向系统服务添加apache</p>
+<pre><code>#chkconfig --add httpd
+</code></pre>
+<p>添加Mysql为系统服务</p>
+<ol>
+<li><p>将mysql拷贝到init.d下</p>
+<pre><code> #cp /usr/local/mysql5/share/mysql/mysql.server /etc/init.d/mysqld
+</code></pre>
+</li>
+<li><p>将mysqld添加到系统服务</p>
+<pre><code> #chkconfig --add mysqld
+</code></pre>
+</li>
+</ol>
+<p>完成上述步骤，就可以使用</p>
+<pre><code>#service httpd/mysqld restart/start/stop
+</code></pre>
+<p>来控制apache/mysql的启动停止重启了</p>
+
         </div></article>
       <article class="post">
     <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+      <h1 class="post-title"><a class="post-link" href="/2012/10/19/macos-vmware-fusion-centos-network-setting/">MacOS+VMware Fusion安装CentOS网络设置</a>
         </h1>
 
       <div class="post-meta">
         <span class="post-time">
-          2018-12-13
+          2012-10-19
         </span><span class="post-category">
-            <a href="/categories/Tech/">Tech</a>
+            <a href="/categories/Mac-Linux/">Mac&Linux</a>
             </span>
         </div>
     </header>
 
-    <div class="post-content"><p><img src="/upload/20181213_01.jpg"></p>
-<p>HTTP 是一个无状态的协议，一次请求结束后，下次在发送服务器就不知道这个请求是谁发来的了（同一个 IP 不代表同一个用户），在 Web 应用中，用户的认证和鉴权是非常重要的一环，实践中有多种可用方案，并且各有千秋。</p>
-          <div class="read-more">
-            <a href="/2018/12/13/combining-jwt-with-refresh-token/" class="read-more-link">阅读更多</a>
-          </div>
+    <div class="post-content"><p>在vmware中最小化安装centos6.3后发现无论vmware设置城共享还是桥接形式都无法连接网络，在网络上查询到vmware workstation下安装centos的设置方法，尝试后发现并不适用mac os下的vmware fusion。<br>经过尝试，发现fusion下centos网络配置非常简单。方法如下：</p>
+<ol>
+<li><p>将vmware设置成桥接网络</p>
+</li>
+<li><p>改变网卡设置</p>
+<p> $vi /etc/sysconfig/network-scripts/ifcfg-eth0</p>
+</li>
+</ol>
+<p>修改为如下值：</p>
+<pre><code>BOOTPROTO=&quot;dhcp&quot; //使用dhcp配置ip地址  
+ONBOOT=&quot;yes&quot; //使设备启动  
+</code></pre>
+<p>3.重启网络服务</p>
+<pre><code>$service network restart
+</code></pre>
+<p>4.查看网络</p>
+<pre><code>$ifconfig
+</code></pre>
+<p>查看设备eth0是否分配到正确ip，网络是否可以ping通。</p>
+
         </div></article>
       <article class="post">
     <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/12/10/ssh-via-ngrok/">通过 ngrok 实现 ssh 内网穿透</a>
+      <h1 class="post-title"><a class="post-link" href="/2012/10/19/ios-push-notification-certificate/">iOS 推送证书制作 （JAVA/PHP）</a>
         </h1>
 
       <div class="post-meta">
         <span class="post-time">
-          2018-12-10
+          2012-10-19
         </span><span class="post-category">
-            <a href="/categories/Tech/">Tech</a>
+            <a href="/categories/Mobile/">Mobile</a>
             </span>
         </div>
     </header>
 
-    <div class="post-content"><h3 id="ngrok"><a href="#ngrok" class="headerlink" title="ngrok"></a>ngrok</h3><p>用 ssh 访问一台主机，如果和主机在一个局域网中或者主机拥有公网 IP，就可以使用 ssh 命令直接连接主机的 IP 地址，但是大部分公司和家庭内部都是局域网，并不能给局域网内的每一台主机都分配一个公网 IP，这时候就需要进行内网穿透，才能从外部连接到局域网内的主机。</p>
-<p>ngrok 是一个反向代理工具，可以实现将内网的端口暴露到公网，通过 ngrok，也能将 ssh 使用的端口暴露出去，以此实现 ssh 的内网穿透。</p>
-          <div class="read-more">
-            <a href="/2018/12/10/ssh-via-ngrok/" class="read-more-link">阅读更多</a>
-          </div>
+    <div class="post-content"><p>在使用Java或者PHP制作iOS推送服务器的时候，需要自己从开发者网站上导出的aps_developer_identity证书和Apple Development Push Services证书进行合成，生成可以供Java使用的p12证书或供PHP使用的pem证书。</p>
+<p>aps_developer_identity证书和Apple Development Push Services证书的申请过程可以参考：</p>
+<p><a target="_blank" rel="noopener" href="http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html">http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html</a></p>
+<p>本文着重讨论如何合成证书</p>
+<p>1.将aps_developer_identity.cer转换成pem</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">$openssl</span> x509 -in aps_developer_identity.cer -inform der -out PushChatCert.pem</span></span><br></pre></td></tr></table></figure>
+<p>2.将Apple Development Push Services证书转换成pem</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$openssl pkcs12 -nocerts -out <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem -<span class="keyword">in</span> <span class="module-access"><span class="module"><span class="identifier">Push</span>.</span></span>p12</span><br></pre></td></tr></table></figure>
+<p>3.合成两个pem证书</p>
+<p>1)Java服务器所需的证书为p12格式</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$openssl pkcs12 -export -<span class="keyword">in</span> <span class="module-access"><span class="module"><span class="identifier">PushChatCert</span>.</span></span>pem -inkey <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem -out pushCert.p12 -name “apns-cert”</span><br></pre></td></tr></table></figure>
+<p>2）PHP服务器所需证书为pem格式</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$cat <span class="module-access"><span class="module"><span class="identifier">PushChatCert</span>.</span></span>pem <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem &gt; pushCert.pem</span><br></pre></td></tr></table></figure>
         </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/12/07/unicode-and-utf-8/">Unicode 和 UTF-8</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-12-07
-        </span><span class="post-category">
-            <a href="/categories/Tech/">Tech</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20181207_01.jpg"></p>
-<p>Unicode 和 UTF-8 的概念是一个非常基础和重要，但是却容易被忽略的问题。</p>
-          <div class="read-more">
-            <a href="/2018/12/07/unicode-and-utf-8/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/10/26/understand-time-struct-in-go/">理解Golang的Time结构</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-10-26
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20181026_01.png"></p>
-<p>在golang中创建并打印一个时间对象，会看到如下输出</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">2018</span>-<span class="number">10</span>-<span class="number">26</span> <span class="number">14</span>:<span class="number">15</span>:<span class="number">50</span>.<span class="number">306558969</span> +<span class="number">0800</span> CST m=+<span class="number">0</span>.<span class="number">000401093</span></span><br></pre></td></tr></table></figure>
-
-<p>前面表示的意义好理解，分别是年月日和时间时区，最后的m=+xxxx这部分代表什么呢？</p>
-          <div class="read-more">
-            <a href="/2018/10/26/understand-time-struct-in-go/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <nav class="pagination"><a class="prev" href="/page/3/">
+      <nav class="pagination"><a class="prev" href="/page/16/">
         <i class="iconfont icon-left"></i>
         <span class="prev-text">上一页</span>
-      </a>
-    <a class="next" href="/page/5/">
-        <span class="next-text">下一页</span>
-        <i class="iconfont icon-right"></i>
       </a>
     </nav></section></div></div>
       </main>

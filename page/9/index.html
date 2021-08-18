@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<link rel="alternate" href="/default" title="simpleapples" ><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
+<link rel="canonical" href="http://www.simpleapples.com/page/9/"/>
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-116134610-1');
+</script><script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
+</script>
+
+    <title>simpleapples</title>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">首页
+          </li>
+      </a><a href="/archives/">
+        <li class="mobile-menu-item">归档
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">simpleapples</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            首页
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            归档
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            关于
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><section id="posts" class="posts"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/26/extract-lockscreen-wallpapers-in-win10/">用Python批量提取Win10锁屏壁纸</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-26
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>使用Win10的朋友会发现，每次开机锁屏界面都会有不一样的漂亮图片，这些图片通常选自优秀的摄影作品，十分精美。</p>
+<p><img src="/upload/20180326_01.jpg"></p>
+<p>但是由于系统会自动更换这些图片，所以就算再好看的图片，也许下次开机之后就被替换掉了。</p>
+<p>借助Python，我们可以用简单的几行代码，批量提取这些精美的锁屏图片。把喜欢的图片设置成桌面背景，就不用担心被替换掉啦。</p>
+<h1 id="提取原理"><a href="#提取原理" class="headerlink" title="提取原理"></a>提取原理</h1><p>Win10系统会自动下载最新的锁屏壁纸，并将他们保存在一个系统文件夹中，路径是<code>C:\Users\[用户名]\AppData\Local\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets</code></p>
+<p><img src="/upload/20180326_02.png" alt="随机命名的锁屏图片"></p>
+<p>直接打开这个文件夹，里面会有随机命名的多个文件，每一个文件就是一张图片。但是由于文件没有扩展名，所以并不能预览。为了不搞坏系统文件，并且把这些文件变成可以预览的格式，我们用Python把这些文件复制出来，加上JPG作为扩展名。</p>
+<h1 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os, shutil</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把这个文件所在目录wallpapers文件夹作为保存图片的目录</span></span><br><span class="line">save_folder = dir_path = os.path.dirname(</span><br><span class="line">	os.path.realpath(__file__)) + <span class="string">&#x27;\wallpapers&#x27;</span></span><br><span class="line"><span class="comment"># 动态获取系统存放锁屏图片的位置</span></span><br><span class="line">wallpaper_folder = os.getenv(<span class="string">&#x27;LOCALAPPDATA&#x27;</span>) + (</span><br><span class="line">	<span class="string">&#x27;\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy&#x27;</span></span><br><span class="line">	<span class="string">&#x27;\LocalState\Assets&#x27;</span>)</span><br><span class="line"><span class="comment"># 列出所有的文件</span></span><br><span class="line">wallpapers = os.listdir(wallpaper_folder)</span><br><span class="line"><span class="keyword">for</span> wallpaper <span class="keyword">in</span> wallpapers:</span><br><span class="line">	wallpaper_path = os.path.join(wallpaper_folder, wallpaper)</span><br><span class="line">	<span class="comment"># 小于150kb的不是锁屏图片</span></span><br><span class="line">	<span class="keyword">if</span> (os.path.getsize(wallpaper_path) / <span class="number">1024</span>) &lt; <span class="number">150</span>:</span><br><span class="line">		<span class="keyword">continue</span></span><br><span class="line">	wallpaper_name = wallpaper + <span class="string">&#x27;.jpg&#x27;</span></span><br><span class="line">	save_path = os.path.join(save_folder, wallpaper_name)</span><br><span class="line">	shutil.copyfile(wallpaper_path, save_path)</span><br><span class="line">	<span class="built_in">print</span>(<span class="string">&#x27;Save wallpaper &#x27;</span> + save_path)</span><br></pre></td></tr></table></figure>
+
+<p>首先确定系统存放锁屏图片的文件夹位置，由于文件夹位于用户的个人文件夹内，每个用户的用户名是不一样的，所以我们需要通过系统的<code>LOCALAPPDATA</code>变量动态的获取路径。代码会把提取出来的图片保存在wallpapers文件夹下，所以代码文件所在的目录没有wallpapers文件夹，需要手工创建一个。</p>
+<p><img src="/upload/20180326_03.png" alt="在代码文件旁新建一个wallpapers文件夹"></p>
+<p>执行上面这段Python代码，再打开wallpapers文件夹，就可以看到提取出的锁屏图片了。</p>
+<p><img src="/upload/20180326_04.png"></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/">15行Python代码，帮你理解令牌桶算法</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-20
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180320_01.jpg"></p>
+<p>在网络中传输数据时，为了防止网络拥塞，需限制流出网络的流量，使流量以比较均匀的速度向外发送，令牌桶算法就实现了这个功能，<strong>可控制发送到网络上数据的数目，并允许突发数据的发送。</strong></p>
+<h1 id="什么是令牌"><a href="#什么是令牌" class="headerlink" title="什么是令牌"></a>什么是令牌</h1><p>从名字上看令牌桶，大概就是一个装有令牌的桶吧，那么什么是令牌呢？</p>
+<p>紫薇格格拿的令箭，可以发号施令，令行禁止。在计算机的世界中，令牌也有令行禁止的意思，有令牌，则相当于得到了进行操作的授权，没有令牌，就什么都不能做。</p>
+<h1 id="用令牌实现限速器"><a href="#用令牌实现限速器" class="headerlink" title="用令牌实现限速器"></a>用令牌实现限速器</h1><p>我们用1块令牌来代表发送1字节数据的资格，假设我们源源不断的发放令牌给程序，程序就有资格源源不断的发送数据，当我们不发放令牌给程序，程序就相当于被限流，无法发送数据了。接下来我们说说限速器，所谓限速器，就是让程序在单位时间内，最多只能发送一定大小的数据。假设在1秒发放10块令牌，那么程序发送数据的速度就会被限制在10bytes/s。如果1秒内有大于10bytes的数据需要发送，就会因为没有令牌而被丢弃。</p>
+<h1 id="改进限速器——加个桶"><a href="#改进限速器——加个桶" class="headerlink" title="改进限速器——加个桶"></a>改进限速器——加个桶</h1><p><img src="/upload/20180320_02.jpg"></p>
+<p>我们实现的限速器，速度是恒定的，但是在实际的应用中，往往会有突发的传输需求（需要更快速的发送，但是不会持续太久，也不会引起网络拥塞），这种数据碰上我们的限速器，就因为拿不到令牌而无法发送。</p>
+<p>对限速器进行一下改动，依然1秒产生10块令牌，但是我们把产生出来的令牌先放到一个桶里，当程序需要发送的时候，从桶里取令牌，不需要的时候，令牌就会在桶里沉淀下来，假设桶里沉淀了10块令牌，程序最多就可以在1秒内发送20bytes的数据，满足了突发数据传输的要求，并且由于桶里的令牌被用完，下一秒最多依然只能发10bytes的数据，不会因为持续发送大量数据，对网络造成压力。</p>
+<p><img src="/upload/20180320_03.jpg"></p>
+<h1 id="15行Python代码实践令牌桶"><a href="#15行Python代码实践令牌桶" class="headerlink" title="15行Python代码实践令牌桶"></a>15行Python代码实践令牌桶</h1><p>令牌桶需要以一定的速度生成令牌放入桶中，当程序要发送数据时，再从桶中取出令牌。这里似乎有点问题，如果我们使用一个死循环，来不停地发放令牌，程序就被阻塞住了，有没有更好的办法？</p>
+<p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
+<p>接下来看代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenBucket</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, rate, capacity</span>):</span></span><br><span class="line">        self._rate = rate</span><br><span class="line">        self._capacity = capacity</span><br><span class="line">        self._current_amount = <span class="number">0</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">consume</span>(<span class="params">self, token_amount</span>):</span></span><br><span class="line">        increment = (<span class="built_in">int</span>(time.time()) - self._last_consume_time) * self._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        self._current_amount = <span class="built_in">min</span>(</span><br><span class="line">            increment + self._current_amount, self._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; self._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line">        self._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/14/understanding-blockchain/">最爱你的人，会让你不费脑细胞的理解区块链原理</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-14
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180314_01.png"></p>
+<p>区块链是一个近期非常火的概念，随便走进一个写字楼的电梯，都会听到有人谈论区块链，或者炒币: ) 希望通过这篇文章，能让你对区块链的概念有一个整体的认识，在理解概念后，<strong>下一篇文章将用大约300行Python代码，实现一个区块链网络。</strong></p>
+<h1 id="区块-和-链"><a href="#区块-和-链" class="headerlink" title="区块 和 链"></a>区块 和 链</h1><p>所谓区块，就是一个块咯（要不然还是什么？），把这些块一个一个连在一起，像链条一样，就称为区块链（别急着打我，先往下看）。</p>
+<p><img src="/upload/20180314_02.jpg" alt="区块和区块链"></p>
+<p>这是一些链条，链条的价值更多的体现在锁楼下小电动车的时候，不过我们再仔细看一下这个链条是不是有点像那什么？⛓</p>
+<p><img src="/upload/20180314_03.gif" alt="脱氧核糖核酸"></p>
+<p>很聪明，高中生物老师在冲你微笑！这就是传说中的脱氧核糖核酸（DNA），DNA也是一种链式结构，<strong>携带了遗传信息</strong>。区块链中的“区块”，就好比DNA分子中的脱氧核糖核苷酸（我也不知道自己在说什么），而区块链中的“链”，就好比DNA分子的链式结构。</p>
+<p>DNA和链条的价值差异，关键在于DNA携带了大量遗传<strong>信息</strong>，而链条什么都没有携带。对于区块链来说，携带信息也是它的一个重要特点（不携带信息连锁电动车的作用都没有）。</p>
+<p>当区块链携带的是账务信息的时候，它就变成了一个特别厉害的东西——账本（我们给他起了个00后的名字——比特币）。</p>
+<h1 id="Peer-to-Peer"><a href="#Peer-to-Peer" class="headerlink" title="Peer-to-Peer"></a>Peer-to-Peer</h1><p>为了显得专业一些，我们祭出比特币的创造者，中本聪的论文<a target="_blank" rel="noopener" href="https://bitcoin.org/bitcoin.pdf">《Bitcoin: A Peer-to-Peer Electronic Cash System》</a>，从这篇论文的题目我们可以看到，区块链是基于<strong>Peer-to-Peer</strong>的，下面就来了解一下什么是Peer-to-Peer。</p>
+<p>Peer-to-Peer，简称P2P（不是互联网借贷的那个P2P），它是一种点对点网络，看图（我也不知道该怎么讲）。</p>
+<p><img src="/upload/20180314_04.jpg" alt="P2P网络"></p>
+<p>图中每一个方脑袋就是一个Peer（节点），注意一下，这些方脑袋有一个共同点，他们都一毛一样（不仅长得一样，每一个脑袋都跟其它脑袋相连）。这也是P2P网络的最大特点——<strong>去中心化</strong>，P2P网络中不存在中心节点，所有节点都是平等的，任何一个节点，想跟谁说话就跟谁说话，并且谁（节点）都不能说了算。</p>
+<h1 id="共识机制"><a href="#共识机制" class="headerlink" title="共识机制"></a>共识机制</h1><p>你和好基友老王，还有你们共同喜欢的一个姑娘阿圆（对，就是圆滚滚的圆），组成了一个三节点的P2P网络，根据P2P网络定义你们三个人谁都不能说了算。这一天，阿圆生日，你和老王同时给阿圆送了一个大蛋糕，那么问题来了，阿圆先吃哪个呢？</p>
+<p>既然没有人能说了算，也不能让你和老王决斗（计算机这么做恐怕人类会毁灭），那么就需要采用一个文明的办法决定——商量。既然商量，就要有规矩，这个规矩叫<strong>共识机制</strong>。</p>
+<p><img src="/upload/20180314_05.png"></p>
+<h1 id="Proof-of-work"><a href="#Proof-of-work" class="headerlink" title="Proof-of-work"></a>Proof-of-work</h1><p>区块链共识机制有很多种，Proof-of-work（POW，工作量证明）是其中一种，所谓工作量证明，有点像是比武招亲。你和老王对阿圆都很好，阿圆也很难抉择到底先吃谁的蛋糕，于是她请了两位武力相当的武林高手，让你和老王分别与高手过招，谁赢了高手，就先吃谁的蛋糕，如果你们都赢了高手，那么谁先赢算数。</p>
+<p><img src="/upload/20180314_06.jpg"></p>
+<h1 id="把这些捏在一起"><a href="#把这些捏在一起" class="headerlink" title="把这些捏在一起"></a>把这些捏在一起</h1><p>了解了POW、共识机制、P2P、区块、链的概念，我们就可以把他们拼在一起，看看会发生什么了。</p>
+<p><img src="/upload/20180314_07.jpeg" alt="区块链诞生了！"></p>
+<p>我们把P2P网络中的每一个节点，赋予一条链，这样网络中所有的链都是平等的了，接下来在其中一条链上增加一个带有信息的区块，P2P网络会将这个区块同步到所有的链上，也就是这条信息会被存储在所有节点。</p>
+<p>把上面的一段话缩成一句（会显得比较厉害）：</p>
+<p><strong>区块链是用分布式数据库识别、传播和记载信息的智能化对等网络, 也称为价值互联网。</strong></p>
+<p>看到这里是不是对区块链略知一二了？</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/06/lru-algorithm-implemented-in-python/">面试不再怕，20行Python代码帮你搞懂LRU算法</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-06
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180306_01.png"></p>
+<p>LRU算法在后端工程师面试中，是一个比较常出现的题目，这篇文章带大家一起，理解LRU算法，并最终用Python轻松实现一个基于LRU算法的缓存。</p>
+<h2 id="缓存是什么"><a href="#缓存是什么" class="headerlink" title="缓存是什么"></a>缓存是什么</h2><p><img src="/upload/20180306_02.jpg"></p>
+<p>先看一张图，当我们访问网页，浏览器会给服务器发请求，服务器会经过一系列的运算，把页面返回给浏览器。</p>
+<p><img src="/upload/20180306_03.jpg"></p>
+<p>当有多个浏览器同时访问的时候，就会在短时间内发起多个请求，而服务器对每一个请求都要进行一系列相同的操作。重复工作不仅浪费资源，还可能导致响应速度变慢。</p>
+<p><img src="/upload/20180306_04.jpg"></p>
+<p>而缓存则可以把服务器返回的页面保存下来，当有其他的浏览器再访问时候，就不必劳服务器大驾，直接由缓存返回页面。为了保证响应速度，缓存通常是基于比较昂贵的硬件，比如RAM，这就决定了我们很难用大量的缓存把所有的页面都存下来，当恰好没有缓存浏览器请求的页面时，依然需要请求服务器。由于缓存容量有限，而数据量无限（互联网每天新产生的页面数无法估计），就需要把好刚用在刀刃上，缓存那些最有用的信息。</p>
+<h2 id="LRU是什么"><a href="#LRU是什么" class="headerlink" title="LRU是什么"></a>LRU是什么</h2><p>LRU是一种缓存淘汰算法（在OS中也叫内存换页算法），由于缓存空间是有限的，所以要淘汰缓存中不常用的数据，留下常用的数据，达到缓存效率的最大化。LRU就是这样一种决定“淘汰谁留下谁”的算法，LRU是Least recently used的缩写，从字面意思“最近最少使用”，我们就可以理解LRU的淘汰规则。</p>
+<h2 id="LRU的淘汰逻辑"><a href="#LRU的淘汰逻辑" class="headerlink" title="LRU的淘汰逻辑"></a>LRU的淘汰逻辑</h2><p><img src="/upload/20180306_05.png"></p>
+<p>我们用一张图来描述LRU的淘汰逻辑，图中的缓存是一个列表结构，上面是头结点下面是尾节点，缓存容量为8（8个小格子）：</p>
+<ul>
+<li>有新数据（意味着数据之前没有被缓存过）时，加入到列表头</li>
+<li>缓存到达最大容量时，需要淘汰数据多出来的数据，此时淘汰列表尾部的数据</li>
+<li>当缓存中有数据被命中，则将数据移动到列表头部（相当于新加入缓存）</li>
+</ul>
+<p>按上面的逻辑我们可以看到，一个数据如果经常被访问就会不断地被移动到列表头部，不会被淘汰出缓存，而越不经常访问的数据，越容易被挤出缓存。</p>
+<h2 id="20行Python代码实践LRU"><a href="#20行Python代码实践LRU" class="headerlink" title="20行Python代码实践LRU"></a>20行Python代码实践LRU</h2><p>接下来我们用Python来实现一个采用LRU算法的缓存。</p>
+<p>从前面的文章中我们可以知道，缓存简化下来就两个功能，一个是往里装数据（缓存数据），一个是往外吐数据（命中缓存），所以我们的缓存对外只需要put和get两个接口就可以了。</p>
+<p>按照前面的示意图，缓存内部我们只需要有一个列表（list）就可以实现LRU逻辑，不过用列表虽然能实现逻辑，但是在判断是否命中缓存时，速度可能非常慢（列表需要遍历才能知道数据有没有在里面）。在Python中，我们可以用基于hash的结构，比如字典（dict）或集合（set），来快速判断数据是否存在，解决列表实现的性能问题。但是字典和集合又是没有顺序的，如果能有一种既能排序，又是基于hash存储的数据结构，就好了。</p>
+<p>在Python的collections包中，已经内置了这种实用的结构OrderedDict，OrderedDict是dict的子类，但是存储在内部的元素是有序的（列表的特点）。</p>
+<p>解决了数据结构的问题，我们可以直接上手写逻辑了，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity</span>):</span></span><br><span class="line">        self.capacity = capacity</span><br><span class="line">        self.queue = collections.OrderedDict()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key</span>):</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.queue:</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span> // 要找的数据不在缓存中返回-<span class="number">1</span></span><br><span class="line">        value = self.queue.pop(key) // 将命中缓存的数据移除</span><br><span class="line">        self.queue[key] = value // 将命中缓存的数据重新添加到头部</span><br><span class="line">        <span class="keyword">return</span> self.queue[key]</span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key, value</span>):</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.queue: // 如果已经在缓存中，则先移除老的数据</span><br><span class="line">            self.queue.pop(key)</span><br><span class="line">        <span class="keyword">elif</span> <span class="built_in">len</span>(self.queue.items()) == self.capacity:</span><br><span class="line">            self.queue.popitem(last=<span class="literal">False</span>) // 如果不在缓存中并且到达最大容量，则把最后的数据淘汰</span><br><span class="line">        self.queue[key] = value // 将新数据添加到头部</span><br></pre></td></tr></table></figure>
+
+<p>下次面试在遇到LRU的题目，是不是就胸有成竹了？</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/03/60-lines-code-to-convert-pdf-to-word/">60行Python代码，实现多线程PDF转Word</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-03
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>工作中经常会遇到需要提取PDF文件中文字的情况，一个PDF还好，复制粘贴一下也花不了太多时间，如果需要把大量PDF转为Word，怎么办呢？</p>
+<p><img src="/upload/cant-do-it.jpg"></p>
+<p>今天教大家用60行代码实现，多线程批量PDF转Word。没兴趣看具体过程可以直接拉到最后，有代码。</p>
+<h2 id="分解任务"><a href="#分解任务" class="headerlink" title="分解任务"></a>分解任务</h2><p>把PDF转为Word，分几步？两步，第一步读取PDF文件，第二步写入Word文件。</p>
+<p><img src="/upload/two-steps.jpg"></p>
+<p>是的，就是这么简单，借助Python第三方包，可以轻松实现上面两个过程，我们要用到pdfminer3k和python-docx这两个包。</p>
+<h2 id="读取PDF"><a href="#读取PDF" class="headerlink" title="读取PDF"></a>读取PDF</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> PDFResourceManager</span><br><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> process_pdf</span><br><span class="line"><span class="keyword">from</span> pdfminer.converter <span class="keyword">import</span> TextConverter</span><br><span class="line"><span class="keyword">from</span> pdfminer.layout <span class="keyword">import</span> LAParams</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">resource_manager = PDFResourceManager()</span><br><span class="line">return_str = StringIO()</span><br><span class="line">lap_params = LAParams()</span><br><span class="line"></span><br><span class="line">device = TextConverter(resource_manager, return_str, laparams=lap_params)</span><br><span class="line">process_pdf(resource_manager, device, file) // file是使用<span class="built_in">open</span>方法打开的PDF文件句柄</span><br><span class="line">device.close()</span><br><span class="line"></span><br><span class="line">// 此处content就是转换为文字的PDF内容</span><br><span class="line">content = return_str.getvalue()</span><br></pre></td></tr></table></figure>
+
+<p>content变量存储的就是我们从PDF文件中读取出的文字内容，可以看到，使用pdfminer3k可以轻松完成这个任务。接下来我们需要把文字内容写入成一个word文件。</p>
+<h2 id="写入Word"><a href="#写入Word" class="headerlink" title="写入Word"></a>写入Word</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> docx <span class="keyword">import</span> Document</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">doc = Document()</span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> content.split(<span class="string">&#x27;\n&#x27;</span>):</span><br><span class="line">    paragraph = doc.add_paragraph()</span><br><span class="line">    paragraph.add_run(remove_control_characters(line))</span><br><span class="line">doc.save(file_path)</span><br><span class="line">content是我们前面读取出的文字内容，由于是讲整个PDF读成一个字符串，所以需要使用split方法将每一行分隔开，然后按行写入word，否则所有的文字会在同一行。同时这段代码使用了一个remove_control_characters函数，这个函数是需要自己实现的，目的是移除控制字符（换行符、制表符、转义符等），因为python-docx是不支持控制字符写入的。</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_control_characters</span>(<span class="params">content</span>):</span></span><br><span class="line">    mpa = <span class="built_in">dict</span>.fromkeys(<span class="built_in">range</span>(<span class="number">32</span>))</span><br><span class="line">    <span class="keyword">return</span> content.translate(mpa)</span><br></pre></td></tr></table></figure>
+
+<p>控制字符就是ASCII码在32以下的，所以我们使用str的translate方法，把32以下的字符移除就可以。</p>
+<h2 id="用是能用，但是太慢了！"><a href="#用是能用，但是太慢了！" class="headerlink" title="用是能用，但是太慢了！"></a>用是能用，但是太慢了！</h2><p><img src="/upload/too-slow.jpg"></p>
+<p>如果我们用上面代码去转换100个PDF文件，就会发现速度慢到难以接受，每个PDF都需要花很长时间才能转换好，怎么办？别急，接下来我们引入多线程，同时转换多个PDF，可以有效加快转换速度。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ProcessPoolExecutor</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> ProcessPoolExecutor(max_workers=<span class="built_in">int</span>(config[<span class="string">&#x27;max_worker&#x27;</span>])) <span class="keyword">as</span> executor:</span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> os.listdir(config[<span class="string">&#x27;pdf_folder&#x27;</span>]):</span><br><span class="line">        extension_name = os.path.splitext(file)[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> extension_name != <span class="string">&#x27;.pdf&#x27;</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        file_name = os.path.splitext(file)[<span class="number">0</span>]</span><br><span class="line">        pdf_file = config[<span class="string">&#x27;pdf_folder&#x27;</span>] + <span class="string">&#x27;/&#x27;</span> + file</span><br><span class="line">        word_file = config[<span class="string">&#x27;word_folder&#x27;</span>] + <span class="string">&#x27;/&#x27;</span> + file_name + <span class="string">&#x27;.docx&#x27;</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;正在处理: &#x27;</span>, file)</span><br><span class="line">        result = executor.submit(pdf_to_word, pdf_file, word_file)</span><br><span class="line">        tasks.append(result)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    exit_flag = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">for</span> task <span class="keyword">in</span> tasks:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> task.done():</span><br><span class="line">            exit_flag = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">if</span> exit_flag:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;完成&#x27;</span>)</span><br><span class="line">        exit(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<p>代码中config是包含存储PDF文件夹地址和word文件夹地址的字典，使用Python标准库中的concurrent包，实现多进程，pdf_to_word方法是对上面读取PDF和写入word逻辑的封装。后面的while循环是查询任务是否进行完成。</p>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><p>到这里，我们已经实现了多线程批量转换PDF为word文档。拿谋篇著名文章来试验一下，效果如图（左侧是转换后的word，右侧是PDF）：</p>
+<p><img src="/upload/pdf-and-word.jpg"></p>
+<h2 id="不想写代码？"><a href="#不想写代码？" class="headerlink" title="不想写代码？"></a>不想写代码？</h2><p>本文介绍的所有代码，已经打包成了一个独立可运行的项目，存放在github，如果不想自己写代码，可以直接clone或下载github项目运行。项目地址如下（记得点star）：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/simpleapples/pdf2word">https://github.com/simpleapples/pdf2word</a></p>
+
+        </div></article>
+      <nav class="pagination"><a class="prev" href="/page/8/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text">上一页</span>
+      </a>
+    <a class="next" href="/page/10/">
+        <span class="next-text">下一页</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></section></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2012 - 2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">simpleapples</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
