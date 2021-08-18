@@ -13,13 +13,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="MagicSearch"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<meta name="description" content="MagicSearch"/><link rel="alternate" href="/default" title="simpleapples" ><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
 <link rel="canonical" href="http://www.simpleapples.com/2012/12/01/magic-search/"/>
 
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-<script id="baidu_push">
+  gtag('config', 'UA-116134610-1');
+</script><script id="baidu_push">
 (function(){
     var bp = document.createElement('script');
     var curProtocol = window.location.protocol.split(':')[0];
@@ -34,7 +42,7 @@
 })();
 </script>
 <script>
-  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
 </script>
 
     <title>MagicSearch - simpleapples</title>
@@ -52,14 +60,38 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"></ul>
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">首页
+          </li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于
+          </li>
+      </a></ul>
 </nav>
 <div class="container" id="mobile-panel">
       <header id="header" class="header"><div class="logo-wrapper">
   <a href="/." class="logo">simpleapples</a>
 </div>
 
-<nav class="site-navbar"></nav>
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            首页
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories/">
+            分类
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            关于
+            </a>
+        </li>
+      </ul></nav>
 </header>
 
       <main id="main" class="main">
@@ -78,7 +110,12 @@
         </div>
     </header>
 
-    <div class="post-content"><p>晚上看到一个OSX上的应用，叫<a target="_blank" rel="noopener" href="http://www.alfredapp.com/">Alfred</a>，是一个类似spotlight的工具，但比spotlight要强大很多。<br>不仅可以在里面搜本地程序，而且在搜索的内容前加“&gt;”就可以输命令，可以直接输入算式，也可以自定义搜索引擎，采用诸如“google 你好世界”的方式搜索。<br>突发奇想，是不是用Javascript也可以实现？<br>于是，首先实现了多搜索引擎集成的功能。<br>不想用以前那种下拉菜单的形式，想用自动补全的形式，着实忙活了好长时间，算是把功能做出来了。<br>例如，输入“douban 平凡的世界”就可以在豆瓣搜索“平凡的世界”，输入“weibo 前端”就可以搜索“前端”相关的微博。<br>还可以输入“t”+回车，然后再输入关键字，就可以搜索淘宝了。<br>目前只加入了简单的几个搜索工具（因为帮我设计界面的AlisterTT同学只给我了这几个图标= =!）：<br>微博、google、豆瓣、淘宝、亚马逊。<br>我给他起了个响亮的名字，MagicSearch，将来如果能做到手机客户端上当然更好了，应该会很有用。<br>还有很多东西和细节有待修改。而且计算器的功能也没有加进去，电脑快没电了，只能等到明天了。<br>先放个截图：</p>
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#update1"><span class="toc-text">update1:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#update2"><span class="toc-text">update2:</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><p>晚上看到一个OSX上的应用，叫<a target="_blank" rel="noopener" href="http://www.alfredapp.com/">Alfred</a>，是一个类似spotlight的工具，但比spotlight要强大很多。<br>不仅可以在里面搜本地程序，而且在搜索的内容前加“&gt;”就可以输命令，可以直接输入算式，也可以自定义搜索引擎，采用诸如“google 你好世界”的方式搜索。<br>突发奇想，是不是用Javascript也可以实现？<br>于是，首先实现了多搜索引擎集成的功能。<br>不想用以前那种下拉菜单的形式，想用自动补全的形式，着实忙活了好长时间，算是把功能做出来了。<br>例如，输入“douban 平凡的世界”就可以在豆瓣搜索“平凡的世界”，输入“weibo 前端”就可以搜索“前端”相关的微博。<br>还可以输入“t”+回车，然后再输入关键字，就可以搜索淘宝了。<br>目前只加入了简单的几个搜索工具（因为帮我设计界面的AlisterTT同学只给我了这几个图标= =!）：<br>微博、google、豆瓣、淘宝、亚马逊。<br>我给他起了个响亮的名字，MagicSearch，将来如果能做到手机客户端上当然更好了，应该会很有用。<br>还有很多东西和细节有待修改。而且计算器的功能也没有加进去，电脑快没电了，只能等到明天了。<br>先放个截图：</p>
 <p><img src="/upload/magicsearch1.png" alt="Alt text"></p>
 <p>对了，还有演示地址（初步版本，轻拍）：<br><a target="_blank" rel="noopener" href="http://labs.simpleapples.com/magicsearch">http://labs.simpleapples.com/magicsearch</a></p>
 <h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>昨天晚上犯懒，没有把搜索引擎的图标和到一张图上，导致输入amazon等搜索引擎名字敲回车之后，右边的图标因为网速没有出来，现在和到一张上了。<br>另外放出github地址：<br><a target="_blank" rel="noopener" href="http://github.com/simpleapples/magicsearch">http://github.com/simpleapples/magicsearch</a></p>
@@ -104,7 +141,11 @@
     </article></div><div class="comments" id="comments"></div></div>
       </main>
 
-      <footer id="footer" class="footer"><div class="copyright">
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
@@ -114,7 +155,7 @@
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2021<span class="heart">
+  <span class="copyright-year">&copy;2012 - 2021<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>
@@ -127,6 +168,7 @@
       </div>
     </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v="></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
 </body>
 </html>

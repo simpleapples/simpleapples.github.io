@@ -13,13 +13,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="实战 | 用aiohttp和uvloop实现一个高性能爬虫"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<meta name="description" content="实战 | 用aiohttp和uvloop实现一个高性能爬虫"/><link rel="alternate" href="/default" title="simpleapples" ><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
 <link rel="canonical" href="http://www.simpleapples.com/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/"/>
 
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-<script id="baidu_push">
+  gtag('config', 'UA-116134610-1');
+</script><script id="baidu_push">
 (function(){
     var bp = document.createElement('script');
     var curProtocol = window.location.protocol.split(':')[0];
@@ -34,7 +42,7 @@
 })();
 </script>
 <script>
-  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
 </script>
 
     <title>实战 | 用aiohttp和uvloop实现一个高性能爬虫 - simpleapples</title>
@@ -52,14 +60,38 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"></ul>
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">首页
+          </li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于
+          </li>
+      </a></ul>
 </nav>
 <div class="container" id="mobile-panel">
       <header id="header" class="header"><div class="logo-wrapper">
   <a href="/." class="logo">simpleapples</a>
 </div>
 
-<nav class="site-navbar"></nav>
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            首页
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories/">
+            分类
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            关于
+            </a>
+        </li>
+      </ul></nav>
 </header>
 
       <main id="main" class="main">
@@ -78,7 +110,12 @@
         </div>
     </header>
 
-    <div class="post-content"><p>asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。</p>
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E4%B8%BB%E8%A6%81%E9%80%BB%E8%BE%91"><span class="toc-text">实现主要逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A0%E5%85%A5%E5%B9%B6%E8%A1%8C%E9%80%BB%E8%BE%91"><span class="toc-text">加入并行逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8uvloop%E5%8A%A0%E9%80%9F"><span class="toc-text">使用uvloop加速</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-text">性能对比</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><p>asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。</p>
 <h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p><a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh">Earth View from Google Earth</a>是一款Chrome插件，会在打开新标签页时自动加载一张来自Google Earth的背景图片。</p>
 <p><img src="/upload/20180410_01.png" alt="Earth View from Google Earth"></p>
 <p>使用Chrome开发者工具观察插件的网络请求，我们发现插件会请求一个地址如<a target="_blank" rel="noopener" href="https://www.gstatic.com/prettyearth/assets/data/v2/1234.json">https://www.gstatic.com/prettyearth/assets/data/v2/1234.json</a>的JSON文件，文件中包含了经过Base64的图片内容，观察发现，图片的ID范围大致在1000-8000之间，我们的爬虫就要来爬取这些精美的背景图片。</p>
@@ -120,7 +157,11 @@
     </article></div><div class="comments" id="comments"></div></div>
       </main>
 
-      <footer id="footer" class="footer"><div class="copyright">
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
@@ -130,7 +171,7 @@
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2021<span class="heart">
+  <span class="copyright-year">&copy;2012 - 2021<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>
@@ -143,6 +184,7 @@
       </div>
     </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v="></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
 </body>
 </html>

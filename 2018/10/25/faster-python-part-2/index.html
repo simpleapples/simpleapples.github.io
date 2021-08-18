@@ -13,13 +13,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="翻译 | 更快的Python（二）"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<meta name="description" content="翻译 | 更快的Python（二）"/><link rel="alternate" href="/default" title="simpleapples" ><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
 <link rel="canonical" href="http://www.simpleapples.com/2018/10/25/faster-python-part-2/"/>
 
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-<script id="baidu_push">
+  gtag('config', 'UA-116134610-1');
+</script><script id="baidu_push">
 (function(){
     var bp = document.createElement('script');
     var curProtocol = window.location.protocol.split(':')[0];
@@ -34,7 +42,7 @@
 })();
 </script>
 <script>
-  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
 </script>
 
     <title>翻译 | 更快的Python（二） - simpleapples</title>
@@ -52,14 +60,38 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"></ul>
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">首页
+          </li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于
+          </li>
+      </a></ul>
 </nav>
 <div class="container" id="mobile-panel">
       <header id="header" class="header"><div class="logo-wrapper">
   <a href="/." class="logo">simpleapples</a>
 </div>
 
-<nav class="site-navbar"></nav>
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            首页
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories/">
+            分类
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            关于
+            </a>
+        </li>
+      </ul></nav>
 </header>
 
       <main id="main" class="main">
@@ -78,7 +110,12 @@
         </div>
     </header>
 
-    <div class="post-content"><p><img src="/upload/20181025_11.png"></p>
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9011%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BF%9E%E6%8E%A5"><span class="toc-text">例子11：字符串连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9012%EF%BC%9A%E6%95%B0%E5%AD%97%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8C%96"><span class="toc-text">例子12：数字的格式化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9013%EF%BC%9A%E8%8E%B7%E5%8F%96%E5%86%85%E7%BD%AE%E5%88%97%E8%A1%A8%E7%B1%BB%E5%9E%8B%E7%9A%84%E9%95%BF%E5%BA%A6"><span class="toc-text">例子13：获取内置列表类型的长度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9014%EF%BC%9A%E6%95%B4%E6%95%B0%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%BF%90%E7%AE%97"><span class="toc-text">例子14：整数类型的运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9015%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">例子15：自定义类型的运算符重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9016%EF%BC%9A%E5%AF%B9range%E7%BB%93%E6%9E%9C%E6%B1%82%E5%92%8C"><span class="toc-text">例子16：对range结果求和</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9017%EF%BC%9Afor%E5%BE%AA%E7%8E%AF%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%9E%84%E5%BB%BA%E5%88%97%E8%A1%A8%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">例子17：for循环和表达式构建列表的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9018%EF%BC%9Afor%E5%BE%AA%E7%8E%AF%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%9E%84%E5%BB%BA%E5%AD%97%E5%85%B8%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">例子18：for循环和表达式构建字典的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9019%EF%BC%9Afor%E5%BE%AA%E7%8E%AF%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%9E%84%E5%BB%BA%E5%AD%97%E5%85%B8%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">例子19：for循环和表达式构建字典的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%9020%EF%BC%9A%E8%BD%AC%E6%8D%A2%E4%B8%BAbool%E5%80%BC"><span class="toc-text">例子20：转换为bool值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="toc-text">参考文章</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><p><img src="/upload/20181025_11.png"></p>
 <p>更快的Python（<a target="_blank" rel="noopener" href="http://pythonfasterway.org/">Python Faster Way</a>）使用代码示例来说明如何书写Python代码能带来更高的性能。本文对代码进行了讲解，从性能和可读性等角度来选择出最适合的写法。</p>
 <span id="more"></span> 
 
@@ -164,7 +201,11 @@
     </article></div><div class="comments" id="comments"></div></div>
       </main>
 
-      <footer id="footer" class="footer"><div class="copyright">
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
@@ -174,7 +215,7 @@
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2021<span class="heart">
+  <span class="copyright-year">&copy;2012 - 2021<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>
@@ -187,6 +228,7 @@
       </div>
     </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v="></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
 </body>
 </html>

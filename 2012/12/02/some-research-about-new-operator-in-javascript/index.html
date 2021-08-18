@@ -13,13 +13,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="Javascript中new操作符的探究"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+<meta name="description" content="Javascript中new操作符的探究"/><link rel="alternate" href="/default" title="simpleapples" ><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
 <link rel="canonical" href="http://www.simpleapples.com/2012/12/02/some-research-about-new-operator-in-javascript/"/>
 
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-<script id="baidu_push">
+  gtag('config', 'UA-116134610-1');
+</script><script id="baidu_push">
 (function(){
     var bp = document.createElement('script');
     var curProtocol = window.location.protocol.split(':')[0];
@@ -34,7 +42,7 @@
 })();
 </script>
 <script>
-  window.config = {"leancloud":"","toc":"","fancybox":"","pjax":"","latex":""};
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
 </script>
 
     <title>Javascript中new操作符的探究 - simpleapples</title>
@@ -52,14 +60,38 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"></ul>
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">首页
+          </li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于
+          </li>
+      </a></ul>
 </nav>
 <div class="container" id="mobile-panel">
       <header id="header" class="header"><div class="logo-wrapper">
   <a href="/." class="logo">simpleapples</a>
 </div>
 
-<nav class="site-navbar"></nav>
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            首页
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories/">
+            分类
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            关于
+            </a>
+        </li>
+      </ul></nav>
 </header>
 
       <main id="main" class="main">
@@ -78,7 +110,12 @@
         </div>
     </header>
 
-    <div class="post-content"><p>Javascript中有一个很有意思的new操作符，在<a target="_blank" rel="noopener" href="http://book.douban.com/subject/3590768/">《Javascript语言精粹》（Javascript:The Good Parts）</a>中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。<br>先来一段代码：<br>    function test() {<br>        var foo1 = new function () {<br>            this.i = 1;<br>        }<br>        var foo2 = function () {<br>            this.i = 2;<br>        }<br>        M.dis(foo1.i);        //1<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //undefined<br>        foo2();<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //2<br>        M.dis(foo1.prototype);    //undefined<br>        M.dis(foo2.prototype);    //[object Object]<br>    }<br>*代码中的<code>M.dis() = document.writeln()</code><br>上面代码很能说明使用new操作符和不使用new操作符的区别。<br>以下是本人根据以上结果对使用new操作符和不使用new操作符的一些理解。    </p>
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#update1"><span class="toc-text">update1:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#update2"><span class="toc-text">update2:</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><p>Javascript中有一个很有意思的new操作符，在<a target="_blank" rel="noopener" href="http://book.douban.com/subject/3590768/">《Javascript语言精粹》（Javascript:The Good Parts）</a>中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。<br>先来一段代码：<br>    function test() {<br>        var foo1 = new function () {<br>            this.i = 1;<br>        }<br>        var foo2 = function () {<br>            this.i = 2;<br>        }<br>        M.dis(foo1.i);        //1<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //undefined<br>        foo2();<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //2<br>        M.dis(foo1.prototype);    //undefined<br>        M.dis(foo2.prototype);    //[object Object]<br>    }<br>*代码中的<code>M.dis() = document.writeln()</code><br>上面代码很能说明使用new操作符和不使用new操作符的区别。<br>以下是本人根据以上结果对使用new操作符和不使用new操作符的一些理解。    </p>
 <ol>
 <li><p>使用new操作符函数会被立刻执行。不使用new操作符，函数会在被调用时执行。<br>foo1在定义的时候就被执行了，所以输出<code>foo1.i = 1</code>，而<code>foo2</code>在定义时未被执行，所以输出<code>foo2</code>的结果为<code>undefined</code>，<br><code>foo2</code>中<code>var foo2 = function () &#123;&#125;</code>的定义形式和<code> function foo2 () &#123;&#125;</code>的效果是一样的。</p>
 </li>
@@ -114,7 +151,11 @@ var b = [3]; //正确！
     </article></div><div class="comments" id="comments"></div></div>
       </main>
 
-      <footer id="footer" class="footer"><div class="copyright">
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
@@ -124,7 +165,7 @@ var b = [3]; //正确！
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2021<span class="heart">
+  <span class="copyright-year">&copy;2012 - 2021<span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
     <span class="author">simpleapples</span>
@@ -137,6 +178,7 @@ var b = [3]; //正确！
       </div>
     </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v="></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
 </body>
 </html>
