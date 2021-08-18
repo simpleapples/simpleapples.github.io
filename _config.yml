@@ -79,7 +79,7 @@ theme: even
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/simpleapples/simpleapples.github.io.git
+  repo: git@github.com:simpleapples/simpleapples.github.io.git
   branch: master
 
 # Archive
