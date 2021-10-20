@@ -116,30 +116,30 @@
       <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE-API"><span class="toc-text">查找 API</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%B0%9D%E8%AF%95"><span class="toc-text">第一次尝试</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E7%99%BB%E5%BD%95%E8%BF%87%E7%A8%8B"><span class="toc-text">分析登录过程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-AWS-Lambda-%E6%90%AD%E5%BB%BA%E6%9C%8D%E5%8A%A1"><span class="toc-text">使用 AWS Lambda 搭建服务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%87%BD%E6%95%B0%E4%BB%A3%E7%A0%81"><span class="toc-text">1. 函数代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%B7%BB%E5%8A%A0-API-Gateway-Trigger"><span class="toc-text">2. 添加 API Gateway Trigger</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%B7%BB%E5%8A%A0%E5%8C%85%E5%90%AB%E4%BE%9D%E8%B5%96%E7%9A%84-Layer"><span class="toc-text">3. 添加包含依赖的 Layer</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEiOS%E6%8D%B7%E5%BE%84"><span class="toc-text">配置iOS捷径</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
     </div>
   </div><div class="post-content"><p>我住的小区使用了一个叫守望领域的智能门禁系统，可以通过手机App开小区门禁和单元门，但是用App开门需要经过四五步：打开App→进入开门界面→找到需要开的门→点击开门。</p>
-<p><img src="20211019_01.png"><a href="20211019_02.png"></a><a href="20211019_03.png"></a></p>
+<p><img src="/upload/20211019_01.png"><a href="20211019_02.png"></a><a href="20211019_03.png"></a></p>
 <p>加上戴口罩时候解锁手机需要输入密码，导致整个流程非常耗时，经常需要站在小区门口和单元门口操作半天，有一段时间我甚至养成了携带实体门禁卡的习惯，实体门禁卡开门要快很多。</p>
 <p>最近又开始忘带门禁卡，苦恼之余发现iOS在锁屏界面右划可以免解锁直接进入spotlight界面，这个界面可以添加捷径，如果能写一个捷径去调用守望领域App的API开门，就可以实现手机免解锁一键开门。</p>
-<p><img src="20211019_04.gif"></p>
+<p><img src="/upload/20211019_04.gif"></p>
 <h1 id="查找-API"><a href="#查找-API" class="headerlink" title="查找 API"></a>查找 API</h1><p>首先需要通过Charles之类的软件查找App调用的API，配置Charles查看App请求的方式不再赘述，Google一下可以看到很多教程。直接看结果Charles的结果，可以看到api.lookdoor.cn是这个软件所请求的API域名。</p>
-<p><img src="20211019_05.png"></p>
+<p><img src="/upload/20211019_05.png"></p>
 <p>打开软件发的请求非常多，经过操作和请求的对比可以看到，发送开门指令调用的API是：/func/hjapp/house/v1/pushOpenDoorBySn.json?equipmentId=xxxxxx 这个路径。</p>
 <p>详细查看这个请求可以发现，equipmentId指的就是小区门的Id，接口使用cookie做认证，只要将cookie带上就可以模拟开门指令。</p>
 <h1 id="第一次尝试"><a href="#第一次尝试" class="headerlink" title="第一次尝试"></a>第一次尝试</h1><p>打开iOS捷径App，创建一个新捷径，App调用API使用了POST请求，搜索Get contents of这个动作来实现发送POST请求。</p>
 <p>通过Charles找到要开的门的URL填入，Method选择POST，Headers里填入Cookie进行认证，内容直接从Charles复制就可以，尝试运行，it works!</p>
-<p><img src="20211019_06.jpeg"></p>
+<p><img src="/upload/20211019_06.jpeg"></p>
 <p>接下来把这个捷径添加到Spotlight界面，锁屏界面右划点一下，就可以实现一键开小区门禁，和打开App的四五步操作相比，确实省时省力。拿着新配好的捷径去上班，下班回到小区想试一把一键开门，结果又被困到门口了，上午还正常的捷径竟然失效了，打开一看API报登录超时，有可能是Cookie里的SESSION_ID过期了。</p>
-<p><img src="20211019_07.jpeg"></p>
+<p><img src="/upload/20211019_07.jpeg"></p>
 <h1 id="分析登录过程"><a href="#分析登录过程" class="headerlink" title="分析登录过程"></a>分析登录过程</h1><p>再次用Charles抓包，分析登录相关的API，会发现主要是这两个：</p>
 <ul>
 <li>/func/hjapp/user/v2/getPasswordAndKey.json：获取AES Key的API</li>
 <li>/func/hjapp/user/v2/login.json?password=xxxxxx：登录API</li>
 </ul>
 <p>通过分析，用时序图来表示这部分的交互逻辑：</p>
-<p><img src="20211019_08.png"></p>
+<p><img src="/upload/20211019_08.png"></p>
 <p>登录过程清楚了，但是其中使用AES_KEY对密码进行加密的配置还是不清楚的，使用一个工具来尝试通过密文和AES_KEY来解密：<a target="_blank" rel="noopener" href="http://tool.chacuo.net/cryptaes">http://tool.chacuo.net/cryptaes</a></p>
-<p><img src="20211019_09.png"></p>
+<p><img src="/upload/20211019_09.png"></p>
 <p>输入密钥和密文，使用各种配置进行解密，当能够解出内容的时候，证明我们找到了加密的配置，可以看到BlockSize=128，padder使用的是pkcs7padding，加密模式是ECB。解密出来的字符并不是我们的密码，看着像是md5过的，用 echo -n xxxxxx | md5sum 把密码md5一下，对上了。看来服务端校验的是单次md5后的密码。</p>
-<p><img src="20211019_10.png"></p>
+<p><img src="/upload/20211019_10.png"></p>
 <p>到这里登录逻辑已经搞清了，但是iOS捷径无法实现AES加密，单纯依托捷径来实现开门已经不可行了，需要搭建一个后端服务来计算密文。既然躲不过麻烦要搭建服务，不如把登录、开门整个流程都放在服务上，这样iOS捷径只需要一个请求就可以完成开门动作了。</p>
 <p>考虑到登录开门的逻辑很简单，也就是3个HTTP请求+AES加密，直接在裸服务器上从0搭建步骤多成本高，要自己申请虚机、部署HTTP Server、Web App，还需要申请SSL证书，不仅初次搭建要搞个一两天，后续对机器和证书的维护也需要大量时间，成本极高。</p>
 <p>最好是有服务能直接托管一段Python代码，第一时间想到的是Leancloud，一个Serverless服务提供商，但是实操过程中发现，由于政策要求Leancloud已经不提供域名了，绑定自己的域名也需要进行备案。这意味着只能选择一家海外Serverless服务商，看来看去AWS Lambda应该可以满足要求，试一下。</p>
@@ -154,17 +154,17 @@
 
 <p>代码首先通过API获取AES_KEY和SESSION_ID，然后使用AES_KEY对密码进行加密，接下来调用登录接口将获取的SESSION_ID绑定到当前账户，接下来根据请求传入的设备ID（门的ID）来发送开门指令。</p>
 <p>点击Deploy部署，然后运行测试，会出现超时的报错，这是因为Lambda函数默认的执行器内存大小是128MB，超时时间是3s，在配置页面把内存改大一些，超时时间设置为10s就可以了。</p>
-<p><img src="20211019_11.png"></p>
+<p><img src="/upload/20211019_11.png"></p>
 <h2 id="2-添加-API-Gateway-Trigger"><a href="#2-添加-API-Gateway-Trigger" class="headerlink" title="2. 添加 API Gateway Trigger"></a>2. 添加 API Gateway Trigger</h2><p>一个Lambda函数可以被多种形式触发执行，因为要使用捷径通过HTTP请求调用，所以加一个API Gateway Trigger，添加后会自动为函数生成一个URL，通过这个URL就可以直接调用函数。</p>
-<p><img src="20211019_12.png"></p>
+<p><img src="/upload/20211019_12.png"></p>
 <h2 id="3-添加包含依赖的-Layer"><a href="#3-添加包含依赖的-Layer" class="headerlink" title="3. 添加包含依赖的 Layer"></a>3. 添加包含依赖的 Layer</h2><p>代码中使用了 requests 和 cryptography 这两个第三方库，Lambda不支持使用pip直接安装这些依赖，而是需要我们在把依赖打成zip包上传成为容器的一层Layer，添加到函数镜像中。需要注意的是，Lambda函数执行的环境是Linux，对于cryptography这个库需要打包Linux版的才可以正常使用。</p>
 <p>由于日常使用的是Mac，所以在AWS上申请一台Ubuntu 20的EC2实例，登录实例后使用如下命令安装依赖，并打包成zip文件：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir python</span><br><span class="line">pip install -t python cryptography</span><br><span class="line">pip install -t python requests</span><br><span class="line"><span class="built_in">zip</span> -r python/*</span><br></pre></td></tr></table></figure>
 
 <p>在AWS上创建一个新的Layer，并将生成的python.zip上传到Layer上。尝试通过URL访问写好的Lambda函数，可以看到开门指令已经成功下发。</p>
-<p><img src="20211019_13.png"></p>
+<p><img src="/upload/20211019_13.png"></p>
 <h1 id="配置iOS捷径"><a href="#配置iOS捷径" class="headerlink" title="配置iOS捷径"></a>配置iOS捷径</h1><p>打开iOS捷径App，创建一个新捷径，搜索Get contents of这个动作，填入Lambda函数的URL和门的ID。由于API Gateway并没有配置认证，所以其他参数默认即可。如果有安全方面的顾虑，可以自己实现一个简单的Token认证或添加Lambda提供的JWT认证。点击执行，接口返回成功，证明整个流程已经跑通，以后就可以用这个捷径给自己和外卖小哥开门了。</p>
-<p><img src="20211019_14.png"></p>
+<p><img src="/upload/20211019_14.png"></p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>一开始本想用自定义一个iOS捷径的方式来实现一键开门禁，但为了实现SESSION_ID自动更新，不得不基于AWS Lambda搭了一个后端服务来模拟App的行为，所幸AWS Lambda提供了低成本的构建方案，包括搭建服务和配置SSL证书都可以几乎0成本的完成，免费套餐政策也能让这个服务长期跑着而不产生任何实际花费。</p>
 
       </div>
