@@ -98,6 +98,32 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2014/01/08/the-key-of-object-in-javascript/">Javscript中Object的Key</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-01-08
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>先来看一段代码：</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;e1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;e2&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="keyword">var</span> c1 = <span class="built_in">document</span>.getElementById(<span class="string">&quot;e1&quot;</span>);</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="keyword">var</span> c2 = <span class="built_in">document</span>.getElementById(<span class="string">&quot;e2&quot;</span>);</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="keyword">var</span> obj = </span></span><span class="template-variable">&#123;&#125;</span><span class="xml"><span class="javascript">;</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	obj[c1] = <span class="number">1</span>;</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	obj[c2] = <span class="number">2</span>;</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="built_in">console</span>.log(obj);</span></span></span><br><span class="line"><span class="javascript"><span class="xml"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码会输出什么结果呢？答案是：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Object</span> &#123;<span class="selector-attr">[object HTMLDivElement]</span>: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为什么给了obj两个元素，输出出来却变成了一个呢？难道c1和c2指向同一个元素？首先c1和c2是两个不同的dom节点，并且通过输出<code>c1 === c2</code>会发现结果为false，而输出<code>obj[c1] === obj[c2]</code>的结果却为true。通过上面结果可以初步推断，c1和c2作为object的key时，值可能是一样的。object的key所接受的值只有string一种，所以当c1这个dom元素作为key时，会被转换为string类型，而c2和c1由于都是div，所以转换成string后，值都是一样的，c2作为key也会覆盖c1。导致出现只有一个元素的结果。如果c2元素变成其他类型的dom节点，转换为string类型时就会不一样，例如将c2改为ul，还是上面的js代码，输出结果为：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Object</span> &#123;<span class="selector-attr">[object HTMLDivElement]</span>: <span class="number">1</span>, [object HTMLUListElement]: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当使用object时，需要注意key的类型会被转换为string。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/10/30/do-not-name-the-project-go-in-liteide/">不要将LiteIDE的项目文件夹命名为go</a>
         </h1>
 
@@ -192,25 +218,6 @@
 <h3 id="Flash-Player-Debugger"><a href="#Flash-Player-Debugger" class="headerlink" title="Flash Player Debugger"></a>Flash Player Debugger</h3><p>Flash Player 的Debugger版本的安装最为复杂，Adobe已经停止对Linux平台Flash Player的开发，目前Linux平台最新版的Flash Player是11.2。所以Debug版的Flash Player最新版也是11.2，Adobe在<a target="_blank" rel="noopener" href="http://www.adobe.com/support/flashplayer/downloads.html">http://www.adobe.com/support/flashplayer/downloads.html</a>上提供了Linux版的下载。<br>这里需要注意的是，Adobe提供的Debug版Flash Player只有32位版本，而64的Linux中的Firefox是无法直接使用该插件的。<br>在64位Firefox下使用Flash Player debugger，需要通过nspluginwrapper将其转换为可在64位Firefox下使用的插件。使用apt-get或yum等安装nspluginwrapper，并将Flash Player debugger压缩包中的libflashplugin.so拷贝到<code>/usr/lib/mozilla/plugin</code>下，启动Firefox，nspluginwrapper会自动将libflashplugin.so转换为64位插件，保存在<code>/usr/lib64/mozilla/plugin-wrapped</code>下。打开Firefox在地址栏中输入<code>about:plugins</code>，查看flash player是否安装正确。<br>在Eclipse中新建一个Actionscript Project，编译运行，如果能够编译并debug，表明配置正确，如果Firefox出现播放Flash就崩溃的情况，可能由于转换后的Flash Player造成的，Firefox默认开启了插件的防崩溃机制，导致debug版本崩溃。在Firefox地址栏中输入<code>about:config</code>搜索<code>dom.ipc.plugins.enabled</code>，将其值设置为false，重启Firefox，Flash Player debugger即可正常运行。</p>
 <p><img src="/upload/linux-as-env.png" alt="Alt text"></p>
 <p>至此，Linux上Actionscript开发环境就搭建完成了。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/06/27/bye-buct/">Bye,BUCT</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-06-27
-        </span><span class="post-category">
-            <a href="/categories/%E7%94%9F%E6%B4%BB/">生活</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>从收垃圾的阿姨开始变得友善而又慈祥的那一刻起，我就感觉到，毕业，离我们不远了。<br>本以为没什么好不舍，没什么好悲伤，可学位授予仪式结束时的那首《再见》，还是让鼻子酸酸的。<br>学生证被盖上了毕业留念四个字，好像在宣告什么的终结。<br>宿舍里空荡而凌乱，收拾行李时翻出来的旧物件，把人一下子拉回到过往的岁月里。楼道里时不时响起拉行李箱的声音，不用回头就知道，又有人离开了。<br>有人选择默默地走，有人选择和每个人告别，共同之处在于，都是闪电战。这个时候，不能有半点拖泥带水，走就走，墨迹纸就不够用了。<br>昏黄路灯下弹吉他的少年，和穿着毕业衫来来往往的情侣，让所有人的目光变的温暖，如果这不是毕业季，就更好了。<br>入夜，带着最后一点行李从学校离开。</p>
-<p><img src="/upload/leave-1024x494.jpg" alt="Alt text"></p>
-<p><em>Young and beautiful</em></p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/11/">

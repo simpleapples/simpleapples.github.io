@@ -98,6 +98,84 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/05/22/four-types-of-queue-in-python/">简析Python中的四种队列</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-05-22
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>队列是一种只允许在一端进行插入操作，而在另一端进行删除操作的线性表。</p>
+<p>在Python文档中搜索队列（queue）会发现，Python标准库中包含了四种队列，分别是queue.Queue / asyncio.Queue / multiprocessing.Queue / collections.deque。</p>
+<h1 id="collections-deque"><a href="#collections-deque" class="headerlink" title="collections.deque"></a>collections.deque</h1><p>deque是双端队列（double-ended queue）的缩写，由于两端都能编辑，deque既可以用来实现栈（stack）也可以用来实现队列（queue）。</p>
+<p>deque支持丰富的操作方法，主要方法如图：</p>
+<p><img src="/upload/20180522_01.jpg"></p>
+<p>相比于list实现的队列，deque实现拥有更低的时间和空间复杂度。list实现在出队（pop）和插入（insert）时的空间复杂度大约为O(n)，deque在出队（pop）和入队（append）时的时间复杂度是O(1)。</p>
+<p>deque也支持in操作符，可以使用如下写法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q = collections.deque([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line"><span class="built_in">print</span>(<span class="number">5</span> <span class="keyword">in</span> q)  <span class="comment"># False</span></span><br><span class="line"><span class="built_in">print</span>(<span class="number">1</span> <span class="keyword">in</span> q)  <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
+
+<p>deque还封装了顺逆时针的旋转的方法：rotate。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 顺时针</span></span><br><span class="line">q = collections.deque([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line">q.rotate(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [4, 1, 2, 3]</span></span><br><span class="line">q.rotate(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [3, 4, 1, 2]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 逆时针</span></span><br><span class="line">q = collections.deque([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line">q.rotate(-<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [2, 3, 4, 1]</span></span><br><span class="line">q.rotate(-<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [3, 4, 1, 2]</span></span><br></pre></td></tr></table></figure>
+
+<p>线程安全方面，通过查看collections.deque中的append()、pop()等方法的源码可以知道，他们都是原子操作，所以是GIL保护下的线程安全方法。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> PyObject *</span></span><br><span class="line"><span class="function"><span class="title">deque_append</span><span class="params">(dequeobject *<span class="built_in">deque</span>, PyObject *item)</span> </span>&#123; </span><br><span class="line">    Py_INCREF(item);</span><br><span class="line">    <span class="keyword">if</span> (deque_append_internal(<span class="built_in">deque</span>, item, <span class="built_in">deque</span>-&gt;maxlen) &lt; <span class="number">0</span>) </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    Py_RETURN_NONE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过dis方法可以看到，append是原子操作（一行字节码）。</p>
+<p><img src="/upload/20180522_02.png"></p>
+<p> 综上，collections.deque是一个可以方便实现队列的数据结构，具有线程安全的特性，并且有很高的性能。</p>
+<h1 id="queue-Queue-amp-asyncio-Queue"><a href="#queue-Queue-amp-asyncio-Queue" class="headerlink" title="queue.Queue &amp; asyncio.Queue"></a>queue.Queue &amp; asyncio.Queue</h1><p>queue.Queue和asyncio.Queue都是支持多生产者、多消费者的队列，基于collections.deque，他们都提供了Queue（FIFO队列）、PriorityQueue（优先级队列）、LifoQueue（LIFO队列），接口方面也相同。</p>
+<p>区别在于queue.Queue适用于多线程的场景，asyncio.Queue适用于协程场景下的通信，由于asyncio的加成，queue.Queue下的阻塞接口在asyncio.Queue中则是以返回协程对象的方式执行，具体差异如下表：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>queue.Queue</th>
+<th>asyncio.Queue</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>介绍</td>
+<td>同步队列</td>
+<td>asyncio队列</td>
+</tr>
+<tr>
+<td>线程安全</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>超时机制</td>
+<td>通过timeout参数实现</td>
+<td>通过asyncio.wait_for()方法实现</td>
+</tr>
+<tr>
+<td>qsize()</td>
+<td>预估的队列长度（获取qsize到下一个操作之间，queue有可能被其它的线程修改，导致qsize大小发生变化）</td>
+<td>准确的队列长度（由于是单线程，所以queue不会被其它线程修改）</td>
+</tr>
+<tr>
+<td>put() / set()</td>
+<td>put(item, block=True, timeout=None)，可以通过设置block是否为True来配置put和set方法是否为阻塞，并且可以为阻塞操作设置最大时长timeout，block为False时行为和put_nowait()方法一致。</td>
+<td>put()方法会返回一个协程对象，所以没有block参数和timeout参数，如果需要非阻塞方法，可以使用put_nowait()，如果需要对阻塞方法应用超时，可以使用coroutine asyncio.wait_for()。</td>
+</tr>
+</tbody></table>
+<h1 id="multiprocessing-Queue"><a href="#multiprocessing-Queue" class="headerlink" title="multiprocessing.Queue"></a>multiprocessing.Queue</h1><p>multiprocessing提供了三种队列，分别是Queue、SimpleQueue、JoinableQueue。</p>
+<p><img src="/upload/20180522_03.png"></p>
+<p>multiprocessing.Queue既是线程安全也是进程安全的，相当于queue.Queue的多进程克隆版。和threading.Queue很像，multiprocessing.Queue支持put和get操作，底层结构是multiprocessing.Pipe。</p>
+<p>multiprocessing.Queue底层是基于Pipe构建的，但是数据传递时并不是直接写入Pipe，而是写入进程本地buffer，通过一个feeder线程写入底层Pipe，这样做是为了实现超时控制和非阻塞put/get，所以Queue提供了join_thread、cancel_join_thread、close函数来控制feeder的行为，close函数用来关闭feeder线程、join_thread用来join feeder线程，cancel_join_thread用来在控制在进程退出时，不自动join feeder线程，使用cancel_join_thread有可能导致部分数据没有被feeder写入Pipe而导致的数据丢失。</p>
+<p>和threading.Queue不同的是，multiprocessing.Queue默认不支持join()和task_done操作，这两个支持需要使用mp.JoinableQueue对象。</p>
+<p>SimpleQueue是一个简化的队列，去掉了Queue中的buffer，没有了使用Queue可能出现的问题，但是put和get方法都是阻塞的并且没有超时控制。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过对比可以发现，上述四种结构都实现了队列，但是用处却各有偏重，collections.deque在数据结构层面实现了队列，但是并没有应用场景方面的支持，可以看做是一个基础的数据结构。queue模块实现了面向多生产线程、多消费线程的队列，asyncio.queue模块则实现了面向多生产协程、多消费协程的队列，而multiprocessing.queue模块实现了面向多成产进程、多消费进程的队列。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/collections.html#collections.deque">https://docs.python.org/3/library/collections.html#collections.deque</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/queue.html?highlight=queue#module-queue">https://docs.python.org/3/library/queue.html</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/asyncio-queue.html?highlight=queue">https://docs.python.org/3/library/asyncio-queue.html</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue">https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue</a><br><a target="_blank" rel="noopener" href="https://bugs.python.org/issue15329">https://bugs.python.org/issue15329</a><br><a target="_blank" rel="noopener" href="http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/">http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/</a><br><a target="_blank" rel="noopener" href="http://cyrusin.github.io/2016/04/27/python-gil-implementaion/">http://cyrusin.github.io/2016/04/27/python-gil-implementaion/</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/05/07/right-way-to-use-assert-in-python/">你真的会正确使用断言吗？</a>
         </h1>
 
@@ -275,56 +353,6 @@
 <h1 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h1><p>为了验证aiohttp和uvloop的性能，笔者使用requests+concurrent库实现了一个多进程版的爬虫，分别爬取20个id，消耗的时间如图。</p>
 <p><img src="/upload/20180410_03.png"></p>
 <p>可以看到，耗时相差了大概7倍，aiohttp+uvloop的组合在爬虫这种I/O密集型的场景下，可以说具有压倒性优势。相信在不远的将来，基于asyncio的库会将无数爬虫工程师从加班中拯救出来。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/03/30/python-access-control/">与面试官谈笑风生 | Python面向对象之访问控制</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-03-30
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>Python从设计之初就是一门面向对象的语言，面向对象思想的第一个要素就是封装。所谓封装，通俗的讲就是类中的属性和方法，分为公有和私有，公有可以被外界访问，私有不能被外界访问，这就是封装中最关键的概念——访问控制。</p>
-<p><img src="/upload/20180330_01.jpg" alt="面向对象编程"></p>
-<p>访问控制有三种级别：私有、受保护、公有</p>
-<p>私有（Private）：只有类自身可以访问<br>受保护（Protected）：只有类自身和子类可以访问<br>公有（Public）：任何类都可以访问</p>
-<p>由于Python不像Java，有访问控制符（private / public / protected），所以Python的访问控制也是容易被应聘者忽视和搞错的。</p>
-<h1 id="公有（Public）"><a href="#公有（Public）" class="headerlink" title="公有（Public）"></a>公有（Public）</h1><p>在Python的类中，默认情况下定义的属性都是公有的。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">	bar = <span class="number">123</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, bob</span>):</span></span><br><span class="line">		self.bob = bob</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(Foo.bar)  <span class="comment"># 123</span></span><br><span class="line"></span><br><span class="line">foo = Foo(<span class="number">456</span>)</span><br><span class="line"><span class="built_in">print</span>(foo.bob)  <span class="comment"># 456</span></span><br></pre></td></tr></table></figure>
-
-<p>上面类<code>Foo</code>中的<code>bar</code>属性就是类属性，<code>__init__</code>方法中定义的bob是实例属性，<code>bar</code>和<code>bob</code>都是公有的属性，外部可以访问，分别print类中的<code>bar</code>和实例中的<code>bob</code>，输出了对应的值。</p>
-<h1 id="受保护（Protected）"><a href="#受保护（Protected）" class="headerlink" title="受保护（Protected）"></a>受保护（Protected）</h1><p>在Python中定义一个受保护的属性，只需要在其名字前加一个下划线<code>_</code>，我们将Foo方法中的<code>bob</code>和<code>bar</code>改为<code>_bob</code>和<code>_bar</code>，他们就变成了受保护的属性了，代码如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">	_bar = <span class="number">123</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, bob</span>):</span></span><br><span class="line">		self._bob = bob</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Son</span>(<span class="params">Foo</span>):</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">print_bob</span>(<span class="params">self</span>):</span></span><br><span class="line">		<span class="built_in">print</span>(self._bob)</span><br><span class="line"></span><br><span class="line"><span class="meta">	@classmethod</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">print_bar</span>(<span class="params">cls</span>):</span></span><br><span class="line">		<span class="built_in">print</span>(cls._bar)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Son.print_bar()  <span class="comment"># 123</span></span><br><span class="line"></span><br><span class="line">son = Son(<span class="number">456</span>)</span><br><span class="line">son.print_bob()  <span class="comment"># 456</span></span><br></pre></td></tr></table></figure>
-
-<p>定义一个类<code>Son</code>继承自<code>Foo</code>，由于受保护的对象只能在类的内部和子类中被访问，不能直接调用<code>print(Son._bar)</code>或<code>print(son._bob)</code>来输出这两个属性的值，所以定义了<code>print_bar</code>和<code>print_bob</code>方法，实现在子类中输出，这段代码也正常的输出了<code>_bar</code>和<code>_bob</code>的值。</p>
-<p>接下来，试着反向验证一下，在类的外部，能不能访问其属性，将上面代码的输出部分修改如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(Son._bar)  <span class="comment"># 123</span></span><br><span class="line"></span><br><span class="line">son = Son(<span class="number">456</span>)</span><br><span class="line"><span class="built_in">print</span>(son._bob)  <span class="comment"># 456</span></span><br></pre></td></tr></table></figure>
-
-<p>（假装）惊讶的发现，竟然没有报错，也输出了正确的值。</p>
-<p>Python中用加下划线来定义受保护变量，是一种约定的规范，而不是语言层面真的实现了访问控制，所以，我们定义的保护变量，依然可以在外部被访问到（这是个feature，不是bug）。</p>
-<h1 id="私有（private）"><a href="#私有（private）" class="headerlink" title="私有（private）"></a>私有（private）</h1><p>Python定义私有属性，需要在属性名前加两个下划线<code>__</code>，把上面的代码修改一下，运行一下会发现下面的代码中的任何一个print都会报错的。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">	__bar = <span class="number">123</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, bob</span>):</span></span><br><span class="line">		self.__bob = bob</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Son</span>(<span class="params">Foo</span>):</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">print_bob</span>(<span class="params">self</span>):</span></span><br><span class="line">		<span class="built_in">print</span>(self.__bob)  <span class="comment"># Error</span></span><br><span class="line"></span><br><span class="line"><span class="meta">	@classmethod</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">print_bar</span>(<span class="params">cls</span>):</span></span><br><span class="line">		<span class="built_in">print</span>(cls.__bar)  <span class="comment"># Error</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(Son.__bar)  <span class="comment"># Error</span></span><br><span class="line"></span><br><span class="line">son = Son(<span class="number">456</span>)</span><br><span class="line"><span class="built_in">print</span>(son._bob)  <span class="comment"># Error</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="深入一下——私有属性真的就访问不到了吗？"><a href="#深入一下——私有属性真的就访问不到了吗？" class="headerlink" title="深入一下——私有属性真的就访问不到了吗？"></a>深入一下——私有属性真的就访问不到了吗？</h2><p>要了解私有属性是否真的访问不到，需要从Python是如何实现私有属性入手。CPython中，会把双下划线的属性变为<code>_ClassName__PropertyName</code>的形式，用代码演示一下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">	__bar = <span class="number">123</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(Foo._Foo__bar)  <span class="comment"># 123</span></span><br></pre></td></tr></table></figure>
-
-<p>运行一下可以知道，正常输出了<code>__bar</code>的值，但是不推荐这样去访问私有属性，因为不同的Python解释器对于私有属性的处理不一样。</p>
-<h2 id="特例"><a href="#特例" class="headerlink" title="特例"></a>特例</h2><p>使用双下划线定义私有属性，有一种特殊情况，当属性后也有两个下划线的时候，这个属性会被Python解释器当做魔术方法，从而不做私有处理。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">	__bar__ = <span class="number">123</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(Foo.__bar__)  <span class="comment"># 123</span></span><br></pre></td></tr></table></figure>
-
-<p>上面代码输出了123，证明Python解释器并没有把<code>__bar__</code>当做私有属性。当定义私有属性时，需要注意名字最后最多只能有一个下划线。</p>
-<h2 id="另一个特例"><a href="#另一个特例" class="headerlink" title="另一个特例"></a>另一个特例</h2><p>假如定义的属性名就叫<code>__</code>呢？不妨直接试一下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">	__ = <span class="number">123</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(Foo.__)  <span class="comment"># 123</span></span><br></pre></td></tr></table></figure>
-
-<p>可以发现名字叫<code>__</code>的属性也不会被认为是私有属性，名字是多个下划线的属性也不是私有属性（比如<code>_______</code>）。</p>
-<h1 id="函数的访问控制"><a href="#函数的访问控制" class="headerlink" title="函数的访问控制"></a>函数的访问控制</h1><p>前面主要介绍了属性的访问控制，在Python中函数是一等公民，所谓一等公民，就是函数可以像变量一样使用，所以函数的访问控制和属性一样，一样应用上面的规则。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/7/">

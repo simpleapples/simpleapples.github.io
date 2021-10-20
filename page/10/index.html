@@ -98,6 +98,43 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/03/60-lines-code-to-convert-pdf-to-word/">60行Python代码，实现多线程PDF转Word</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-03
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>工作中经常会遇到需要提取PDF文件中文字的情况，一个PDF还好，复制粘贴一下也花不了太多时间，如果需要把大量PDF转为Word，怎么办呢？</p>
+<p><img src="/upload/cant-do-it.jpg"></p>
+<p>今天教大家用60行代码实现，多线程批量PDF转Word。没兴趣看具体过程可以直接拉到最后，有代码。</p>
+<h2 id="分解任务"><a href="#分解任务" class="headerlink" title="分解任务"></a>分解任务</h2><p>把PDF转为Word，分几步？两步，第一步读取PDF文件，第二步写入Word文件。</p>
+<p><img src="/upload/two-steps.jpg"></p>
+<p>是的，就是这么简单，借助Python第三方包，可以轻松实现上面两个过程，我们要用到pdfminer3k和python-docx这两个包。</p>
+<h2 id="读取PDF"><a href="#读取PDF" class="headerlink" title="读取PDF"></a>读取PDF</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> PDFResourceManager</span><br><span class="line"><span class="keyword">from</span> pdfminer.pdfinterp <span class="keyword">import</span> process_pdf</span><br><span class="line"><span class="keyword">from</span> pdfminer.converter <span class="keyword">import</span> TextConverter</span><br><span class="line"><span class="keyword">from</span> pdfminer.layout <span class="keyword">import</span> LAParams</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">resource_manager = PDFResourceManager()</span><br><span class="line">return_str = StringIO()</span><br><span class="line">lap_params = LAParams()</span><br><span class="line"></span><br><span class="line">device = TextConverter(resource_manager, return_str, laparams=lap_params)</span><br><span class="line">process_pdf(resource_manager, device, file) // file是使用<span class="built_in">open</span>方法打开的PDF文件句柄</span><br><span class="line">device.close()</span><br><span class="line"></span><br><span class="line">// 此处content就是转换为文字的PDF内容</span><br><span class="line">content = return_str.getvalue()</span><br></pre></td></tr></table></figure>
+
+<p>content变量存储的就是我们从PDF文件中读取出的文字内容，可以看到，使用pdfminer3k可以轻松完成这个任务。接下来我们需要把文字内容写入成一个word文件。</p>
+<h2 id="写入Word"><a href="#写入Word" class="headerlink" title="写入Word"></a>写入Word</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> docx <span class="keyword">import</span> Document</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">doc = Document()</span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> content.split(<span class="string">&#x27;\n&#x27;</span>):</span><br><span class="line">    paragraph = doc.add_paragraph()</span><br><span class="line">    paragraph.add_run(remove_control_characters(line))</span><br><span class="line">doc.save(file_path)</span><br><span class="line">content是我们前面读取出的文字内容，由于是讲整个PDF读成一个字符串，所以需要使用split方法将每一行分隔开，然后按行写入word，否则所有的文字会在同一行。同时这段代码使用了一个remove_control_characters函数，这个函数是需要自己实现的，目的是移除控制字符（换行符、制表符、转义符等），因为python-docx是不支持控制字符写入的。</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_control_characters</span>(<span class="params">content</span>):</span></span><br><span class="line">    mpa = <span class="built_in">dict</span>.fromkeys(<span class="built_in">range</span>(<span class="number">32</span>))</span><br><span class="line">    <span class="keyword">return</span> content.translate(mpa)</span><br></pre></td></tr></table></figure>
+
+<p>控制字符就是ASCII码在32以下的，所以我们使用str的translate方法，把32以下的字符移除就可以。</p>
+<h2 id="用是能用，但是太慢了！"><a href="#用是能用，但是太慢了！" class="headerlink" title="用是能用，但是太慢了！"></a>用是能用，但是太慢了！</h2><p><img src="/upload/too-slow.jpg"></p>
+<p>如果我们用上面代码去转换100个PDF文件，就会发现速度慢到难以接受，每个PDF都需要花很长时间才能转换好，怎么办？别急，接下来我们引入多线程，同时转换多个PDF，可以有效加快转换速度。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ProcessPoolExecutor</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> ProcessPoolExecutor(max_workers=<span class="built_in">int</span>(config[<span class="string">&#x27;max_worker&#x27;</span>])) <span class="keyword">as</span> executor:</span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> os.listdir(config[<span class="string">&#x27;pdf_folder&#x27;</span>]):</span><br><span class="line">        extension_name = os.path.splitext(file)[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> extension_name != <span class="string">&#x27;.pdf&#x27;</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        file_name = os.path.splitext(file)[<span class="number">0</span>]</span><br><span class="line">        pdf_file = config[<span class="string">&#x27;pdf_folder&#x27;</span>] + <span class="string">&#x27;/&#x27;</span> + file</span><br><span class="line">        word_file = config[<span class="string">&#x27;word_folder&#x27;</span>] + <span class="string">&#x27;/&#x27;</span> + file_name + <span class="string">&#x27;.docx&#x27;</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;正在处理: &#x27;</span>, file)</span><br><span class="line">        result = executor.submit(pdf_to_word, pdf_file, word_file)</span><br><span class="line">        tasks.append(result)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    exit_flag = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">for</span> task <span class="keyword">in</span> tasks:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> task.done():</span><br><span class="line">            exit_flag = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">if</span> exit_flag:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;完成&#x27;</span>)</span><br><span class="line">        exit(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<p>代码中config是包含存储PDF文件夹地址和word文件夹地址的字典，使用Python标准库中的concurrent包，实现多进程，pdf_to_word方法是对上面读取PDF和写入word逻辑的封装。后面的while循环是查询任务是否进行完成。</p>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><p>到这里，我们已经实现了多线程批量转换PDF为word文档。拿谋篇著名文章来试验一下，效果如图（左侧是转换后的word，右侧是PDF）：</p>
+<p><img src="/upload/pdf-and-word.jpg"></p>
+<h2 id="不想写代码？"><a href="#不想写代码？" class="headerlink" title="不想写代码？"></a>不想写代码？</h2><p>本文介绍的所有代码，已经打包成了一个独立可运行的项目，存放在github，如果不想自己写代码，可以直接clone或下载github项目运行。项目地址如下（记得点star）：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/simpleapples/pdf2word">https://github.com/simpleapples/pdf2word</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2016/08/28/snake-crack/">「贪吃蛇大作战」的刷分尝试</a>
         </h1>
 
@@ -252,32 +289,6 @@
 <p>有了内测用户和测试App，下一步就要将两者关联了，进入iTunes Connect -&gt; My Apps -&gt; 某个App -&gt; Prerelease -&gt; Internal Testers中，这里会显示可用的内测用户，勾选用户并点击右上角的Invite，Apple就会给这个邮箱发送一封邀请邮件。接下来需要在要测试的手机上安装TestFlight，安装好后，TestFlight会自动绑定当前手机的Apple Id登录，这里你会发现TestFlight里并没有出现测试App，经过测试，<em>必须要在iOS的自带邮件客户端上点击邀请邮件中的链接，才会跳转到TestFlight中安装应用。</em>这是TestFlight让人非常不爽的一点。你可以将收到的邀请邮件转发到自带的邮件客户端所绑定的邮箱上，让后在自带邮件客户端中点击邀请链接打开TestFlight。</p>
 <p><img src="/upload/testflight-3.png" alt="图3"></p>
 <p>点击链接后会自动跳转到TestFlight中，点击Install安装应用，再次进入TestFlight中就可以看到已安装的测试应用了。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2014/10/25/launchsreen-and-launchimage/">iOS8中LaunchImage和LaunchScreen的完美结合</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2014-10-25
-        </span><span class="post-category">
-            <a href="/categories/Mobile/">Mobile</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>Apple在iOS8中推出了LaunchScreen.xib来代替之前的LaunchImage作为程序的启动界面，相比与LaunchImage，在iOS设备屏幕尺寸越来越多样的情况下，LaunchScreen.xib依托AutoLayout无疑更方便，否则，对于一个兼容iPhone5-iPhone6Plus的应用，就需要有4长不同尺寸的LaunchImage。</p>
-<p>但是LaunchScreen只有在iOS8中才能被支持，所以一些开发者还是选择用传统的LaunchImage方式。不过，还有一种方式是将LaunchImage和LaunchScreen结合，在大尺寸iPhone中使用LaunchScreen（iPhone6和iPhone6Plus都是iOS8系统），在iOS7中使用LaunchImage（使用iOS7的手机只有4寸和5.5寸的iPhone，所以只需要两张图）。</p>
-<p>首先进入Target配置，找到App Icons and Launch Images，Xcode6中默认使用了LaunchScreen.xib，而LaunchImage则没有使用。</p>
-<p><img src="/upload/launch-screen-1.png" alt="图1"></p>
-<p>接下来点击Use Assets Catelog，这时Xcode会在Images.xcassets中生成LaunchImage，这里我们只需要给4寸Retina屏和3.5寸2x屏放两张LaunchImage就好了。</p>
-<p>在iOS8中系统会优先调用LaunchScreen作为启动界面，而iOS7不支持LaunchScreen则会使用LaunchImage中的图片作为启动界面。</p>
-<p><img src="/upload/launch-screen-2.png" alt="图2"></p>
-<p>项目在iOS7模拟器中运行效果（使用LaunchImage）</p>
-<p><img src="/upload/launch-screen-3.png" alt="图3"></p>
-<p>项目在iOS8模拟器中运行效果（使用默认的LaunchScreen.xib）</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/9/">

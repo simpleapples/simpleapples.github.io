@@ -98,6 +98,50 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/06/28/the-secret-of-string-concatenation/">你所不知道的Python | 字符串连接的秘密</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-06-28
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180628_04.jpg"></p>
+<p>字符串连接，就是将2个或以上的字符串合并成一个，看上去连接字符串是一个非常基础的小问题，但是在Python中，我们可以用多种方式实现字符串的连接，稍有不慎就有可能因为选择不当而给程序带来性能损失。</p>
+<h1 id="方法1：加号连接"><a href="#方法1：加号连接" class="headerlink" title="方法1：加号连接"></a>方法1：加号连接</h1><p>很多语言都支持使用加号连接字符串，Python也不例外，只需要简单的将2个或多个字符串相加就可以完成拼接。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = a + b  <span class="comment"># 输出&#x27;Python私房菜&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="方法2：使用-操作符"><a href="#方法2：使用-操作符" class="headerlink" title="方法2：使用%操作符"></a>方法2：使用%操作符</h1><p>在Python 2.6以前，%操作符是唯一一种格式化字符串的方法，它也可以用于连接字符串。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">&#x27;%s%s&#x27;</span> % (a, b)  <span class="comment"># 输出&#x27;Python私房菜&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="方法3：使用format方法"><a href="#方法3：使用format方法" class="headerlink" title="方法3：使用format方法"></a>方法3：使用format方法</h1><p>format方法是Python 2.6中出现的一种代替%操作符的字符串格式化方法，同样可以用来连接字符串。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">&#x27;&#123;&#125;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(a, b)</span><br></pre></td></tr></table></figure>
+
+<h1 id="方法4：使用f-string"><a href="#方法4：使用f-string" class="headerlink" title="方法4：使用f-string"></a>方法4：使用f-string</h1><p>Python 3.6中引入了Formatted String Literals（字面量格式化字符串），简称f-string，f-string是%操作符和format方法的进化版，使用f-string连接字符串的方法和使用%操作符、format方法类似。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">f&#x27;<span class="subst">&#123;a&#125;</span><span class="subst">&#123;b&#125;</span>&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="方法5：使用str-join-方法"><a href="#方法5：使用str-join-方法" class="headerlink" title="方法5：使用str.join()方法"></a>方法5：使用str.join()方法</h1><p>字符串有一个内置方法join，其参数是一个序列类型，例如数组或者元组等。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">&#x27;Python&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;私房菜&#x27;</span></span><br><span class="line">r = <span class="string">&#x27;&#x27;</span>.join([a, b])</span><br></pre></td></tr></table></figure>
+
+<h1 id="对比测试"><a href="#对比测试" class="headerlink" title="对比测试"></a>对比测试</h1><p>既然连接字符串有这么多方法，那么使用时到底选择哪种呢？我们从代码可读性和性能两个层面来评估一下上面5种方法。</p>
+<p>使用timeit模块，分别执行上述5种方法的示例代码100000次，执行时间如图。</p>
+<p><img src="/upload/20180628_05.png"></p>
+<p>可以看到，%操作符、format和f-string都是字符串格式化方法，性能依次递增，加号连接的性能和f-string不相上下。</p>
+<p>有一点需要注意的是，字符串类型是不可变的，所以每一次应用加号连接字符串都会生成一个新的字符串，连接多个字符串时，效率低下就是必然的了，我们将一次连接的字符串提升到10个和20个，再来进行2轮测试，下面是连接20个字符串时的耗时情况。</p>
+<p><img src="/upload/20180628_06.png"></p>
+<p>和连接两个字符串时的结果出现了一些不同，首先使用加号连接的方式在字符串数量较多时（大于10个），性能会急剧下降，str.join()方法在连接大量字符串时性能最好。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>连接少量字符串时</strong><br>使用<strong>加号</strong>连接符在性能和可读性上都是明智的，如果对可读性有更高的要求，并且使用的Python 3.6以上版本，<strong>f-string</strong>也是一个非常好的选择，例如下面这种情况，f-string的可读性显然比加号连接好得多。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">f&#x27;姓名：<span class="subst">&#123;name&#125;</span> 年龄：<span class="subst">&#123;age&#125;</span> 性别：<span class="subst">&#123;gender&#125;</span>&#x27;</span></span><br><span class="line">b = <span class="string">&#x27;姓名：&#x27;</span> + name + <span class="string">&#x27;年龄：&#x27;</span> + age + <span class="string">&#x27;性别：&#x27;</span> + gender</span><br></pre></td></tr></table></figure>
+
+<p><strong>连接大量字符串时</strong><br><strong>join</strong>和<strong>f-string</strong>都是性能最好的选择，选择时依然取决于你使用的Python版本以及对可读性的要求，f-string在连接大量字符串时可读性并不一定好。切记不要使用加号连接，尤其是在for循环中。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/06/28/install-kvm-on-ubuntu-18.04-lts/">Ubuntu 18.04 LTS安装KVM虚拟机</a>
         </h1>
 
@@ -426,84 +470,6 @@
 </ul>
 <p>共计100多个方法，点击图片——查看原图——下载。</p>
 <p><img src="/upload/20180531_01.jpg"></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/05/22/four-types-of-queue-in-python/">简析Python中的四种队列</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-05-22
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>队列是一种只允许在一端进行插入操作，而在另一端进行删除操作的线性表。</p>
-<p>在Python文档中搜索队列（queue）会发现，Python标准库中包含了四种队列，分别是queue.Queue / asyncio.Queue / multiprocessing.Queue / collections.deque。</p>
-<h1 id="collections-deque"><a href="#collections-deque" class="headerlink" title="collections.deque"></a>collections.deque</h1><p>deque是双端队列（double-ended queue）的缩写，由于两端都能编辑，deque既可以用来实现栈（stack）也可以用来实现队列（queue）。</p>
-<p>deque支持丰富的操作方法，主要方法如图：</p>
-<p><img src="/upload/20180522_01.jpg"></p>
-<p>相比于list实现的队列，deque实现拥有更低的时间和空间复杂度。list实现在出队（pop）和插入（insert）时的空间复杂度大约为O(n)，deque在出队（pop）和入队（append）时的时间复杂度是O(1)。</p>
-<p>deque也支持in操作符，可以使用如下写法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q = collections.deque([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line"><span class="built_in">print</span>(<span class="number">5</span> <span class="keyword">in</span> q)  <span class="comment"># False</span></span><br><span class="line"><span class="built_in">print</span>(<span class="number">1</span> <span class="keyword">in</span> q)  <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
-
-<p>deque还封装了顺逆时针的旋转的方法：rotate。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 顺时针</span></span><br><span class="line">q = collections.deque([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line">q.rotate(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [4, 1, 2, 3]</span></span><br><span class="line">q.rotate(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [3, 4, 1, 2]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 逆时针</span></span><br><span class="line">q = collections.deque([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line">q.rotate(-<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [2, 3, 4, 1]</span></span><br><span class="line">q.rotate(-<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(q)  <span class="comment"># [3, 4, 1, 2]</span></span><br></pre></td></tr></table></figure>
-
-<p>线程安全方面，通过查看collections.deque中的append()、pop()等方法的源码可以知道，他们都是原子操作，所以是GIL保护下的线程安全方法。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> PyObject *</span></span><br><span class="line"><span class="function"><span class="title">deque_append</span><span class="params">(dequeobject *<span class="built_in">deque</span>, PyObject *item)</span> </span>&#123; </span><br><span class="line">    Py_INCREF(item);</span><br><span class="line">    <span class="keyword">if</span> (deque_append_internal(<span class="built_in">deque</span>, item, <span class="built_in">deque</span>-&gt;maxlen) &lt; <span class="number">0</span>) </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    Py_RETURN_NONE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>通过dis方法可以看到，append是原子操作（一行字节码）。</p>
-<p><img src="/upload/20180522_02.png"></p>
-<p> 综上，collections.deque是一个可以方便实现队列的数据结构，具有线程安全的特性，并且有很高的性能。</p>
-<h1 id="queue-Queue-amp-asyncio-Queue"><a href="#queue-Queue-amp-asyncio-Queue" class="headerlink" title="queue.Queue &amp; asyncio.Queue"></a>queue.Queue &amp; asyncio.Queue</h1><p>queue.Queue和asyncio.Queue都是支持多生产者、多消费者的队列，基于collections.deque，他们都提供了Queue（FIFO队列）、PriorityQueue（优先级队列）、LifoQueue（LIFO队列），接口方面也相同。</p>
-<p>区别在于queue.Queue适用于多线程的场景，asyncio.Queue适用于协程场景下的通信，由于asyncio的加成，queue.Queue下的阻塞接口在asyncio.Queue中则是以返回协程对象的方式执行，具体差异如下表：</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>queue.Queue</th>
-<th>asyncio.Queue</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>介绍</td>
-<td>同步队列</td>
-<td>asyncio队列</td>
-</tr>
-<tr>
-<td>线程安全</td>
-<td>是</td>
-<td>否</td>
-</tr>
-<tr>
-<td>超时机制</td>
-<td>通过timeout参数实现</td>
-<td>通过asyncio.wait_for()方法实现</td>
-</tr>
-<tr>
-<td>qsize()</td>
-<td>预估的队列长度（获取qsize到下一个操作之间，queue有可能被其它的线程修改，导致qsize大小发生变化）</td>
-<td>准确的队列长度（由于是单线程，所以queue不会被其它线程修改）</td>
-</tr>
-<tr>
-<td>put() / set()</td>
-<td>put(item, block=True, timeout=None)，可以通过设置block是否为True来配置put和set方法是否为阻塞，并且可以为阻塞操作设置最大时长timeout，block为False时行为和put_nowait()方法一致。</td>
-<td>put()方法会返回一个协程对象，所以没有block参数和timeout参数，如果需要非阻塞方法，可以使用put_nowait()，如果需要对阻塞方法应用超时，可以使用coroutine asyncio.wait_for()。</td>
-</tr>
-</tbody></table>
-<h1 id="multiprocessing-Queue"><a href="#multiprocessing-Queue" class="headerlink" title="multiprocessing.Queue"></a>multiprocessing.Queue</h1><p>multiprocessing提供了三种队列，分别是Queue、SimpleQueue、JoinableQueue。</p>
-<p><img src="/upload/20180522_03.png"></p>
-<p>multiprocessing.Queue既是线程安全也是进程安全的，相当于queue.Queue的多进程克隆版。和threading.Queue很像，multiprocessing.Queue支持put和get操作，底层结构是multiprocessing.Pipe。</p>
-<p>multiprocessing.Queue底层是基于Pipe构建的，但是数据传递时并不是直接写入Pipe，而是写入进程本地buffer，通过一个feeder线程写入底层Pipe，这样做是为了实现超时控制和非阻塞put/get，所以Queue提供了join_thread、cancel_join_thread、close函数来控制feeder的行为，close函数用来关闭feeder线程、join_thread用来join feeder线程，cancel_join_thread用来在控制在进程退出时，不自动join feeder线程，使用cancel_join_thread有可能导致部分数据没有被feeder写入Pipe而导致的数据丢失。</p>
-<p>和threading.Queue不同的是，multiprocessing.Queue默认不支持join()和task_done操作，这两个支持需要使用mp.JoinableQueue对象。</p>
-<p>SimpleQueue是一个简化的队列，去掉了Queue中的buffer，没有了使用Queue可能出现的问题，但是put和get方法都是阻塞的并且没有超时控制。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过对比可以发现，上述四种结构都实现了队列，但是用处却各有偏重，collections.deque在数据结构层面实现了队列，但是并没有应用场景方面的支持，可以看做是一个基础的数据结构。queue模块实现了面向多生产线程、多消费线程的队列，asyncio.queue模块则实现了面向多生产协程、多消费协程的队列，而multiprocessing.queue模块实现了面向多成产进程、多消费进程的队列。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/collections.html#collections.deque">https://docs.python.org/3/library/collections.html#collections.deque</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/queue.html?highlight=queue#module-queue">https://docs.python.org/3/library/queue.html</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/asyncio-queue.html?highlight=queue">https://docs.python.org/3/library/asyncio-queue.html</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue">https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue</a><br><a target="_blank" rel="noopener" href="https://bugs.python.org/issue15329">https://bugs.python.org/issue15329</a><br><a target="_blank" rel="noopener" href="http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/">http://blog.ftofficer.com/2009/12/python-multiprocessing-3-about-queue/</a><br><a target="_blank" rel="noopener" href="http://cyrusin.github.io/2016/04/27/python-gil-implementaion/">http://cyrusin.github.io/2016/04/27/python-gil-implementaion/</a></p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/6/">

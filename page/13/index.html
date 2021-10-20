@@ -98,6 +98,25 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2013/06/27/bye-buct/">Bye,BUCT</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-06-27
+        </span><span class="post-category">
+            <a href="/categories/%E7%94%9F%E6%B4%BB/">生活</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>从收垃圾的阿姨开始变得友善而又慈祥的那一刻起，我就感觉到，毕业，离我们不远了。<br>本以为没什么好不舍，没什么好悲伤，可学位授予仪式结束时的那首《再见》，还是让鼻子酸酸的。<br>学生证被盖上了毕业留念四个字，好像在宣告什么的终结。<br>宿舍里空荡而凌乱，收拾行李时翻出来的旧物件，把人一下子拉回到过往的岁月里。楼道里时不时响起拉行李箱的声音，不用回头就知道，又有人离开了。<br>有人选择默默地走，有人选择和每个人告别，共同之处在于，都是闪电战。这个时候，不能有半点拖泥带水，走就走，墨迹纸就不够用了。<br>昏黄路灯下弹吉他的少年，和穿着毕业衫来来往往的情侣，让所有人的目光变的温暖，如果这不是毕业季，就更好了。<br>入夜，带着最后一点行李从学校离开。</p>
+<p><img src="/upload/leave-1024x494.jpg" alt="Alt text"></p>
+<p><em>Young and beautiful</em></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/06/02/why-write-blog/">为什么写博客</a>
         </h1>
 
@@ -189,31 +208,6 @@
     <div class="post-content"><p>平时测试javascript代码都是写一个html页面，放到body里面，再在浏览器中执行网页，然后看javascript控制台。突然想到可以使用javascript引擎直接执行js。ok，说干就干。<br>google了一下，有Mozilla的引擎SpiderMonkey和google的v8引擎，嗯，既然公认v8引擎比较快，那就用v8吧。不过看了一下网上的文章，安装v8引擎好麻烦 = .=<br>忽然想起来nodeJS使用的好像是v8引擎，那么直接用nodeJS执行js就好了。<br>上<a target="_blank" rel="noopener" href="http://nodejs.org/">nodeJS官网</a>下载最新版，有针对mac的pkg安装包，安装完成后就要让vim使用nodeJS执行js文件了。接下来修改.vimrc文件。<br>在.vimrc中为javascript文件添加编译命令：node filename.js，如图。  </p>
 <p><img src="/upload/javascript-enviroment.png" alt="图1"></p>
 <p>完成这些步骤，就可以在vim中直接运行javascript了。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/03/05/ios-6-text-alignment/">iOS6文字居中问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-03-05
-        </span><span class="post-category">
-            <a href="/categories/Mobile/">Mobile</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>升级Xcode之后一直没有用过，今天给一个label写居中属性，发现以前的文字居中属性UITextAlignment已经不推荐使用。如图。</p>
-<p><img src="/upload/ios6-text1.png" alt="Alt text"></p>
-<p>查看文档，原来在iOS6中已经有了新的属性NSTextAlignment。</p>
-<p><img src="/upload/ios6-text2.png" alt="Alt text"></p>
-<p><img src="/upload/ios6-text3.png" alt="Alt text"></p>
-<p>新属性增加了Justified和Natural，于是好奇在label中尝试了一下Natural属性。报错。</p>
-<p><img src="/upload/ios6-text4.png" alt="Alt text"></p>
-<p>提示textAlignment中不能使用NSTextAlignmentNatural，当然，Justified也不能用（= .=），也就是说，对于label标签中的文字，只能使用center、left、right三种属性，和UITextAlignment一样。ok，那么，什么情况下可以使用Justified和Natural呢？</p>
-<p>搜了一下，没有发现问题的解答，不过从苹果的文档来看，Justified和Natural可能是针对大段文字的，没有尝试，只是推测。(⊙o⊙)…</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/12/">

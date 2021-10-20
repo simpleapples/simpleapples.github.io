@@ -98,6 +98,32 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2014/10/25/launchsreen-and-launchimage/">iOS8中LaunchImage和LaunchScreen的完美结合</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-10-25
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>Apple在iOS8中推出了LaunchScreen.xib来代替之前的LaunchImage作为程序的启动界面，相比与LaunchImage，在iOS设备屏幕尺寸越来越多样的情况下，LaunchScreen.xib依托AutoLayout无疑更方便，否则，对于一个兼容iPhone5-iPhone6Plus的应用，就需要有4长不同尺寸的LaunchImage。</p>
+<p>但是LaunchScreen只有在iOS8中才能被支持，所以一些开发者还是选择用传统的LaunchImage方式。不过，还有一种方式是将LaunchImage和LaunchScreen结合，在大尺寸iPhone中使用LaunchScreen（iPhone6和iPhone6Plus都是iOS8系统），在iOS7中使用LaunchImage（使用iOS7的手机只有4寸和5.5寸的iPhone，所以只需要两张图）。</p>
+<p>首先进入Target配置，找到App Icons and Launch Images，Xcode6中默认使用了LaunchScreen.xib，而LaunchImage则没有使用。</p>
+<p><img src="/upload/launch-screen-1.png" alt="图1"></p>
+<p>接下来点击Use Assets Catelog，这时Xcode会在Images.xcassets中生成LaunchImage，这里我们只需要给4寸Retina屏和3.5寸2x屏放两张LaunchImage就好了。</p>
+<p>在iOS8中系统会优先调用LaunchScreen作为启动界面，而iOS7不支持LaunchScreen则会使用LaunchImage中的图片作为启动界面。</p>
+<p><img src="/upload/launch-screen-2.png" alt="图2"></p>
+<p>项目在iOS7模拟器中运行效果（使用LaunchImage）</p>
+<p><img src="/upload/launch-screen-3.png" alt="图3"></p>
+<p>项目在iOS8模拟器中运行效果（使用默认的LaunchScreen.xib）</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2014/10/23/build-a-safari-extension/">创建一个简单的Safari扩展</a>
         </h1>
 
@@ -213,32 +239,6 @@
 <p>执行插件版安装程序后按提示进行，Eclipse目前的最新版是4.3，而Flash Builder 4.7的插件版只支持Eclipse 3.7或4.2版，无法安装在4.3中。</p>
 <p><img src="/upload/flashbuilder4.7plugin.png" alt="Alt text"></p>
 <p>解决办法是，下载Eclipse 4.2，现将Flash Builder插件版安装到4.2版的Eclipse中，再拷贝Eclipse文件夹下的dropins目录覆盖Eclipse 4.3的dropins。启动Eclipse 4.3，第一次启动速度会很慢，启动后，Flash Builder插件版就已经安装到Eclipse 4.3中了。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2014/01/08/the-key-of-object-in-javascript/">Javscript中Object的Key</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2014-01-08
-        </span><span class="post-category">
-            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>先来看一段代码：</p>
-<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;e1&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;e2&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="keyword">var</span> c1 = <span class="built_in">document</span>.getElementById(<span class="string">&quot;e1&quot;</span>);</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="keyword">var</span> c2 = <span class="built_in">document</span>.getElementById(<span class="string">&quot;e2&quot;</span>);</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="keyword">var</span> obj = </span></span><span class="template-variable">&#123;&#125;</span><span class="xml"><span class="javascript">;</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	obj[c1] = <span class="number">1</span>;</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	obj[c2] = <span class="number">2</span>;</span></span></span><br><span class="line"><span class="javascript"><span class="xml">	<span class="built_in">console</span>.log(obj);</span></span></span><br><span class="line"><span class="javascript"><span class="xml"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
-
-<p>上面这段代码会输出什么结果呢？答案是：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Object</span> &#123;<span class="selector-attr">[object HTMLDivElement]</span>: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
-
-<p>为什么给了obj两个元素，输出出来却变成了一个呢？难道c1和c2指向同一个元素？首先c1和c2是两个不同的dom节点，并且通过输出<code>c1 === c2</code>会发现结果为false，而输出<code>obj[c1] === obj[c2]</code>的结果却为true。通过上面结果可以初步推断，c1和c2作为object的key时，值可能是一样的。object的key所接受的值只有string一种，所以当c1这个dom元素作为key时，会被转换为string类型，而c2和c1由于都是div，所以转换成string后，值都是一样的，c2作为key也会覆盖c1。导致出现只有一个元素的结果。如果c2元素变成其他类型的dom节点，转换为string类型时就会不一样，例如将c2改为ul，还是上面的js代码，输出结果为：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Object</span> &#123;<span class="selector-attr">[object HTMLDivElement]</span>: <span class="number">1</span>, [object HTMLUListElement]: <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当使用object时，需要注意key的类型会被转换为string。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/10/">

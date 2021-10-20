@@ -98,6 +98,26 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/">探究 Pandas 读取 Excel 文件报错问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-08-22
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>使用 Pandas 的 <code>read_excel</code> 方法读取一个 16 万行的 Excel 文件报 <code>AssertionError</code> 错误：</p>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">&quot;/Users/XXX/excel_test/venv/lib/python3.7/site-packages/xlrd/xlsx.py&quot;</span>, <span class="keyword">line</span> <span class="number">637</span>, in do_row</span><br><span class="line">    <span class="keyword">assert</span> <span class="number">0</span> &lt;= self.rowx &lt; X12_MAX_ROWS</span><br><span class="line">AssertionError</span><br></pre></td></tr></table></figure>
+          <div class="read-more">
+            <a href="/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/" class="read-more-link">阅读更多</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2019/04/18/building-docker-image-behind-proxy/">使用代理进行 docker build 问题的解决思路</a>
         </h1>
 
@@ -177,26 +197,6 @@
 <p>在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。</p>
           <div class="read-more">
             <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2019/01/25/practice-on-python-logging/">Python 日志库 logging 的理解和实践经验</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2019-01-25
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20190125_01.jpg"></p>
-<p>本文从 Python logging 库的基础概念入手，理解 logging 库的执行流程，以及可能忽视的一些细节。</p>
-          <div class="read-more">
-            <a href="/2019/01/25/practice-on-python-logging/" class="read-more-link">阅读更多</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/2/">

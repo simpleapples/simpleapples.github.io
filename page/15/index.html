@@ -98,6 +98,39 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/12/02/some-research-about-new-operator-in-javascript/">Javascript中new操作符的探究</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-12-02
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>Javascript中有一个很有意思的new操作符，在<a target="_blank" rel="noopener" href="http://book.douban.com/subject/3590768/">《Javascript语言精粹》（Javascript:The Good Parts）</a>中，new被列为了不推荐的操作符。下面对于new的使用进行一些探究。<br>先来一段代码：<br>    function test() {<br>        var foo1 = new function () {<br>            this.i = 1;<br>        }<br>        var foo2 = function () {<br>            this.i = 2;<br>        }<br>        M.dis(foo1.i);        //1<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //undefined<br>        foo2();<br>        M.dis(foo2.i);        //undefined<br>        M.dis(this.i);        //2<br>        M.dis(foo1.prototype);    //undefined<br>        M.dis(foo2.prototype);    //[object Object]<br>    }<br>*代码中的<code>M.dis() = document.writeln()</code><br>上面代码很能说明使用new操作符和不使用new操作符的区别。<br>以下是本人根据以上结果对使用new操作符和不使用new操作符的一些理解。    </p>
+<ol>
+<li><p>使用new操作符函数会被立刻执行。不使用new操作符，函数会在被调用时执行。<br>foo1在定义的时候就被执行了，所以输出<code>foo1.i = 1</code>，而<code>foo2</code>在定义时未被执行，所以输出<code>foo2</code>的结果为<code>undefined</code>，<br><code>foo2</code>中<code>var foo2 = function () &#123;&#125;</code>的定义形式和<code> function foo2 () &#123;&#125;</code>的效果是一样的。</p>
+</li>
+<li><p>使用new操作符后<code>this</code>会被绑定到函数本身。  </p>
+</li>
+</ol>
+<p>这一点很好理解，首先<code>foo1</code>的定义方式中，<code>foo1</code>是立刻执行的，那么为了方便理解可以看成<code>foo1</code>是function的执行空间，<code>this</code>自然就会绑定到<code>foo1</code>上，也就是绑定到function自身上。于是输出<code>foo1.i</code>可以得到结果。而不使用new操作符时，函数没有立即执行，当调用该函数（即<code>foo2</code>）时，执行空间是<code>test()</code>函数，所以在<code>test()</code>中输出this.i才能得到结果。至于<code>foo2.i</code>为    <code>undefined</code>的情况也好理解，这样的执行方式相当于执行<code>foo2().i</code>，显然，没有这种用法。</p>
+<p>3.使用new操作符和不使用new操作符的原型差异。</p>
+<p>使用new操作符时，相当于讲一个构造函数实例化了，那么它的prototype自然是<code>undefined</code>的。<br>而不使用new操作符时，<code>foo2</code>就是一个function，<code>foo2</code>的prototype就是function的prototype。<br>关于使用new和不使用new的原型问题，请参考淘宝UED团队的一篇文章：</p>
+<p><a target="_blank" rel="noopener" href="http://ued.taobao.com/blog/2007/05/15/">http://ued.taobao.com/blog/2007/05/15/</a>你真的会写javascript吗？</p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>对于new操作符的探究目前仅限于new function，而对于new Array()和[] 的区别以及new Object()和{}的区别，本人认为并没有new function和function的区别这么大，但也有人说new Array()和[]是有区别的（见《你真的会写javascript吗？》评论）。</p>
+<h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>new Array()和字面量定义Array还有一个很重要的区别，比如想定义一个只有一个元素3的数组，看代码：  </p>
+<pre><code>var a = new Array(3); //这样只能定义一个长度为3的数组
+var b = [3]; //正确！
+</code></pre>
+<p>可见，只有字面量可以定义一个元素的数组。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/12/01/magic-search/">MagicSearch</a>
         </h1>
 
@@ -222,33 +255,6 @@ timeInter = setInterval(timer, 3000);  //设置定时器3000ms
 </blockquote>
 <p>其它的下载软件使用的方法也大同小异，FlashGet是在字符串前后加<code>[FLASHGET]</code> ，然后base64加密，而QQ旋风则直接对连接链接进行加密。</p>
 <p>这里有一个在线的迅雷链接解密程序：<a target="_blank" rel="noopener" href="http://labs.simpleapples.com/thunderurl">http://labs.simpleapples.com/thunderurl</a></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/11/10/a-lbs-web-app-based-on-html5/">使用javascript和html5制作的LBS类WebApp</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-11-10
-        </span><span class="post-category">
-            <a href="/categories/Idea-Demo/">Idea&Demo</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>使用javascript和html5+css3制作的一个可以显示目前位置以及行动路径的webapp。</p>
-<p>调用了百度地图的api，在地图上绿色的线画出了当天的路径。</p>
-<p>一个marker显示了当前的位置。</p>
-<p>首页的圆是用canvas画的，但是没能把文字画进去，还在研究。</p>
-<p>至于获取到的数据都存到了localStorage里，目前是每3s定位一次，不知道这样的数据量如何，如果数据量大，localStorage还是不太适合。</p>
-<p>还没有仔细测试，应该还有不少bug。</p>
-<p><img src="/upload/cellphonepreview.jpg" alt="Alt text"></p>
-<p>这是在我手机浏览器上运行的效果，定位有些不太准 = =!</p>
-<p>演示地址：<a target="_blank" rel="noopener" href="http://labs.simpleapples.com/liner">http://labs.simpleapples.com/liner</a></p>
-<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>修改了几个bug，发布到github了。</p>
-<p>github:<a target="_blank" rel="noopener" href="https://github.com/simpleapples/liner">https://github.com/simpleapples/liner</a></p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/14/">

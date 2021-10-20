@@ -98,6 +98,31 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/10/20/fix-the-outline-of-link/">解决超链接点击后周围有虚线框的问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-10-20
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在火狐或IE浏览器中点击点击<code>&lt;a&gt;</code>标签，标签周围会出现虚线框（如图），影响美观。</p>
+<p><img src="/upload/outline.png" alt="Alt text"></p>
+<p>针对IE浏览器解决这个问题的方法是将</p>
+<pre><code>hidefocus=&quot;hidefocus&quot;
+</code></pre>
+<p>添加到<code>&lt;a&gt;</code>标签中。</p>
+<p>针对firefox浏览器的方法是添加css属性</p>
+<pre><code>outline:none
+</code></pre>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/10/19/add-apache-mysql-to-centos-system-service/">将Apache和Mysql添加为CentOS服务</a>
         </h1>
 

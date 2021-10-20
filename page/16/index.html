@@ -98,6 +98,33 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/11/10/a-lbs-web-app-based-on-html5/">使用javascript和html5制作的LBS类WebApp</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-10
+        </span><span class="post-category">
+            <a href="/categories/Idea-Demo/">Idea&Demo</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>使用javascript和html5+css3制作的一个可以显示目前位置以及行动路径的webapp。</p>
+<p>调用了百度地图的api，在地图上绿色的线画出了当天的路径。</p>
+<p>一个marker显示了当前的位置。</p>
+<p>首页的圆是用canvas画的，但是没能把文字画进去，还在研究。</p>
+<p>至于获取到的数据都存到了localStorage里，目前是每3s定位一次，不知道这样的数据量如何，如果数据量大，localStorage还是不太适合。</p>
+<p>还没有仔细测试，应该还有不少bug。</p>
+<p><img src="/upload/cellphonepreview.jpg" alt="Alt text"></p>
+<p>这是在我手机浏览器上运行的效果，定位有些不太准 = =!</p>
+<p>演示地址：<a target="_blank" rel="noopener" href="http://labs.simpleapples.com/liner">http://labs.simpleapples.com/liner</a></p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>修改了几个bug，发布到github了。</p>
+<p>github:<a target="_blank" rel="noopener" href="https://github.com/simpleapples/liner">https://github.com/simpleapples/liner</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/11/07/a-timer-based-on-canvas/">一个用canvas做的电子表</a>
         </h1>
 
@@ -227,31 +254,6 @@ person3.prototype.name = &quot;name3&quot;;
 &#125;
 </code></pre>
 <p>此方法实现了ff、ie和chrome兼容。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/10/20/fix-the-outline-of-link/">解决超链接点击后周围有虚线框的问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-10-20
-        </span><span class="post-category">
-            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>在火狐或IE浏览器中点击点击<code>&lt;a&gt;</code>标签，标签周围会出现虚线框（如图），影响美观。</p>
-<p><img src="/upload/outline.png" alt="Alt text"></p>
-<p>针对IE浏览器解决这个问题的方法是将</p>
-<pre><code>hidefocus=&quot;hidefocus&quot;
-</code></pre>
-<p>添加到<code>&lt;a&gt;</code>标签中。</p>
-<p>针对firefox浏览器的方法是添加css属性</p>
-<pre><code>outline:none
-</code></pre>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/15/">
