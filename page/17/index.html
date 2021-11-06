@@ -98,6 +98,42 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/10/20/solve-removeattribute-not-be-supported/">浏览器不支持removeAttribute()的解决方法</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-10-20
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>今天在做一个网页的时候，想实现mouse over时候给li加载background-image，在mouse out时候移除background-image。<br>通过js实现：  </p>
+<pre><code>if(action == 0) &#123;
+    btn.style.backgroundImage = &quot;url(images/index_nav1_07.jpg)&quot;;
+    btn.style.backgroundRepeat = &quot;repeat-x&quot;;
+&#125; else &#123;
+    btn.removeAttribute(&quot;style&quot;);
+&#125;
+</code></pre>
+<p>发现可以兼容ff和ie，但是在chrome下mouse out动作没有执行。</p>
+<p>后发现可能是chrome不支持removeAttribute()，于是加入兼容写法：</p>
+<pre><code>if(action == 0) &#123;
+    btn.style.backgroundImage = &quot;url(images/index_nav1_07.jpg)&quot;;
+    btn.style.backgroundRepeat = &quot;repeat-x&quot;;
+&#125; else &#123;
+    btn.style.backgroundImage = &quot;&quot;;
+    btn.style.backgroundRepeat = &quot;&quot;;
+    btn.removeAttribute(&quot;style&quot;);
+&#125;
+</code></pre>
+<p>此方法实现了ff、ie和chrome兼容。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/10/20/fix-the-outline-of-link/">解决超链接点击后周围有虚线框的问题</a>
         </h1>
 

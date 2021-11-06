@@ -98,6 +98,32 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2019/10/28/dockers-creepy-behaviour-in-copying-folders/">Docker COPY 复制文件夹的诡异行为</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-10-28
+        </span><span class="post-category">
+            <a href="/categories/DevOps/">DevOps</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="问题现象"><a href="#问题现象" class="headerlink" title="问题现象"></a>问题现象</h3><p>在制作 docker 镜像时，有复制某一个路径下所有文件和文件夹到镜像的需求，写下了如下 dockerfile：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> alpine</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /root/test_docker_proj</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> * ./</span></span><br></pre></td></tr></table></figure>
+
+<p>原始目录结构是这样的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/projects/test_docker_proj</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── dir1</span><br><span class="line">│   ├── dir11</span><br><span class="line">│   │   └── file11</span><br><span class="line">│   └── file1</span><br><span class="line">└── file2</span><br></pre></td></tr></table></figure>
+
+<p>然而复制到 docker 镜像里的目录结构变成了这样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/root/test_docker_proj</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── dir11</span><br><span class="line">│   └── file11</span><br><span class="line">├── file1</span><br><span class="line">└── file2</span><br></pre></td></tr></table></figure>
+          <div class="read-more">
+            <a href="/2019/10/28/dockers-creepy-behaviour-in-copying-folders/" class="read-more-link">阅读更多</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/">探究 Pandas 读取 Excel 文件报错问题</a>
         </h1>
 
@@ -177,26 +203,6 @@
 <p>如果隔几秒再请求（例如使用 Chrome 开发者工具中的 Replay XHR），就会成功。</p>
           <div class="read-more">
             <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2019-02-28
-        </span><span class="post-category">
-            <a href="/categories/DevOps/">DevOps</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20190228_01.jpeg"></p>
-<p>在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。</p>
-          <div class="read-more">
-            <a href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/" class="read-more-link">阅读更多</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/2/">

@@ -98,6 +98,57 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2021/11/06/python-cross-scope-issue/"></a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2021-11-06
+        </span></div>
+    </header>
+
+    <div class="post-content"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在一个古老的系统中，有这样一段代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">scope = <span class="built_in">dict</span>(<span class="built_in">globals</span>(), **<span class="built_in">locals</span>())</span><br><span class="line"><span class="built_in">exec</span>(</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">global_a = 123</span></span><br><span class="line"><span class="string">def func_a():</span></span><br><span class="line"><span class="string">    print(global_a)</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">, scope)</span><br><span class="line"><span class="built_in">exec</span>(<span class="string">&quot;func_a()&quot;</span>, scope)</span><br></pre></td></tr></table></figure>
+
+<p>第一段用户代码定义了函数，第二段用户代码执行函数（不要问为什么这么做，因为用户永远是正确的）。第一个代码段执行后，func_a和global_a都会被加入作用域scope，由于第二个代码段也使用同一个scope，所以第二个代码段调用func_a是可以正确输出123的。</p>
+<p>但是使用exec执行用户代码毕竟不优雅，也很危险，于是把exec函数封装在了一个Python沙箱环境中（简单理解就是另一个Python服务，将code和scope传给这个服务后，服务会在沙箱环境调用exec(code,scope)执行代码），相当于每一次对exec调用都替换成了对沙箱服务的RPC请求。</p>
+<p>于是代码变成了这个样子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">scope = <span class="built_in">dict</span>(<span class="built_in">globals</span>(), **<span class="built_in">locals</span>())</span><br><span class="line">scope = call_sandbox(</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">global_a = 123</span></span><br><span class="line"><span class="string">def func_a():</span></span><br><span class="line"><span class="string">    print(global_a)</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">, scope)</span><br><span class="line">call_sandbox(<span class="string">&quot;func_a()&quot;</span>, scope)</span><br></pre></td></tr></table></figure>
+
+<h1 id="作用域跨服务传递问题"><a href="#作用域跨服务传递问题" class="headerlink" title="作用域跨服务传递问题"></a>作用域跨服务传递问题</h1><p>由于多次RPC调用需要使用同一个作用域，所以沙箱服务返回了新的scope，以保证下次调用时作用域不会丢失。但是执行代码会发现第二次call_sandbox调用时候，会返回错误：</p>
+<p>global name ‘global_a’ is not defined</p>
+<p>首先怀疑第一次调用后scope没有更新，但是如果scope没有更新，应该会报找不到func_a才对，这个报错说明，第二次调用时候，作用域里的func_a是存在的，但是func_a找不到变量global_a。通过输出第二次call_sandbox前的scope，会发现global_a和func_a都是存在的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(scope.keys())</span><br><span class="line"><span class="comment"># [&#x27;__name__&#x27;, &#x27;__doc__&#x27;, &#x27;__package__&#x27;, &#x27;__loader__&#x27;, &#x27;__spec__&#x27;, &#x27;__file__&#x27;, &#x27;__cached__&#x27;, </span></span><br><span class="line"><span class="comment"># &#x27;__builtins__&#x27;, &#x27;global_a&#x27;, &#x27;func_a&#x27;]</span></span><br><span class="line">call_sandbox(<span class="string">&quot;func_a()&quot;</span>, scope)</span><br></pre></td></tr></table></figure>
+
+<p>证明在第二次call_sandbox时，scope被正确的传入了，没有报找不到func_a也印证了这个结论。在func_a里获取并输出一下globals()和locals()：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func_a</span>():</span></span><br><span class="line">    inner_scope = <span class="built_in">dict</span>(<span class="built_in">globals</span>(), **<span class="built_in">locals</span>()</span><br><span class="line">    <span class="built_in">print</span>(inner_scope.keys())</span><br><span class="line">    <span class="comment"># [&#x27;__builtins__&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到在func_a外作用域是正常的，但是func_a内的作用域就只有__builtins__了，相当于作用域被清空了。猜测是函数的caller指向的是沙箱环境内的作用域，当scope回传回来后，caller没有更新，所以在函数内找不到函数外的作用域，查看一下Python函数的魔术方法：</p>
+<p><img src="/upload/20211106_01.png">   </p>
+<p>发现有一个__globals__变量，指向的就是所在作用域，相当于函数的caller，通过如下代码验证调用沙箱服务后的scope里的func_a的__globals__是否和当前作用域的一样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scope[<span class="string">&quot;func_a&quot;</span>].__globals__ == <span class="built_in">globals</span>()  <span class="comment"># False</span></span><br></pre></td></tr></table></figure>
+
+<p>确实不一样，接下来试试把scope[“func_a”].__globals__置为globals()，应该就可以跑通了。</p>
+<h1 id="优化作用域更新逻辑"><a href="#优化作用域更新逻辑" class="headerlink" title="优化作用域更新逻辑"></a>优化作用域更新逻辑</h1><p>到这里问题的根源已经搞清了：</p>
+<ul>
+<li>第一个exec语句和第二个exec语句分别在Python服务A和B中执行，第一个exec语句中定义的func_a所在的作用域是服务A（func_a.<strong>globals</strong> == A）</li>
+<li>在scope回传到服务B后，global_a和func_a被拷贝到了服务B所在作用域，但是func_a.__globals__还是指向服务A的作用域，所以出现可以调用到func_a但在func_a里找不到global_a</li>
+<li>将func_a.__globals__置为B，就可以使代码在服务B正确执行</li>
+</ul>
+<p>如文档所述，函数__globals__是一个只读变量，所以不能直接赋值，需要通过拷贝函数的方式实现，定义一个拷贝函数的方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"><span class="keyword">import</span> types</span><br><span class="line"><span class="keyword">import</span> functools</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">copy_func</span>(<span class="params">f, <span class="built_in">globals</span>=<span class="literal">None</span>, module=<span class="literal">None</span></span>):</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">globals</span> <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        <span class="built_in">globals</span> = f.__globals__</span><br><span class="line">    g = types.FunctionType(f.__code__, <span class="built_in">globals</span>, name=f.__name__,</span><br><span class="line">                           argdefs=f.__defaults__, closure=f.__closure__)</span><br><span class="line">    g = functools.update_wrapper(g, f)</span><br><span class="line">    <span class="keyword">if</span> module <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        g.__module__ = module</span><br><span class="line">    <span class="keyword">return</span> g</span><br></pre></td></tr></table></figure>
+
+<p>更新调用沙箱后回传的scope，如果scope中的value是一个function，就通过复制的方式更新它的__globals__为scope：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">scope = <span class="built_in">dict</span>(<span class="built_in">globals</span>(), **<span class="built_in">locals</span>())</span><br><span class="line">scope = call_sandbox(</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">global_a = 123</span></span><br><span class="line"><span class="string">def func_a():</span></span><br><span class="line"><span class="string">    print(global_a)</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">, scope)</span><br><span class="line"><span class="keyword">for</span> k, v <span class="keyword">in</span> scope:</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(v, types.FunctionType):</span><br><span class="line">        scope[k] = copy_func(v, scope, __name__)</span><br><span class="line">call_sandbox(<span class="string">&quot;func_a()&quot;</span>, scope)</span><br></pre></td></tr></table></figure>
+
+<p>重新运行，两个call_sandbox都可以正常执行，问题解决。</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a target="_blank" rel="noopener" href="https://docs.python.org/3/reference/datamodel.html">https://docs.python.org/3/reference/datamodel.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/49076566/override-globals-in-function-imported-from-another-module">https://stackoverflow.com/questions/49076566/override-globals-in-function-imported-from-another-module</a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/2904274/globals-and-locals-in-python-exec/2906198">https://stackoverflow.com/questions/2904274/globals-and-locals-in-python-exec/2906198</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2021/10/19/one-click-open-door-based-on-aws-lambda-and-ios-shortcut/">利用AWS Lambda和iOS捷径实现手机一键开小区门禁</a>
         </h1>
 
@@ -301,86 +352,6 @@
 
 <p>脚本通过 <code>cat /etc/resolv.conf</code> 来获取 DNS 服务器，也就是 Windows 的 IP，再将其中的 IP 部分截取出来，加上代理客户端的端口（我的是 7890，可以根据自己实际情况修改），使用 export 写入环境变量中。</p>
 <p>脚本也可以从这里下载<a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/simpleapples/dotfiles/master/.proxyrc">.proxyrc</a>，使用时只需要 <code>source .proxyrc</code> 就可以生效。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2020/06/01/wsl2-guideline-for-developers/">面向开发者的 WSL2 安装指南</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2020-06-01
-        </span><span class="post-category">
-            <a href="/categories/DevOps/">DevOps</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h3 id="为什么要使用-Windows-做开发"><a href="#为什么要使用-Windows-做开发" class="headerlink" title="为什么要使用 Windows 做开发"></a>为什么要使用 Windows 做开发</h3><p>一直以来 macOS 以类 unix 的特性，获得了程序员的青睐，但是近几年 Apple 在硬件领域少有让人耳目一新的产品，加上取消 Esc、使用蝶式键盘、基本为0的硬件可升级性、系统权限的收紧等骚操作，让 Mac 从软件到硬件都不如以前适合编程。另一方面，PC 阵营在软件层面保持开放的基础上，硬件体验也逐步赶上甚至超越 Mac，我也不想在用 Mac 做开发，用 PC 玩游戏，希望用一台电脑兼顾游戏和开发，所以选择回到了 PC 阵营。</p>
-<p>随着微软拥抱开源领域，Windows 也开始变得程序员友好。Windows 10 2004 发布后，WSL2 也可以在正式版 Windows 10 中使用，相比于 macOS，WSL2 是一个原生 Linux 环境而非类 unix 环境，甚至可以在 App 商店中选择所需要的发行版。而相比于 WSL1，WSL2 采用了 HyperV 虚拟机的方式，解决了 WSL1 不能安装 Docker 等问题。</p>
-<h3 id="WSL1-和-WSL2"><a href="#WSL1-和-WSL2" class="headerlink" title="WSL1 和 WSL2"></a>WSL1 和 WSL2</h3><p>相比于 WSL1，WSL2 通过虚拟机的方式带来了更完整的 Linux 内核，但这种方式也引入了一些问题，微软给出了下面的图表来展示这些不同：</p>
-<p><img src="/upload/20200601_01.png"></p>
-<p>WSL2 不能和 VMWarework Station、VirtualBox 同时运行这一条已经过时了，VirtualBox 和 VMWare Workstation 都发布了支持 WSL2 和 Hyper-V 的新版。</p>
-<p>WSL2 跨 OS 的磁盘性能的确低的令人发指，尤其是小文件，安装一个 Python 依赖可能需要等几分钟，安装一个 NodeJS 依赖…当我没说…相关 ISSUE 底下有无数吐槽，不过目前还没有人出来解决，在这里：<a target="_blank" rel="noopener" href="https://github.com/microsoft/WSL/issues/4197">https://github.com/microsoft/WSL/issues/4197</a>）。不过微软在文档里也说了，有很多方式可以避免跨 OS 使用文件系统，比如使用 VSCode 的 remote deployment 功能，我认为这也是更好的实践，并且也这么做了。当然，如果你必须跨 OS 使用文件系统，还是乖乖留在 WSL1 吧（WSL1 太渣了，还是留在 VirtualBox 吧）。</p>
-<p>除了表格里说的，我认为 WSL2 最大的问题在于…资源占用太大了…我是一台 16G 内存的电脑，使用 WSL2 后开机就要吃掉 11G 的内存，虽然可以使用 <code>wsl --shutdown</code> 关闭虚拟机释放资源，但是相比于 VirtualBox 和 WSL1，WSL2 的资源占用可以说翻倍了。</p>
-<blockquote>
-<p>微软提供了限制 WSL2 资源的方式，参见<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945">https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945</a></p>
-</blockquote>
-<h3 id="要做些什么"><a href="#要做些什么" class="headerlink" title="要做些什么"></a>要做些什么</h3><p>好了，搞清楚 WSL2 是什么之后接下来的问题就是怎么做了，这篇文章会指导你完成如下的安装流程：</p>
-<ul>
-<li>升级 Windows 10 到 2004</li>
-<li>启用 WSL2 并安装 Linux</li>
-</ul>
-<p>以及一些最佳实践：</p>
-<ul>
-<li>网络互通</li>
-<li>文件系统互通</li>
-<li>使用 Docker</li>
-</ul>
-<p>最后会聊聊 WSL2 的未来。</p>
-<h3 id="升级-Windows-10-2004"><a href="#升级-Windows-10-2004" class="headerlink" title="升级 Windows 10 2004"></a>升级 Windows 10 2004</h3><p>升级到 Windows 10 2004 有多种方法，最靠谱的还是从设置 - 更新和安全里进行 OTA 升级，但是 Windows 的更新是分批推送的，2004 更新有可能等到一两个月后才会出现在你的更新界面中。</p>
-<p>另一种更快速的方法是从官方地址下载镜像升级，访问这个地址下载运行就可以升级到最新的版本 <a target="_blank" rel="noopener" href="https://www.microsoft.com/software-download/windows10">https://www.microsoft.com/software-download/windows10</a>，需要注意的是，发布初期可能 bug 含量会高一些，介意的还是再等等。</p>
-<h3 id="启用-WSL2"><a href="#启用-WSL2" class="headerlink" title="启用 WSL2"></a>启用 WSL2</h3><p>升级 Windows 10 的过程不会碰到太多问题，升级后还需要进行一些配置才可以使用 WSL2，首先要启用 Windows 子系统功能，使用管理员权限打开一个 PowerShell 窗口，输入以下命令，并重启系统：</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dism.exe /online /<span class="built_in">enable-feature</span> /featurename:Microsoft<span class="literal">-Windows</span><span class="literal">-Subsystem</span><span class="literal">-Linux</span> /all /norestart</span><br></pre></td></tr></table></figure>
-
-<p>重启后，Windows 默认启用的是 WSL1，还需要再启用虚拟机平台功能，在 PowerShell 中输入以下命令，并再次重启系统：</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dism.exe /online /<span class="built_in">enable-feature</span> /featurename:VirtualMachinePlatform /all /norestart</span><br></pre></td></tr></table></figure>
-
-<p>重启后，在 PowerShell 中输入以下命令，将 WSL 默认版本改为 WSL2:</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl -<span class="literal">-set</span><span class="literal">-default</span><span class="literal">-version</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
-
-<p>接下来在 Microsoft Store 中找一个 Linux 发行版进行安装，安装后在 PowerShell 中执行 <code>wsl -l -v</code> 可以看到当前的发行版是否跑在 WSL2 中，如果显示版本是1…请重复上面的安装步骤。</p>
-<blockquote>
-<p>设置 WSL 版本为 WSL2 报错时，请访问 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel">https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel</a> 下载 WSL2 Kernel。</p>
-</blockquote>
-<h3 id="网络互通"><a href="#网络互通" class="headerlink" title="网络互通"></a>网络互通</h3><p>WSL2 不和 Windows 共享一个 localhost，所以不像 WSL1 中 Linux 和 Windows 有无感知的网络互通性。</p>
-<p>Windows 访问 WSL2 启动的网络服务，可以直接使用 localhost，但是 Linux 访问 Windows 启动的网络服务这种方式就不行了，可以使用如下脚本获取 Windows 的 IP，并使用 IP 访问 Windows：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip route | grep default | awk <span class="string">&#x27;&#123;print $3&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="文件系统互通"><a href="#文件系统互通" class="headerlink" title="文件系统互通"></a>文件系统互通</h3><p>WSL2 访问 Windows 文件系统依然通过挂载分区的方式，Windows 下的磁盘会被挂载在 <code>/mnt</code> 下，例如 <code>/mnt/c</code>。</p>
-<p>相比于 WSL1，这次增加了 Windows 访问 Linux 分区的能力，可以在资源管理器中输入 <code>\\wsl$\&lt;子系统名&gt;</code> 访问对应的子系统分区，为了方便也可以在资源管理器中把 Linux 分区挂载成一个磁盘。</p>
-<p>更加方便的一个方式是，在 Terminal 中，使用 <code>explorer.exe .</code> 可以直接调用资源管理器打开当前目录，有点类似 Mac 下的 <code>open .</code>。</p>
-<h3 id="使用-Docker"><a href="#使用-Docker" class="headerlink" title="使用 Docker"></a>使用 Docker</h3><p>WSL2 带来了完整的 Linux 内核，所以可以参照 Docker 在 Linux 上安装的过程安装 Docker，并且可以正常使用，但是会有一个小瑕疵。WSL2 的 systemd 吧…还不是原生的，也就是在 WSL1 上就有的无法启动服务守护进程的问题依然存在，Docker 服务自然也不能幸免。</p>
-<p>解决这个问题有三种方案：</p>
-<ul>
-<li><p>可以让 Windows 执行开机脚本，通过脚本启动 WSL2 中的 Docker，参见<a target="_blank" rel="noopener" href="https://blog.csdn.net/XhyEax/article/details/105560377">https://blog.csdn.net/XhyEax/article/details/105560377</a>，这种方案在 WSL1 时代就有，我自己使用过没碰到过问题。</p>
-</li>
-<li><p>第二种方案是使用第三方工具运行 systemd，参见 <a target="_blank" rel="noopener" href="https://github.com/arkane-systems/genie">https://github.com/arkane-systems/genie</a>，原理是提供了一个单独的 namespace 跑 systemd。</p>
-</li>
-<li><p>第三种方案是使用 Docker Desktop，2.3.0.2 以上版本已经支持 WSL2 和 Hyper-V，免去一些折腾。</p>
-</li>
-</ul>
-<h3 id="GPU-支持"><a href="#GPU-支持" class="headerlink" title="GPU 支持"></a>GPU 支持</h3><p>Build 2020 发出消息说 WSL2 要支持 GPU，Nvidia 也发出了 CUDA on WSL2 的预览版，在这里：<a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda/wsl">https://developer.nvidia.com/cuda/wsl</a>。</p>
-<p>这意味着以后可以直接在 Windows 上使用 GPU 加速训练模型了，虽然支持成都还很有限，但是相比于 Mac 可领先了一个身位都不只了。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在体系结构上 WSL2 没有太大的创新，本质就是一台跑在 Hyper-V 上的虚拟机，你可以使用 VMWare Workstation 或 VirtualBox，经过简单的配置实现其 100% 的功能，并且会有更高的性能，更少的资源占用，但是毕竟 WSL2 是一项原生功能，其配置上的便利性和兼容性，大大减少了使用者花在配置上的精力，最大程度的实现开箱即用，这也是 Apple 一直以来吸引开发者的主要原因。在这个时间点，使用 Windows + WSL2 来构建开发环境已经可以满足大部分的需求。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a target="_blank" rel="noopener" href="https://github.com/microsoft/WSL/issues/4197">https://github.com/microsoft/WSL/issues/4197</a></p>
-<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel">https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel</a></p>
-<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">https://docs.microsoft.com/en-us/windows/wsl/install-win10</a></p>
-<p><a target="_blank" rel="noopener" href="https://github.com/arkane-systems/genie">https://github.com/arkane-systems/genie</a></p>
-<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945">https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945</a></p>
-<p><a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda/wsl">https://developer.nvidia.com/cuda/wsl</a></p>
-<p><a target="_blank" rel="noopener" href="https://devblogs.microsoft.com/directx/directx-heart-linux/">https://devblogs.microsoft.com/directx/directx-heart-linux/</a></p>
 
         </div></article>
       <nav class="pagination"><a class="next" href="/page/2/">

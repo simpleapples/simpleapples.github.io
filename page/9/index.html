@@ -98,6 +98,45 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/">实战 | 用aiohttp和uvloop实现一个高性能爬虫</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-04-10
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>asyncio于Python3.4引入标准库，增加了对异步I/O的支持，asyncio基于事件循环，可以轻松实现异步I/O操作。接下来，我们用基于asyncio的库实现一个高性能爬虫。</p>
+<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p><a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh">Earth View from Google Earth</a>是一款Chrome插件，会在打开新标签页时自动加载一张来自Google Earth的背景图片。</p>
+<p><img src="/upload/20180410_01.png" alt="Earth View from Google Earth"></p>
+<p>使用Chrome开发者工具观察插件的网络请求，我们发现插件会请求一个地址如<a target="_blank" rel="noopener" href="https://www.gstatic.com/prettyearth/assets/data/v2/1234.json">https://www.gstatic.com/prettyearth/assets/data/v2/1234.json</a>的JSON文件，文件中包含了经过Base64的图片内容，观察发现，图片的ID范围大致在1000-8000之间，我们的爬虫就要来爬取这些精美的背景图片。</p>
+<h1 id="实现主要逻辑"><a href="#实现主要逻辑" class="headerlink" title="实现主要逻辑"></a>实现主要逻辑</h1><p>由于爬取目标是JSON文件，爬虫的主要逻辑就变成了<strong>爬取JSON–&gt;提取图片–&gt;保存图片</strong>。</p>
+<p>requests是一个常用的http请求库，但是由于requests的请求都是同步的，我们使用<a target="_blank" rel="noopener" href="https://aiohttp.readthedocs.io/en/stable/">aiohttp</a>这个异步http请求库来代替。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">fetch_image_by_id</span>(<span class="params">item_id</span>):</span></span><br><span class="line">	url = <span class="string">f&#x27;https://www.gstatic.com/prettyearth/assets/data/v2/<span class="subst">&#123;item_id&#125;</span>.json&#x27;</span></span><br><span class="line">        <span class="comment"># 由于URL是https的，所以选择不验证SSL</span></span><br><span class="line">	<span class="keyword">async</span> <span class="keyword">with</span> aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=<span class="literal">False</span>)) <span class="keyword">as</span> session:</span><br><span class="line">		<span class="keyword">async</span> <span class="keyword">with</span> session.get(url) <span class="keyword">as</span> response:</span><br><span class="line">            <span class="comment"># 获取后需要将JSON字符串转为对象</span></span><br><span class="line">			<span class="keyword">try</span>:</span><br><span class="line">				json_obj = json.loads(<span class="keyword">await</span> response.text())</span><br><span class="line">			<span class="keyword">except</span> json.decoder.JSONDecodeError <span class="keyword">as</span> e:</span><br><span class="line">				<span class="built_in">print</span>(<span class="string">f&#x27;Download failed - <span class="subst">&#123;item_id&#125;</span>.jpg&#x27;</span>)</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">            <span class="comment"># 获取JSON中的图片内容字段，经过Base64解码成二进制内容</span></span><br><span class="line">			image_str = json_obj[<span class="string">&#x27;dataUri&#x27;</span>].replace(<span class="string">&#x27;data:image/jpeg;base64,&#x27;</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">			image_data = base64.b64decode(image_str)</span><br><span class="line">			save_folder = dir_path = os.path.dirname(</span><br><span class="line">				os.path.realpath(__file__)) + <span class="string">&#x27;/google_earth/&#x27;</span></span><br><span class="line">			<span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">f&#x27;<span class="subst">&#123;save_folder&#125;</span><span class="subst">&#123;item_id&#125;</span>.jpg&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">				f.write(image_data)</span><br><span class="line">			<span class="built_in">print</span>(<span class="string">f&#x27;Download complete - <span class="subst">&#123;item_id&#125;</span>.jpg&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>aiohttp基于asyncio，所以在调用时需要使用async/await语法糖，可以看到，由于aiohttp中提供了一个ClientSession上下文，代码中使用了async with的语法糖。</p>
+<h1 id="加入并行逻辑"><a href="#加入并行逻辑" class="headerlink" title="加入并行逻辑"></a>加入并行逻辑</h1><p>上面的代码是抓取单张图片的逻辑，批量抓取图片，需要再嵌套一层方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">fetch_all_images</span>():</span></span><br><span class="line">    <span class="comment"># 使用Semaphore限制最大并发数</span></span><br><span class="line">	sem = asyncio.Semaphore(<span class="number">10</span>)</span><br><span class="line">	ids = [<span class="built_in">id</span> <span class="keyword">for</span> <span class="built_in">id</span> <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1000</span>, <span class="number">8000</span>)]</span><br><span class="line">	<span class="keyword">for</span> current_id <span class="keyword">in</span> ids:</span><br><span class="line">		<span class="keyword">async</span> <span class="keyword">with</span> sem:</span><br><span class="line">			<span class="keyword">await</span> fetch_image_by_id(current_id)</span><br></pre></td></tr></table></figure>
+
+<p>接下来，将这个方法加入到asyncio的事件循环中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">event_loop = asyncio.get_event_loop()</span><br><span class="line">future = asyncio.ensure_future(fetch_all_images())</span><br><span class="line">results = event_loop.run_until_complete(future)</span><br></pre></td></tr></table></figure>
+<h1 id="使用uvloop加速"><a href="#使用uvloop加速" class="headerlink" title="使用uvloop加速"></a>使用uvloop加速</h1><p>uvloop基于libuv，libuv是一个使用C语言实现的高性能异步I/O库，uvloop用来代替asyncio默认事件循环，可以进一步加快异步I/O操作的速度。</p>
+<p>uvloop的使用非常简单，只要在获取事件循环前，调用如下方法，将asyncio的事件循环策略设置为uvloop的事件循环策略。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())</span><br></pre></td></tr></table></figure>
+
+<p>使用上面的代码，我们可以快速将大约1500张的图片爬取下来。</p>
+<p><img src="/upload/20180410_02.png" alt="爬取下来的Google Earth图片"></p>
+<h1 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h1><p>为了验证aiohttp和uvloop的性能，笔者使用requests+concurrent库实现了一个多进程版的爬虫，分别爬取20个id，消耗的时间如图。</p>
+<p><img src="/upload/20180410_03.png"></p>
+<p>可以看到，耗时相差了大概7倍，aiohttp+uvloop的组合在爬虫这种I/O密集型的场景下，可以说具有压倒性优势。相信在不远的将来，基于asyncio的库会将无数爬虫工程师从加班中拯救出来。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/03/30/python-access-control/">与面试官谈笑风生 | Python面向对象之访问控制</a>
         </h1>
 
@@ -242,47 +281,6 @@
 <p>把上面的一段话缩成一句（会显得比较厉害）：</p>
 <p><strong>区块链是用分布式数据库识别、传播和记载信息的智能化对等网络, 也称为价值互联网。</strong></p>
 <p>看到这里是不是对区块链略知一二了？</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/03/06/lru-algorithm-implemented-in-python/">面试不再怕，20行Python代码帮你搞懂LRU算法</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-03-06
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20180306_01.png"></p>
-<p>LRU算法在后端工程师面试中，是一个比较常出现的题目，这篇文章带大家一起，理解LRU算法，并最终用Python轻松实现一个基于LRU算法的缓存。</p>
-<h2 id="缓存是什么"><a href="#缓存是什么" class="headerlink" title="缓存是什么"></a>缓存是什么</h2><p><img src="/upload/20180306_02.jpg"></p>
-<p>先看一张图，当我们访问网页，浏览器会给服务器发请求，服务器会经过一系列的运算，把页面返回给浏览器。</p>
-<p><img src="/upload/20180306_03.jpg"></p>
-<p>当有多个浏览器同时访问的时候，就会在短时间内发起多个请求，而服务器对每一个请求都要进行一系列相同的操作。重复工作不仅浪费资源，还可能导致响应速度变慢。</p>
-<p><img src="/upload/20180306_04.jpg"></p>
-<p>而缓存则可以把服务器返回的页面保存下来，当有其他的浏览器再访问时候，就不必劳服务器大驾，直接由缓存返回页面。为了保证响应速度，缓存通常是基于比较昂贵的硬件，比如RAM，这就决定了我们很难用大量的缓存把所有的页面都存下来，当恰好没有缓存浏览器请求的页面时，依然需要请求服务器。由于缓存容量有限，而数据量无限（互联网每天新产生的页面数无法估计），就需要把好刚用在刀刃上，缓存那些最有用的信息。</p>
-<h2 id="LRU是什么"><a href="#LRU是什么" class="headerlink" title="LRU是什么"></a>LRU是什么</h2><p>LRU是一种缓存淘汰算法（在OS中也叫内存换页算法），由于缓存空间是有限的，所以要淘汰缓存中不常用的数据，留下常用的数据，达到缓存效率的最大化。LRU就是这样一种决定“淘汰谁留下谁”的算法，LRU是Least recently used的缩写，从字面意思“最近最少使用”，我们就可以理解LRU的淘汰规则。</p>
-<h2 id="LRU的淘汰逻辑"><a href="#LRU的淘汰逻辑" class="headerlink" title="LRU的淘汰逻辑"></a>LRU的淘汰逻辑</h2><p><img src="/upload/20180306_05.png"></p>
-<p>我们用一张图来描述LRU的淘汰逻辑，图中的缓存是一个列表结构，上面是头结点下面是尾节点，缓存容量为8（8个小格子）：</p>
-<ul>
-<li>有新数据（意味着数据之前没有被缓存过）时，加入到列表头</li>
-<li>缓存到达最大容量时，需要淘汰数据多出来的数据，此时淘汰列表尾部的数据</li>
-<li>当缓存中有数据被命中，则将数据移动到列表头部（相当于新加入缓存）</li>
-</ul>
-<p>按上面的逻辑我们可以看到，一个数据如果经常被访问就会不断地被移动到列表头部，不会被淘汰出缓存，而越不经常访问的数据，越容易被挤出缓存。</p>
-<h2 id="20行Python代码实践LRU"><a href="#20行Python代码实践LRU" class="headerlink" title="20行Python代码实践LRU"></a>20行Python代码实践LRU</h2><p>接下来我们用Python来实现一个采用LRU算法的缓存。</p>
-<p>从前面的文章中我们可以知道，缓存简化下来就两个功能，一个是往里装数据（缓存数据），一个是往外吐数据（命中缓存），所以我们的缓存对外只需要put和get两个接口就可以了。</p>
-<p>按照前面的示意图，缓存内部我们只需要有一个列表（list）就可以实现LRU逻辑，不过用列表虽然能实现逻辑，但是在判断是否命中缓存时，速度可能非常慢（列表需要遍历才能知道数据有没有在里面）。在Python中，我们可以用基于hash的结构，比如字典（dict）或集合（set），来快速判断数据是否存在，解决列表实现的性能问题。但是字典和集合又是没有顺序的，如果能有一种既能排序，又是基于hash存储的数据结构，就好了。</p>
-<p>在Python的collections包中，已经内置了这种实用的结构OrderedDict，OrderedDict是dict的子类，但是存储在内部的元素是有序的（列表的特点）。</p>
-<p>解决了数据结构的问题，我们可以直接上手写逻辑了，代码如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity</span>):</span></span><br><span class="line">        self.capacity = capacity</span><br><span class="line">        self.queue = collections.OrderedDict()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key</span>):</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.queue:</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span> // 要找的数据不在缓存中返回-<span class="number">1</span></span><br><span class="line">        value = self.queue.pop(key) // 将命中缓存的数据移除</span><br><span class="line">        self.queue[key] = value // 将命中缓存的数据重新添加到头部</span><br><span class="line">        <span class="keyword">return</span> self.queue[key]</span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key, value</span>):</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.queue: // 如果已经在缓存中，则先移除老的数据</span><br><span class="line">            self.queue.pop(key)</span><br><span class="line">        <span class="keyword">elif</span> <span class="built_in">len</span>(self.queue.items()) == self.capacity:</span><br><span class="line">            self.queue.popitem(last=<span class="literal">False</span>) // 如果不在缓存中并且到达最大容量，则把最后的数据淘汰</span><br><span class="line">        self.queue[key] = value // 将新数据添加到头部</span><br></pre></td></tr></table></figure>
-
-<p>下次面试在遇到LRU的题目，是不是就胸有成竹了？</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/8/">
