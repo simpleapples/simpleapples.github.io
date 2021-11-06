@@ -1,3 +1,11 @@
+---
+layout: post
+title: Python跨服务传递作用域的坑
+date: 2021-11-06 08:25
+comments: true
+categories: Python
+---
+
 # 背景
 
 在一个古老的系统中，有这样一段代码：
