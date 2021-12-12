@@ -98,6 +98,27 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/">Air SDK和Flex SDK的区别</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2014-03-27
+        </span><span class="post-category">
+            <a href="/categories/Actionscript/">Actionscript</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>最近将AS开发的SDK从Flex SDK 4.9.1升级到了Air SDK 4.0，导致之前写的一个FLV播放器不能播放视频了，最后发现bug是一个方法内的变量名和类中的一个get方法重名了。类似下图中所示情况：</p>
+<p><img src="/upload/air-and-flex-sdk.png" alt="Alt text"></p>
+<p>图中变量time和get方法time重名，而编译器对这种重名的处理在Flex SDK和Air SDK下是不一样的。</p>
+<p>Flex SDK下，会根据上下文将<code>var time:int = time;</code>中的第二个time作为get方法，而Air SDK中，这行两个time会被当作同一个变量，也就是自己等于自己，而int类型定义时候会被初始化为0，所以使用Air SDK输出结果为0，使用Flex SDK输出结果为1000。</p>
+<p>看来Air SDK不如Flex SDK智能啊 :)</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2014/02/27/install-flash-builder-plugin-for-eclipse-kepler/">Eclipse 4.3安装Flash Builder Plugin</a>
         </h1>
 
@@ -191,31 +212,6 @@
 <p><img src="/upload/googledoodle1.jpg" alt="Alt text"></p>
 <p>本以为这是一个很高的分数了，可上微博一查竟然有不少180分以上的，并且180分以上有彩蛋，这不能忍，于是又是一通刷，不过一直没能达到173以上。<br>无奈之下，想从程序上下手。既然是JS游戏，理论上只要修改可以打的次数，就能提高分数。<br>去Google首页找JS文件，很容易发现一个<a target="_blank" rel="noopener" href="https://www.google.com.hk/logos/2013/bday13/bday13.js">https://www.google.com.hk/logos/2013/bday13/bday13.js</a>文件，在这里查找数字10，可以发现很多搜索结果，经过直觉判断，感觉<code>bd=10</code>这个赋值比较可疑，于是改之。刷新，成功！<br>下面是改为99次之后的分数：</p>
 <p><img src="/upload/googledoodle2.png" alt="Alt text"></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/">升级到Flex SDK 4.9.1后无法找到基类BitmapAsset的问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-08-27
-        </span><span class="post-category">
-            <a href="/categories/Actionscript/">Actionscript</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>一个使用flex sdk编译的项目在升级sdk到4.9.1后出现了如下错误：</p>
-<blockquote>
-<p>errors: 1017: The definition of base class BitmapAsset was not found.</p>
-</blockquote>
-<p>google后发现也有人遇到了这样的问题，详见：<a target="_blank" rel="noopener" href="http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E">http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E</a></p>
-<p>flex sdk 4.9中的core.swc的体积比4.8中core.swc的体积小了大概1/2，估计部分基类被从core.swc中移了出来，导致找不到BitmapAsset。</p>
-<p>解决办法是，在项目上单击右键——属性——Actionscript构建路径——添加SWC，定位到sdk安装路径下的framework/libs文件夹下，选择framework.swc。</p>
-<p>如果展开framework.swc包，可以看到BitmapAsset类，所以将其添加到构建路径中，就可以解决找不到基类的问题。</p>
-<p><img src="/upload/frameworkswc.png" alt="Alt text"></p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/11/">

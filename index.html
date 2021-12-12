@@ -98,6 +98,50 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2021/12/12/go-project-with-clean-architecture/">基于Clean Architecture的Go项目架构实践</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2021-12-12
+        </span><span class="post-category">
+            <a href="/categories/Golang/">Golang</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>经过这些年的发展，Go语言已经成为一门被广泛使用在各个领域的编程语言。从k8s、docker等基础组件，到业务领域的微服务，都可以用Go构建。在构建这些Go项目时，采用哪种架构模式和代码布局，是一个仁者见仁智者见智的事情。有Java Spring经验的可能会采用MVC模式，有Python Flask经验的可能会采用MTV模式。加上Go语言领域并没有出现主流的企业级开发框架，很多项目甚至没有明确的架构模式。</p>
+<h1 id="Clean-Architecture"><a href="#Clean-Architecture" class="headerlink" title="Clean Architecture"></a>Clean Architecture</h1><p><img src="/upload/20211212_01.png"></p>
+<p>Clean Architecture是Uncle Bob提出的适用于复杂业务系统的架构模式，其核心思想是将业务复杂度与技术复杂度解藕，相比于MVC、MTV等模式，Clean Architecture除了进行分层，还通过约定依赖原则，明确了与外部依赖的交互方式，以及外部依赖与业务逻辑的边界。感兴趣的朋友可以直接阅读作者原文<a target="_blank" rel="noopener" href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html</a>。</p>
+<p>由于Clean Architecture具有脱离语言和框架的灵活性，作者在提出时也没有规定实现细节，给Clean Architecture的落地带来了困难，接下来以一个例子来说明如何在Go项目中应用Clean Architecture的思想。</p>
+<h1 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h1><p>作为一个Go项目，不管用哪种架构模式，建议都建立app和scripts这两个路径。app存放启动Go项目的入口文件，通常是main.go。而scripts可以放一些构建和部署时候用到的脚本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">clean_architecture_demo</span><br><span class="line">├── README.md</span><br><span class="line">├── app</span><br><span class="line">│   └── main.go</span><br><span class="line">├── scripts</span><br><span class="line">│   ├── build.sh</span><br><span class="line">│   └── run.sh</span><br><span class="line">├── go.mod</span><br><span class="line">├── go.sum</span><br><span class="line">└── usecases</span><br></pre></td></tr></table></figure>
+
+<p>接下来是代码部分，分为entities、usecases、adapters三个部分。</p>
+<ul>
+<li>entities：存储领域实体。用一个博客系统举例，领域实体可能有用户（user）和文章（article）</li>
+<li>usecases：存储业务逻辑。用博客系统举例，可能会有用户相关的业务逻辑（signup_user、signin_user、add_user、delete_user)和文章相关的业务逻辑（add_article、show_article、delete_article）</li>
+<li>adapters：存储适配器逻辑。适配器是连接业务逻辑与外部依赖的层，博客以Web形式提供服务，就需要一个http_adapter来封装Web服务；同时保存文章到数据库，需要封装一个db_adapter来连接。</li>
+</ul>
+<p>下面是项目的布局结构。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">clean_architecture_demo</span><br><span class="line">├── README.md</span><br><span class="line">├── adapters</span><br><span class="line">│   ├── api</span><br><span class="line">│   ├── db</span><br><span class="line">│   └── log</span><br><span class="line">├── app</span><br><span class="line">│   └── main.go</span><br><span class="line">├── scripts</span><br><span class="line">│   ├── build.sh</span><br><span class="line">│   └── run.sh</span><br><span class="line">├── entities</span><br><span class="line">│   ├── article.go</span><br><span class="line">│   └── user.go</span><br><span class="line">├── go.mod</span><br><span class="line">├── go.<span class="built_in">sum</span></span><br><span class="line">└── usecases</span><br></pre></td></tr></table></figure>
+
+<h1 id="数据流向"><a href="#数据流向" class="headerlink" title="数据流向"></a>数据流向</h1><p>用一个查询文章的请求来描述一下调用链路。</p>
+<ul>
+<li>用户通过HTTP服务的调用WebAdapter的ShowArticleHandler方法</li>
+<li>由于是文章相关的逻辑，ShowArticleHandler调用ArticleUsecase的ShowArticle方法</li>
+<li>需要从DB中查询文章，ArticleUsecase会调用DBAdapter的GetArticle方法</li>
+<li>DBAdapter的GetArticle从MySQL中查询出文章内容返回给ArticleUsecase</li>
+<li>ArticleUsecase返回给WebAdapter</li>
+<li>WebAdapter通过HTTP服务返回给用户</li>
+</ul>
+<p><img src="/upload/20211212_02.png"></p>
+<h1 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h1><p>为了更清晰的说分层和架构，我在Github上发布了一个示例项目，感兴趣的朋友可以直接去看源码：<a target="_blank" rel="noopener" href="https://github.com/simpleapples/go-clean-architecture">https://github.com/simpleapples/go-clean-architecture</a></p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>由于Clean Architecture没有规定实现细节，所以上述的分层和布局方式只是一种参考，还有众多的实践方式。例如Adapter层可以根据外部依赖的类型细分成平行的Presenter+Gateway层，在复杂项目中，更细致的分层可以把代码拆的更细致，大家可以根据自己的项目规模来调整分层和布局，这里就不做赘述了。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2021/11/06/python-cross-scope-issue/">Python跨服务传递作用域的坑</a>
         </h1>
 
@@ -315,46 +359,6 @@
 </ul>
 <h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/26372511/mysql-mariadb-order-by-inside-subquery">https://stackoverflow.com/questions/26372511/mysql-mariadb-order-by-inside-subquery</a></p>
 <p><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/why-is-order-by-in-a-from-subquery-ignored/">https://mariadb.com/kb/en/why-is-order-by-in-a-from-subquery-ignored/</a></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2020/06/30/one-click-setting-proxy-for-wsl2/">为 WSL2 一键设置代理</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2020-06-30
-        </span><span class="post-category">
-            <a href="/categories/DevOps/">DevOps</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>在 WSL2 环境中 clone 一个很大的 git 项目，不走代理速度很慢，所以研究了一下怎么让 WSL2 走 Windows 的代理客户端。</p>
-<h3 id="WSL1-和-WSL2-网络的区别"><a href="#WSL1-和-WSL2-网络的区别" class="headerlink" title="WSL1 和 WSL2 网络的区别"></a>WSL1 和 WSL2 网络的区别</h3><p>在 WSL1 时代，由于 Linux 子系统和 Windows 共享了网络端口，所以访问 Windows 的代理非常简单。例如 Windows 的代理客户端监听了 8000 端口，那么只需要在 Linux 子系统中执行如下命令，就可以让当前 session 中的请求通过代理访问互联网。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> ALL_PROXY=<span class="string">&quot;http://127.0.0.1:8000&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>但是 WSL2 基于 Hyper-V 运行，导致 Linux 子系统和 Windows 在网络上是两台各自独立的机器，从 Linux 子系统访问 Windows 首先需要找到 Windows 的 IP。</p>
-<h3 id="配置-WSL2-访问-Windows-上的代理"><a href="#配置-WSL2-访问-Windows-上的代理" class="headerlink" title="配置 WSL2 访问 Windows 上的代理"></a>配置 WSL2 访问 Windows 上的代理</h3><p>有两个关键步骤：</p>
-<ol>
-<li>WSL2 中配置的代理要指向 Windows 的 IP；</li>
-<li>Windows 上的代理客户端需要允许来自本地局域网的请求；</li>
-</ol>
-<p>由于 Linux 子系统也是通过 Windows 访问网络，所以 Linux 子系统中的网关指向的是 Windows，DNS 服务器指向的也是 Windows，基于这两个特性，我们可以将 Windows 的 IP 读取出来。</p>
-<p>例如，在 Ubuntu 子系统中，通过 <code>cat /etc/resolv.conf</code> 查看 DNS 服务器 IP。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># This file was automatically generated by WSL. To stop </span></span><br><span class="line">automatic generation of this file, add the following entry to /etc/wsl.conf:<span class="comment"># [network]# generateResolvConf = falsenameserver 172.19.80.1</span></span><br></pre></td></tr></table></figure>
-
-<p>可以看到 DNS 服务器是 <code>172.19.80.1</code>，通过环境变量 <code>ALL_PROXY</code> 配置代理：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> ALL_PROXY=<span class="string">&quot;http://172.19.80.1:7890&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>7890 是 Windows 上运行的代理客户端的端口，记得要在 Windows 代理客户端上配置允许本地局域网请求。</p>
-<p><img src="/upload/20200630_01.jpg"></p>
-<h3 id="一键配置脚本"><a href="#一键配置脚本" class="headerlink" title="一键配置脚本"></a>一键配置脚本</h3><p>将上面的过程写入一个 bash 脚本，可以轻松的实现一键配置代理：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">host_ip=$(cat /etc/resolv.conf |grep <span class="string">&quot;nameserver&quot;</span> |cut -f 2 -d <span class="string">&quot; &quot;</span>)</span><br><span class="line"><span class="built_in">export</span> ALL_PROXY=<span class="string">&quot;http://<span class="variable">$host_ip</span>:7890&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>脚本通过 <code>cat /etc/resolv.conf</code> 来获取 DNS 服务器，也就是 Windows 的 IP，再将其中的 IP 部分截取出来，加上代理客户端的端口（我的是 7890，可以根据自己实际情况修改），使用 export 写入环境变量中。</p>
-<p>脚本也可以从这里下载<a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/simpleapples/dotfiles/master/.proxyrc">.proxyrc</a>，使用时只需要 <code>source .proxyrc</code> 就可以生效。</p>
 
         </div></article>
       <nav class="pagination"><a class="next" href="/page/2/">

@@ -98,6 +98,198 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/06/11/things-you-dont-know-about-python/">你所不知道的Python | 字符串格式化的演进之路</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-06-11
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180611_01.jpg"></p>
+<p>字符串格式化对于每个语言来说都是一个非常基础和常用的功能，学习Python的同学大概都知道可以用%语法来格式化字符串。然而为了让我们更方便的使用这个常用功能，语言本身也在对字符串格式化方法进行迭代。</p>
+<h1 id="Python-2-6以前：-操作符"><a href="#Python-2-6以前：-操作符" class="headerlink" title="Python 2.6以前：%操作符"></a>Python 2.6以前：%操作符</h1><p>在Python 2.6出现之前，字符串迭代只有一种方法，就是%（也是取模）操作符，%操作符支持unicode和str类型的Python字符串，效果和C语言中的sprintf()方法相似，下面是一个使用%格式化字符串的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">&quot;I&#x27;m %s. I&#x27;m %d year old&quot;</span> % (<span class="string">&#x27;Tom&#x27;</span>, <span class="number">27</span>))</span><br></pre></td></tr></table></figure>
+
+<p>%符号前面使用一个字符串作为模板，模板中有标记格式的占位符号，%后面是一个tuple或者dict，用来传递需要格式化的值。占位符控制着显示的格式，下面列表展示了占位符的种类：</p>
+<table>
+<thead>
+<tr>
+<th>占位符</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>%d</td>
+<td>十进制整数</td>
+</tr>
+<tr>
+<td>%i</td>
+<td>十进制整数</td>
+</tr>
+<tr>
+<td>%o</td>
+<td>八进制整数</td>
+</tr>
+<tr>
+<td>%u</td>
+<td>无符号整数</td>
+</tr>
+<tr>
+<td>%x</td>
+<td>无符号十六进制（小写）</td>
+</tr>
+<tr>
+<td>%X</td>
+<td>无符号十六进制（大写）</td>
+</tr>
+<tr>
+<td>%e</td>
+<td>浮点型（科学记数法，小写）</td>
+</tr>
+<tr>
+<td>%E</td>
+<td>浮点型（科学记数法，大写）</td>
+</tr>
+<tr>
+<td>%f</td>
+<td>浮点数</td>
+</tr>
+<tr>
+<td>%F</td>
+<td>浮点数</td>
+</tr>
+<tr>
+<td>%g</td>
+<td>浮点型，如果小数位数超过4位，使用科学记数法表示（小写）</td>
+</tr>
+<tr>
+<td>%G</td>
+<td>浮点型，如果小数位数超过4位，使用科学记数法表示（大写）</td>
+</tr>
+<tr>
+<td>%c</td>
+<td>单个字符</td>
+</tr>
+<tr>
+<td>%r</td>
+<td>字符串（调用repr()方法生成）</td>
+</tr>
+<tr>
+<td>%s</td>
+<td>字符串（调用str()方法生成）</td>
+</tr>
+</tbody></table>
+<p>除了对数据类型的指定，%操作符还支持更复杂的格式控制：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%<span class="selector-attr">[数据名称]</span><span class="selector-attr">[对齐标志]</span><span class="selector-attr">[宽度]</span>.<span class="selector-attr">[精度]</span>类型</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据名称</td>
+<td>数据名称用于字典赋值，如果%符号后面传递的数组就不需要填写了</td>
+</tr>
+<tr>
+<td>对齐标志</td>
+<td>有+、-、0、‘ ’四种，+表示显示正负数符号，-表示左对齐，空格表示在左侧填充一个空格，0表示用0填充</td>
+</tr>
+<tr>
+<td>宽度</td>
+<td>表示格式化后的字符串长度，位数不足用0或空格补齐</td>
+</tr>
+<tr>
+<td>精度</td>
+<td>小数点后的位数</td>
+</tr>
+<tr>
+<td>类型</td>
+<td>数据类型（参考占位符种类）</td>
+</tr>
+</tbody></table>
+<p>例如print(‘%053f’ % ‘12.34’)会输出0012.340</p>
+<h1 id="Python-2-6：format函数"><a href="#Python-2-6：format函数" class="headerlink" title="Python 2.6：format函数"></a>Python 2.6：format函数</h1><p>到Python2.6时，出现了一种新的字符串格式化方式，str.format()函数，相比于%操作符，format函数使用{}和:代替了%，威力更加强大，在映射关系方面，format函数支持位置映射、关键字映射、对象属性映射、下标映射等多种方式，不仅参数可以不按顺序，也可以不用参数或者一个参数使用多次，下面通过几个例子来说明。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#123;1&#125; &#123;0&#125;&#x27;</span>.<span class="built_in">format</span>(<span class="string">&#x27;abc&#x27;</span>, <span class="number">123</span>)  <span class="comment"># 可以不按顺序进行位置映射，输出&#x27;123 abc&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#123;&#125; &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(<span class="string">&#x27;abc&#x27;</span>, <span class="number">123</span>)  <span class="comment"># 可以不指定参数名称，输出&#x27;abc 123&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#123;1&#125; &#123;0&#125; &#123;1&#125;&#x27;</span>.<span class="built_in">format</span>(<span class="string">&#x27;abc&#x27;</span>, <span class="number">123</span>)  <span class="comment"># 参数可以使用多次，输出&#x27;123 abc 123&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#123;name&#125; &#123;age&#125;&#x27;</span>.<span class="built_in">format</span>(name=<span class="string">&#x27;tom&#x27;</span>, age=<span class="number">27</span>)  <span class="comment"># 可以按关键字映射，输出&#x27;tom 27&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#123;person.name&#125; &#123;person.age&#125;&#x27;</span>.<span class="built_in">format</span>(person=person)  <span class="comment"># 可以按对象属性映射，输出&#x27;tom 27&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#123;0[1]&#125; &#123;0[0]&#125;&#x27;</span>.<span class="built_in">format</span>(lst)  <span class="comment"># 通过下标映射</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，format函数比%操作符使用起来更加方便，不需要记住太多各种占位符代表的意义，代码可读性也更高。在复杂格式控制方面，format函数也提供了更加强大的控制方式：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[填充字符]对齐方式][符号标志][#][宽度][,][.精度][类型]</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#123;:S^+#016,.2f&#125;&#x27;</span>.format(<span class="number">1234</span>)  <span class="meta"># 输出<span class="string">&#x27;SSS+1,234.00SSSS&#x27;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>我们以上面的代码为例，通过表格说明一下format格式控制参数：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th>说明</th>
+<th>示例说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">填充字符</td>
+<td>不填时默认用空格填充</td>
+<td>S表示用S填充</td>
+</tr>
+<tr>
+<td align="left">对齐方式</td>
+<td>^表示居中对齐、&lt;表示左对齐、&gt;表示右对齐</td>
+<td>^表示居中对齐，左右位数不足部分会用填充字符填充</td>
+</tr>
+<tr>
+<td align="left">符号标志</td>
+<td>+表示有符号（正数前显示+，负数前显示-），空格表示整数前加一个空格以和负数对齐</td>
+<td>+表示正数前显示空格</td>
+</tr>
+<tr>
+<td align="left">#</td>
+<td>表示是否在二进制、八进制、十六进制前显示0b、0o、0x等符号</td>
+<td>#表示显示进制符号，由于是十进制，所以不显示</td>
+</tr>
+<tr>
+<td align="left">宽度</td>
+<td>表示输出字符串的宽度</td>
+<td>16表示字符串宽度为16，不足部分会补齐</td>
+</tr>
+<tr>
+<td align="left">,</td>
+<td>表示使用,作为千位分隔符</td>
+<td>,表示使用千位分隔符</td>
+</tr>
+<tr>
+<td align="left">精度</td>
+<td>表示小数点后数字位数</td>
+<td>.2表示精度为2为</td>
+</tr>
+<tr>
+<td align="left">类型</td>
+<td>s表示字符串类型，c表示字符类型，b\o\d分别表示二八十进制，x\X表示小写和大写十六进制，e\E表示小写和大写的科学记数法，f表示浮点型</td>
+<td>f表示浮点型数字</td>
+</tr>
+</tbody></table>
+<p>可以看到format函数在%基础上丰富了格式控制种类，并且使输出更容易。</p>
+<h1 id="Python-3-6：f-string"><a href="#Python-3-6：f-string" class="headerlink" title="Python 3.6：f-string"></a>Python 3.6：f-string</h1><p>不少使用过ES6的小伙伴会知道其中的模板字符串，采用直接在字符串中内嵌变量的方式进行字符串格式化操作，Python在3.6版本中也为我们带来了类似的功能：Formatted String Literals（字面量格式化字符串），简称f-string。</p>
+<p>f-string就是以f’’开头的字符串，类似u’’和b’’，字符串内容和format方法中的格式一样，但是可以直接将变量带入到字符串中，可读性进一步增加，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">amount = <span class="number">1234</span></span><br><span class="line"><span class="string">f&#x27;请转账给我<span class="subst">&#123;amount:,<span class="number">.2</span>f&#125;</span>元&#x27;</span>  <span class="comment"># &#x27;请转账给我1,234.00元&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>同时，f-string的性能是比%和format都有提升的，我们做一个简单的测试，分别使用%操作符、format和f-string将下面语句执行10000次：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;My name is %s and i&#x27;</span>m %s years old.<span class="string">&#x27; % (name, age)</span></span><br><span class="line"><span class="string">&#x27;</span>My name <span class="keyword">is</span> &#123;&#125; <span class="keyword">and</span> i<span class="string">&#x27;m &#123;&#125; years old.&#x27;</span>.<span class="built_in">format</span>(name, age)</span><br><span class="line"><span class="string">f&#x27;My name is <span class="subst">&#123;name&#125;</span> and i&#x27;</span>m &#123;age&#125; years old.<span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>用时结果如下：</p>
+<p><img src="/upload/20180611_02.png"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>如果你的项目使用的Python版本已经提升到3.6，f-string格式化是首选方式，不仅在保持功能强大的同时语义上更容易理解，而且性能也有较大的提升。如果项目还没有提升到3.6或者使用的2.7，更建议使用format，虽然性能上没有优势，但是语义上还是比%操作符更加便于理解的，功能也更加强大。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/05/31/python-cheat-sheet/">初学者必备 | Python Cheat Sheet 中文版</a>
         </h1>
 
@@ -294,53 +486,6 @@
 <h1 id="开箱即用"><a href="#开箱即用" class="headerlink" title="开箱即用"></a>开箱即用</h1><p>笔者已经把上面的代码封装成了一个库发布到了PyPI，想直接用的朋友可以使用<code>pip install flask-wtf-decorators</code>安装，项目源码也已经发布到Github。</p>
 <p><a target="_blank" rel="noopener" href="https://pypi.org/project/Flask-WTF-Decorators/">查看PyPI</a></p>
 <p><a target="_blank" rel="noopener" href="https://github.com/simpleapples/flask-wtf-decorators">查看Github</a></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/04/22/python-parameter-passing/">Python参数传递，既不是传值也不是传引用</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-04-22
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20180422_01.png"></p>
-<p>面试的时候，有没有被问到Python传参是传引用还是传值这种问题？有没有听到过Python传参既不是传值也不是传引用这种说法？一个小小的参数默认值也可能让代码出现难以查找的bug？</p>
-<p>如果你也遇到过上面的问题，不妨我们来探究下Python函数传递的种种。</p>
-<h1 id="万物皆对象"><a href="#万物皆对象" class="headerlink" title="万物皆对象"></a>万物皆对象</h1><p>Python中有一个非常重要的概念——万物皆对象，无论是一个数字、字符串，还是数组、字典，在Python中都会以一个对象的形式存在。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">123</span></span><br></pre></td></tr></table></figure>
-
-<p>对于上面这行代码，在Python看来就是创建一个PyObject对象，值为123，然后定义一个指针a，a指向这个PyObject对象。</p>
-<h1 id="可变对象和不可变对象"><a href="#可变对象和不可变对象" class="headerlink" title="可变对象和不可变对象"></a>可变对象和不可变对象</h1><p>Python中的对象分为两种类型，可变对象和不可变对象，不可变对象指tuple、str、int等类型的对象，可变对象指的是dict、list、自定义对象等类型的对象，我们用一段代码说明他们的区别。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 2587116690248</span></span><br><span class="line">a += [<span class="number">4</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(a)) <span class="comment"># 2587116690248</span></span><br><span class="line"></span><br><span class="line">b = <span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(b)) <span class="comment"># 2006430784</span></span><br><span class="line">b += <span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(b)) <span class="comment"># 2006430816</span></span><br></pre></td></tr></table></figure>
-
-<p>上面代码中我们分别定义了一个可变对象和一个不可变对象，并且对他们进行修改，打印修改前后的对象标识可以发现，对可变对象进行修改，变量对其引用不会发生变化，对不可变对象进行修改，变量引用发生了变化。</p>
-<p><img src="/upload/20180422_02.png" alt="可变对象的引用"></p>
-<p>上图是一个可变对象，当修改对象时，例如删除数组中的一个元素，实际上把其中一个元素从对象中移除，对象本身的标识是不发生变化的。</p>
-<p><img src="/upload/20180422_03.png" alt="不可变对象的引用"></p>
-<p>改变一个不可变对象时，例如给一个int型加2，语法上看上去是直接修改了i这个对象，但是如前面所说，i只是一个指向对象73的一个变量，Python会将这个变量指向的对象加2后，生成一个新的对象，然后再让i指向这个新的对象。</p>
-<h1 id="参数传递时的表现"><a href="#参数传递时的表现" class="headerlink" title="参数传递时的表现"></a>参数传递时的表现</h1><p>了解了对象的原理后，我们就可以来尝试理解一下参数传递时他们的不同表现了。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 1437494204232</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mutable</span>(<span class="params">a</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 1437494204232</span></span><br><span class="line">	a += [<span class="number">4</span>]</span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 1437494204232</span></span><br><span class="line">mutable(a)</span><br><span class="line"></span><br><span class="line">b = <span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(b))  <span class="comment"># 2006430784</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">immutable</span>(<span class="params">b</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(b))  <span class="comment"># 2006430784</span></span><br><span class="line">	b += <span class="number">1</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(b))  <span class="comment"># 2006430816</span></span><br><span class="line">immutable(b)</span><br></pre></td></tr></table></figure>
-
-<p>通过上面的代码可以看出，修改传进的可变参数时，会对外部对象产生影响，修改不可变参数时则不会影响。</p>
-<p><strong>概括地说，Python参数传递时，既不是传对象也不是传引用，之所以会有上述的区别，跟Python的对象机制有关，参数传递只是给对象绑定了一个新的变量（实际上是传递C中的指针）。</strong></p>
-<h1 id="参数传递时的坑"><a href="#参数传递时的坑" class="headerlink" title="参数传递时的坑"></a>参数传递时的坑</h1><p>理解了参数传递的逻辑，我们需要注意一下这种逻辑可能引发的问题。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>(<span class="params">b=[]</span>):</span></span><br><span class="line">	b += [<span class="number">1</span>]</span><br><span class="line">	<span class="built_in">print</span>(b)</span><br><span class="line"></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1, 1]</span></span><br><span class="line">test()  <span class="comment"># [1, 1, 1]</span></span><br></pre></td></tr></table></figure>
-
-<p>上面的代码的输出，按照可变对象传参的逻辑，应该每次调用都输出[1]才对，而实际输出看上去好像默认参数好像只生效了一次。原因在于Python的函数也是对象（万物皆对象），这个对象只初始化一次，加上参数又是不可变对象，所以每次调用实际上都修改的是一个对象。</p>
-<p>解决这个问题，推荐再参数传递可变对象时，默认值设置为None，在函数内部对None进行判断后再赋予默认值。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>(<span class="params">b=<span class="literal">None</span></span>):</span></span><br><span class="line">	b = b <span class="keyword">or</span> []</span><br><span class="line">	b += [<span class="number">1</span>]</span><br><span class="line">	<span class="built_in">print</span>(b)</span><br><span class="line"></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br></pre></td></tr></table></figure>
-
-<p>再看一段代码。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">i = <span class="number">1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>(<span class="params">a=i</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line"></span><br><span class="line">i = <span class="number">2</span></span><br><span class="line">test()  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
-
-<p>由于参数默认值是在函数定义时而不是函数执行时确定的，所以这段代码test方法的参数默认值时1而不是2。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/7/">

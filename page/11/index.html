@@ -98,6 +98,44 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/">在viewDidAppear中PushViewController失败的问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-03-13
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>需要在ViewController(FirstViewController)的viewDidAppear中Push另一个ViewController()SecondViewController)，于是使用如下代码：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+&#123;
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    [self.navigationController pushViewController:secondViewController animated:YES];
+&#125;
+</code></pre>
+<p>在iOS8中，这段代码工作良好，当FirstViewController出现时，由于立刻Push了SecondViewController，即使animated参数是YES，Push的动画都没有显示出来。但是在iOS7中却出现了不一样的情况，pushViewController方法似乎没有执行，SecondViewController也没有被推出。打断点可以发现pushViewController方法是被执行了的，但是界面上没有任何效果。</p>
+<p>由于pushViewController方法是在viewDidAppear中被调用的，会不会是因为viewDidAppear时FirstViewController还有什么UI上的动作没有处理完，导致立即调用pushViewController失败？那么将pushViewController放入dispatch_async中应该就能解决这个问题。使用如下代码实现：</p>
+<pre><code>- (void)viewDidAppear:(BOOL)animated 
+&#123;
+    [super viewDidAppear:animated];
+
+    UIViewController *secondViewController = [self.storyboard instantiateViewControllerWithIdentifier:@&quot;secondViewController&quot;];
+    dispatch_async(dispatch_get_main_queue(), ^&#123;
+        [self.navigationController pushViewController:secondViewController animated:YES];
+       &#125;);
+&#125;
+</code></pre>
+<p>使用GCD后，SecondViewController被成功的Push了出来。虽然不能确定，但是也在一定程度上印证了上面的猜测。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2014/10/30/beta-testing-with-testflight/">使用TestFlight进行应用的Beta测试</a>
         </h1>
 
@@ -223,27 +261,6 @@
 <p>苹果可能考虑到一些应用注册提醒可能只是为了获取deviceToken，所以将获取deviceToken单独提成一个方法，而要接收推送还需要单独调用别的方法，这样就细化了逻辑，方便不用的开发需求。不过在真机调试中，一台刚重置过的搭载iOS8系统的iPhone5c，调用registerForRemoteNotifications方法后，并没有收到任何失败或成功的回调，和Apple文档中描述的不符，怀疑是SDK在这部分也有bug。</p>
 <p>下面贴一下兼容iOS7和iOS8的注册推送代码：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IS_OS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0)</span></span><br><span class="line"><span class="keyword">if</span> (IS_OS_8_OR_LATER) &#123;</span><br><span class="line">    [[<span class="built_in">UIApplication</span> sharedApplication] registerForRemoteNotifications];</span><br><span class="line">    <span class="built_in">UIUserNotificationSettings</span> *settings = [<span class="built_in">UIUserNotificationSettings</span> settingsForTypes: (<span class="built_in">UIRemoteNotificationTypeBadge</span> | <span class="built_in">UIRemoteNotificationTypeAlert</span> | <span class="built_in">UIRemoteNotificationTypeSound</span>) categories:<span class="literal">nil</span>];</span><br><span class="line">    [[<span class="built_in">UIApplication</span> sharedApplication] registerUserNotificationSettings:settings];</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    [application registerForRemoteNotificationTypes:</span><br><span class="line">     <span class="built_in">UIRemoteNotificationTypeBadge</span> |</span><br><span class="line">     <span class="built_in">UIRemoteNotificationTypeAlert</span> |</span><br><span class="line">     <span class="built_in">UIRemoteNotificationTypeSound</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/">Air SDK和Flex SDK的区别</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2014-03-27
-        </span><span class="post-category">
-            <a href="/categories/Actionscript/">Actionscript</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>最近将AS开发的SDK从Flex SDK 4.9.1升级到了Air SDK 4.0，导致之前写的一个FLV播放器不能播放视频了，最后发现bug是一个方法内的变量名和类中的一个get方法重名了。类似下图中所示情况：</p>
-<p><img src="/upload/air-and-flex-sdk.png" alt="Alt text"></p>
-<p>图中变量time和get方法time重名，而编译器对这种重名的处理在Flex SDK和Air SDK下是不一样的。</p>
-<p>Flex SDK下，会根据上下文将<code>var time:int = time;</code>中的第二个time作为get方法，而Air SDK中，这行两个time会被当作同一个变量，也就是自己等于自己，而int类型定义时候会被初始化为0，所以使用Air SDK输出结果为0，使用Flex SDK输出结果为1000。</p>
-<p>看来Air SDK不如Flex SDK智能啊 :)</p>
-
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/10/">
         <i class="iconfont icon-left"></i>

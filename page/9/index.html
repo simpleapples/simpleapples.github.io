@@ -98,6 +98,53 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/04/22/python-parameter-passing/">Python参数传递，既不是传值也不是传引用</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-04-22
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180422_01.png"></p>
+<p>面试的时候，有没有被问到Python传参是传引用还是传值这种问题？有没有听到过Python传参既不是传值也不是传引用这种说法？一个小小的参数默认值也可能让代码出现难以查找的bug？</p>
+<p>如果你也遇到过上面的问题，不妨我们来探究下Python函数传递的种种。</p>
+<h1 id="万物皆对象"><a href="#万物皆对象" class="headerlink" title="万物皆对象"></a>万物皆对象</h1><p>Python中有一个非常重要的概念——万物皆对象，无论是一个数字、字符串，还是数组、字典，在Python中都会以一个对象的形式存在。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">123</span></span><br></pre></td></tr></table></figure>
+
+<p>对于上面这行代码，在Python看来就是创建一个PyObject对象，值为123，然后定义一个指针a，a指向这个PyObject对象。</p>
+<h1 id="可变对象和不可变对象"><a href="#可变对象和不可变对象" class="headerlink" title="可变对象和不可变对象"></a>可变对象和不可变对象</h1><p>Python中的对象分为两种类型，可变对象和不可变对象，不可变对象指tuple、str、int等类型的对象，可变对象指的是dict、list、自定义对象等类型的对象，我们用一段代码说明他们的区别。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 2587116690248</span></span><br><span class="line">a += [<span class="number">4</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(a)) <span class="comment"># 2587116690248</span></span><br><span class="line"></span><br><span class="line">b = <span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(b)) <span class="comment"># 2006430784</span></span><br><span class="line">b += <span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(b)) <span class="comment"># 2006430816</span></span><br></pre></td></tr></table></figure>
+
+<p>上面代码中我们分别定义了一个可变对象和一个不可变对象，并且对他们进行修改，打印修改前后的对象标识可以发现，对可变对象进行修改，变量对其引用不会发生变化，对不可变对象进行修改，变量引用发生了变化。</p>
+<p><img src="/upload/20180422_02.png" alt="可变对象的引用"></p>
+<p>上图是一个可变对象，当修改对象时，例如删除数组中的一个元素，实际上把其中一个元素从对象中移除，对象本身的标识是不发生变化的。</p>
+<p><img src="/upload/20180422_03.png" alt="不可变对象的引用"></p>
+<p>改变一个不可变对象时，例如给一个int型加2，语法上看上去是直接修改了i这个对象，但是如前面所说，i只是一个指向对象73的一个变量，Python会将这个变量指向的对象加2后，生成一个新的对象，然后再让i指向这个新的对象。</p>
+<h1 id="参数传递时的表现"><a href="#参数传递时的表现" class="headerlink" title="参数传递时的表现"></a>参数传递时的表现</h1><p>了解了对象的原理后，我们就可以来尝试理解一下参数传递时他们的不同表现了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 1437494204232</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mutable</span>(<span class="params">a</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 1437494204232</span></span><br><span class="line">	a += [<span class="number">4</span>]</span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(a))  <span class="comment"># 1437494204232</span></span><br><span class="line">mutable(a)</span><br><span class="line"></span><br><span class="line">b = <span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(b))  <span class="comment"># 2006430784</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">immutable</span>(<span class="params">b</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(b))  <span class="comment"># 2006430784</span></span><br><span class="line">	b += <span class="number">1</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="built_in">id</span>(b))  <span class="comment"># 2006430816</span></span><br><span class="line">immutable(b)</span><br></pre></td></tr></table></figure>
+
+<p>通过上面的代码可以看出，修改传进的可变参数时，会对外部对象产生影响，修改不可变参数时则不会影响。</p>
+<p><strong>概括地说，Python参数传递时，既不是传对象也不是传引用，之所以会有上述的区别，跟Python的对象机制有关，参数传递只是给对象绑定了一个新的变量（实际上是传递C中的指针）。</strong></p>
+<h1 id="参数传递时的坑"><a href="#参数传递时的坑" class="headerlink" title="参数传递时的坑"></a>参数传递时的坑</h1><p>理解了参数传递的逻辑，我们需要注意一下这种逻辑可能引发的问题。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>(<span class="params">b=[]</span>):</span></span><br><span class="line">	b += [<span class="number">1</span>]</span><br><span class="line">	<span class="built_in">print</span>(b)</span><br><span class="line"></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1, 1]</span></span><br><span class="line">test()  <span class="comment"># [1, 1, 1]</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的代码的输出，按照可变对象传参的逻辑，应该每次调用都输出[1]才对，而实际输出看上去好像默认参数好像只生效了一次。原因在于Python的函数也是对象（万物皆对象），这个对象只初始化一次，加上参数又是不可变对象，所以每次调用实际上都修改的是一个对象。</p>
+<p>解决这个问题，推荐再参数传递可变对象时，默认值设置为None，在函数内部对None进行判断后再赋予默认值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>(<span class="params">b=<span class="literal">None</span></span>):</span></span><br><span class="line">	b = b <span class="keyword">or</span> []</span><br><span class="line">	b += [<span class="number">1</span>]</span><br><span class="line">	<span class="built_in">print</span>(b)</span><br><span class="line"></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br><span class="line">test()  <span class="comment"># [1]</span></span><br></pre></td></tr></table></figure>
+
+<p>再看一段代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">i = <span class="number">1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>(<span class="params">a=i</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(a)</span><br><span class="line"></span><br><span class="line">i = <span class="number">2</span></span><br><span class="line">test()  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
+
+<p>由于参数默认值是在函数定义时而不是函数执行时确定的，所以这段代码test方法的参数默认值时1而不是2。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/04/10/a-crawler-based-on-aiohttp-and-uvloop/">实战 | 用aiohttp和uvloop实现一个高性能爬虫</a>
         </h1>
 
@@ -241,46 +288,6 @@
 <p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
 <p>接下来看代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenBucket</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, rate, capacity</span>):</span></span><br><span class="line">        self._rate = rate</span><br><span class="line">        self._capacity = capacity</span><br><span class="line">        self._current_amount = <span class="number">0</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">consume</span>(<span class="params">self, token_amount</span>):</span></span><br><span class="line">        increment = (<span class="built_in">int</span>(time.time()) - self._last_consume_time) * self._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        self._current_amount = <span class="built_in">min</span>(</span><br><span class="line">            increment + self._current_amount, self._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; self._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line">        self._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/03/14/understanding-blockchain/">最爱你的人，会让你不费脑细胞的理解区块链原理</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-03-14
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20180314_01.png"></p>
-<p>区块链是一个近期非常火的概念，随便走进一个写字楼的电梯，都会听到有人谈论区块链，或者炒币: ) 希望通过这篇文章，能让你对区块链的概念有一个整体的认识，在理解概念后，<strong>下一篇文章将用大约300行Python代码，实现一个区块链网络。</strong></p>
-<h1 id="区块-和-链"><a href="#区块-和-链" class="headerlink" title="区块 和 链"></a>区块 和 链</h1><p>所谓区块，就是一个块咯（要不然还是什么？），把这些块一个一个连在一起，像链条一样，就称为区块链（别急着打我，先往下看）。</p>
-<p><img src="/upload/20180314_02.jpg" alt="区块和区块链"></p>
-<p>这是一些链条，链条的价值更多的体现在锁楼下小电动车的时候，不过我们再仔细看一下这个链条是不是有点像那什么？⛓</p>
-<p><img src="/upload/20180314_03.gif" alt="脱氧核糖核酸"></p>
-<p>很聪明，高中生物老师在冲你微笑！这就是传说中的脱氧核糖核酸（DNA），DNA也是一种链式结构，<strong>携带了遗传信息</strong>。区块链中的“区块”，就好比DNA分子中的脱氧核糖核苷酸（我也不知道自己在说什么），而区块链中的“链”，就好比DNA分子的链式结构。</p>
-<p>DNA和链条的价值差异，关键在于DNA携带了大量遗传<strong>信息</strong>，而链条什么都没有携带。对于区块链来说，携带信息也是它的一个重要特点（不携带信息连锁电动车的作用都没有）。</p>
-<p>当区块链携带的是账务信息的时候，它就变成了一个特别厉害的东西——账本（我们给他起了个00后的名字——比特币）。</p>
-<h1 id="Peer-to-Peer"><a href="#Peer-to-Peer" class="headerlink" title="Peer-to-Peer"></a>Peer-to-Peer</h1><p>为了显得专业一些，我们祭出比特币的创造者，中本聪的论文<a target="_blank" rel="noopener" href="https://bitcoin.org/bitcoin.pdf">《Bitcoin: A Peer-to-Peer Electronic Cash System》</a>，从这篇论文的题目我们可以看到，区块链是基于<strong>Peer-to-Peer</strong>的，下面就来了解一下什么是Peer-to-Peer。</p>
-<p>Peer-to-Peer，简称P2P（不是互联网借贷的那个P2P），它是一种点对点网络，看图（我也不知道该怎么讲）。</p>
-<p><img src="/upload/20180314_04.jpg" alt="P2P网络"></p>
-<p>图中每一个方脑袋就是一个Peer（节点），注意一下，这些方脑袋有一个共同点，他们都一毛一样（不仅长得一样，每一个脑袋都跟其它脑袋相连）。这也是P2P网络的最大特点——<strong>去中心化</strong>，P2P网络中不存在中心节点，所有节点都是平等的，任何一个节点，想跟谁说话就跟谁说话，并且谁（节点）都不能说了算。</p>
-<h1 id="共识机制"><a href="#共识机制" class="headerlink" title="共识机制"></a>共识机制</h1><p>你和好基友老王，还有你们共同喜欢的一个姑娘阿圆（对，就是圆滚滚的圆），组成了一个三节点的P2P网络，根据P2P网络定义你们三个人谁都不能说了算。这一天，阿圆生日，你和老王同时给阿圆送了一个大蛋糕，那么问题来了，阿圆先吃哪个呢？</p>
-<p>既然没有人能说了算，也不能让你和老王决斗（计算机这么做恐怕人类会毁灭），那么就需要采用一个文明的办法决定——商量。既然商量，就要有规矩，这个规矩叫<strong>共识机制</strong>。</p>
-<p><img src="/upload/20180314_05.png"></p>
-<h1 id="Proof-of-work"><a href="#Proof-of-work" class="headerlink" title="Proof-of-work"></a>Proof-of-work</h1><p>区块链共识机制有很多种，Proof-of-work（POW，工作量证明）是其中一种，所谓工作量证明，有点像是比武招亲。你和老王对阿圆都很好，阿圆也很难抉择到底先吃谁的蛋糕，于是她请了两位武力相当的武林高手，让你和老王分别与高手过招，谁赢了高手，就先吃谁的蛋糕，如果你们都赢了高手，那么谁先赢算数。</p>
-<p><img src="/upload/20180314_06.jpg"></p>
-<h1 id="把这些捏在一起"><a href="#把这些捏在一起" class="headerlink" title="把这些捏在一起"></a>把这些捏在一起</h1><p>了解了POW、共识机制、P2P、区块、链的概念，我们就可以把他们拼在一起，看看会发生什么了。</p>
-<p><img src="/upload/20180314_07.jpeg" alt="区块链诞生了！"></p>
-<p>我们把P2P网络中的每一个节点，赋予一条链，这样网络中所有的链都是平等的了，接下来在其中一条链上增加一个带有信息的区块，P2P网络会将这个区块同步到所有的链上，也就是这条信息会被存储在所有节点。</p>
-<p>把上面的一段话缩成一句（会显得比较厉害）：</p>
-<p><strong>区块链是用分布式数据库识别、传播和记载信息的智能化对等网络, 也称为价值互联网。</strong></p>
-<p>看到这里是不是对区块链略知一二了？</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/8/">

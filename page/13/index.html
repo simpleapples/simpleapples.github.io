@@ -98,6 +98,31 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/">升级到Flex SDK 4.9.1后无法找到基类BitmapAsset的问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-08-27
+        </span><span class="post-category">
+            <a href="/categories/Actionscript/">Actionscript</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>一个使用flex sdk编译的项目在升级sdk到4.9.1后出现了如下错误：</p>
+<blockquote>
+<p>errors: 1017: The definition of base class BitmapAsset was not found.</p>
+</blockquote>
+<p>google后发现也有人遇到了这样的问题，详见：<a target="_blank" rel="noopener" href="http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E">http://mail-archives.apache.org/mod_mbox/flex-dev/201303.mbox/%3CCD596C86.4E4D3%25aharui@adobe.com%3E</a></p>
+<p>flex sdk 4.9中的core.swc的体积比4.8中core.swc的体积小了大概1/2，估计部分基类被从core.swc中移了出来，导致找不到BitmapAsset。</p>
+<p>解决办法是，在项目上单击右键——属性——Actionscript构建路径——添加SWC，定位到sdk安装路径下的framework/libs文件夹下，选择framework.swc。</p>
+<p>如果展开framework.swc包，可以看到BitmapAsset类，所以将其添加到构建路径中，就可以解决找不到基类的问题。</p>
+<p><img src="/upload/frameworkswc.png" alt="Alt text"></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/08/04/actionscript-development-enviroment-on-linux/">在Linux上搭建Actionscript开发环境</a>
         </h1>
 
@@ -194,23 +219,6 @@
     return YES;
 &#125;
 </code></pre>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/04/24/actionscript3-download-manager/">AS3下载管理器</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-04-24
-        </span><span class="post-category">
-            <a href="/categories/Idea-Demo/">Idea&Demo</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>工作中需要一个应用内的全局下载管理器，于是使用AS3实现了一个。<br>使用一个数组来存储下载列表，当向列表中添加一个新的下载项时，会检查列表，如果有未下载项，则下载该项，下载完成后再次检查列表，当目前有进行中的下载时，不添加新的下载进程，以保证同时只有一个下载进程。<br>github: <a target="_blank" rel="noopener" href="https://github.com/simpleapples/AS3DownloadManager">https://github.com/simpleapples/AS3DownloadManager</a></p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/12/">

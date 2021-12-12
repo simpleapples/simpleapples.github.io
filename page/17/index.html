@@ -98,6 +98,55 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/10/22/about-prototype-and-constructor-in-javascript/">关于Javascript中constructor和prototype的一点理解</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-10-22
+        </span><span class="post-category">
+            <a href="/categories/Javascript-CSS/">Javascript&CSS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>constructor和prototype，顾名思义，是构造者（构造器）和原型的意思。  </p>
+<p>从语义的角度来看，对象A构造了对象B，则A就是B的constructor，如果对象A的形态来自对象B，则对象B是A的原型。  </p>
+<p>看一段代码：  </p>
+<pre><code>function Person() &#123;
+    Person.prototype.name = &quot;myname&quot;;
+    Person.prototype.age = 18;
+    Person.prototype.sayName = function () &#123; alert(this.name); &#125;;
+&#125;
+var person1 = new Person();
+person1.sayName();
+</code></pre>
+<p>这里Person就是Person.prototype的constructor，为什么？因为Person构造了Person.prototype。而person1的prototype不是Person.prototype。在person1初始化时，可以理解成把Person拷贝了一份（就是new了一份）扔给person1，而Person每new一次，都会从他的原形处继承（只是称为继承，方便理解）了一份name,age,sayName。person1是copy了Person，但是prototype并没有copy，所以说person1的prototype是undefined。  </p>
+<p>这里person1很容易被理解成由Person构造，这样的话person1.constructor岂不成了Person，现在就要区别一下构造和原形，构造，我们把它理解成从一个框架里建立一个对象，而原形，则是说对象的所有东西（数据）都要从原形继承过来。  </p>
+<p>再看一个函数：  </p>
+<pre><code>function Person(name, age) &#123;
+    this.name = name;
+    this.age = age;
+    this.sayName = function() &#123; alert(this.name); &#125;;
+&#125;
+var person2 = new Person( &quot;myname&quot;, 18 );
+person2.sayName();
+</code></pre>
+<p>这里的Person和上面的Person想必相比，上面的Person不光构建了一个框架，而且填上了数据，而下面的Person只构建了框架，现在就很好区别constructor和prototype了，person1从一个对象继承了数据和框架，而person2从一个对象只获取了结构（我们把这个过程理解成Person构建了person2），那么person2的构造者自然就是Person。</p>
+<p>现在应该比较容易弄清constructor和prototype的意义了。</p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>这里还有一个非常说明问题的例子：</p>
+<pre><code>var arrayTest = new Array();
+alert(arrayTest.constructor); // 为Array
+</code></pre>
+<h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>还有一个可能遇到的问题，先看代码：</p>
+<pre><code>var person3 = new Person();
+person3.prototype.name = &quot;name3&quot;;
+</code></pre>
+<p>上面的错误非常明显，person3是Person的实例，不能为实例定义原型。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/10/20/solve-removeattribute-not-be-supported/">浏览器不支持removeAttribute()的解决方法</a>
         </h1>
 
@@ -238,37 +287,13 @@ ONBOOT=&quot;yes&quot; //使设备启动
 <p>查看设备eth0是否分配到正确ip，网络是否可以ping通。</p>
 
         </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/10/19/ios-push-notification-certificate/">iOS 推送证书制作 （JAVA/PHP）</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-10-19
-        </span><span class="post-category">
-            <a href="/categories/Mobile/">Mobile</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>在使用Java或者PHP制作iOS推送服务器的时候，需要自己从开发者网站上导出的aps_developer_identity证书和Apple Development Push Services证书进行合成，生成可以供Java使用的p12证书或供PHP使用的pem证书。</p>
-<p>aps_developer_identity证书和Apple Development Push Services证书的申请过程可以参考：</p>
-<p><a target="_blank" rel="noopener" href="http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html">http://www.cnblogs.com/hubj/archive/2012/06/14/2549816.html</a></p>
-<p>本文着重讨论如何合成证书</p>
-<p>1.将aps_developer_identity.cer转换成pem</p>
-<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">$openssl</span> x509 -in aps_developer_identity.cer -inform der -out PushChatCert.pem</span></span><br></pre></td></tr></table></figure>
-<p>2.将Apple Development Push Services证书转换成pem</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$openssl pkcs12 -nocerts -out <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem -<span class="keyword">in</span> <span class="module-access"><span class="module"><span class="identifier">Push</span>.</span></span>p12</span><br></pre></td></tr></table></figure>
-<p>3.合成两个pem证书</p>
-<p>1)Java服务器所需的证书为p12格式</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$openssl pkcs12 -export -<span class="keyword">in</span> <span class="module-access"><span class="module"><span class="identifier">PushChatCert</span>.</span></span>pem -inkey <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem -out pushCert.p12 -name “apns-cert”</span><br></pre></td></tr></table></figure>
-<p>2）PHP服务器所需证书为pem格式</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$cat <span class="module-access"><span class="module"><span class="identifier">PushChatCert</span>.</span></span>pem <span class="module-access"><span class="module"><span class="identifier">PushChatKey</span>.</span></span>pem &gt; pushCert.pem</span><br></pre></td></tr></table></figure>
-        </div></article>
       <nav class="pagination"><a class="prev" href="/page/16/">
         <i class="iconfont icon-left"></i>
         <span class="prev-text">上一页</span>
+      </a>
+    <a class="next" href="/page/18/">
+        <span class="next-text">下一页</span>
+        <i class="iconfont icon-right"></i>
       </a>
     </nav></section></div></div>
       </main>

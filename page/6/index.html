@@ -98,6 +98,87 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/10/08/faster-python-part-1/">翻译 | 更快的Python（一）</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-10-08
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20181008_11.png"></p>
+<p>更快的Python（<a target="_blank" rel="noopener" href="http://pythonfasterway.org/">Python Faster Way</a>）使用代码示例来说明如何书写Python代码能带来更高的性能。本文对代码进行了讲解，从性能和可读性等角度来选择出最适合的写法。</p>
+<h3 id="例子1：字符串格式化"><a href="#例子1：字符串格式化" class="headerlink" title="例子1：字符串格式化"></a>例子1：字符串格式化</h3><p><img src="/upload/20181008_01.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.95</strong></li>
+<li>使用建议：Python 3.7或以上推荐使用f-string，其他版本推荐使用format方法。</li>
+<li>说明：字符串格式化是代码中最常遇到的情况，虽然在连接少量字符串的情景中，使用+号的性能最优，但是使用+号的代码可读性最差。如果使用Python 3.7或优以上版本，可以使用f-string来解决这个问题，f-string的性能比format方法和%操作符的性能都要高，可读性也比+号好。</li>
+</ul>
+<h3 id="例子2：字典的初始化"><a href="#例子2：字典的初始化" class="headerlink" title="例子2：字典的初始化"></a>例子2：字典的初始化</h3><p><img src="/upload/20181008_02.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.83</strong></li>
+<li>使用建议：使用字面量初始化字典（以及其他集合类型）。</li>
+<li>说明：Python中初始化集合类型时使用字面量的方式，解释器会直接调用BUILD_MAP等字节码来创建，如果用构造函数的方式来创建，则需要先查询构造方法，再执行构造方法。使用字面量初始化，Python代码也更简洁。</li>
+</ul>
+<h3 id="例子3：内置排序方法"><a href="#例子3：内置排序方法" class="headerlink" title="例子3：内置排序方法"></a>例子3：内置排序方法</h3><p><img src="/upload/20181008_03.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.26</strong></li>
+<li>使用建议：根据是否需要修改原始值来决定使用哪个方法。</li>
+<li>说明：sorted和list.sort方法是Python中内置的排序方法，sorted方法不会修改原始值，list.sort方法在原始值上直接排序，会修改原始值。比较这两个方法的性能差异，意义不大。</li>
+</ul>
+<h3 id="例子4：初始化多个变量"><a href="#例子4：初始化多个变量" class="headerlink" title="例子4：初始化多个变量"></a>例子4：初始化多个变量</h3><p><img src="/upload/20181008_04.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.01</strong></li>
+<li>使用建议：推荐使用第二种。</li>
+<li>说明：从字节码中可以看出两种方式出了执行顺序之外，基本一致，所以性能上也非常接近。</li>
+</ul>
+<h3 id="例子5：多个变量的比较"><a href="#例子5：多个变量的比较" class="headerlink" title="例子5：多个变量的比较"></a>例子5：多个变量的比较</h3><p><img src="/upload/20181008_05.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.11</strong></li>
+<li>使用建议：推荐使用第二种。</li>
+<li>说明：使用第一种方法能带来一定的性能提升，但是提升有限，在实际情况中也很少出现多个变量连续比较大小的情况，并且第一种方法非常不Pythonic，所以推荐使用第二种。</li>
+</ul>
+<h3 id="例子6：if-true的条件判断"><a href="#例子6：if-true的条件判断" class="headerlink" title="例子6：if true的条件判断"></a>例子6：if true的条件判断</h3><p><img src="/upload/20181008_06.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.17</strong></li>
+<li>使用建议：推荐使用第一种。</li>
+<li>说明：从字节码上看，第一种方法的性能最高，并且语法上也更加简洁。</li>
+</ul>
+<h3 id="例子7：if-false的条件判断"><a href="#例子7：if-false的条件判断" class="headerlink" title="例子7：if false的条件判断"></a>例子7：if false的条件判断</h3><p><img src="/upload/20181008_07.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.10</strong></li>
+<li>使用建议：推荐使用第一种。</li>
+<li>说明：从字节码上看，第一种方法的性能最高，语法角度上，if not写成第二种和第三种都是不推荐的。</li>
+</ul>
+<h3 id="例子8：判断list是否为空"><a href="#例子8：判断list是否为空" class="headerlink" title="例子8：判断list是否为空"></a>例子8：判断list是否为空</h3><p><img src="/upload/20181008_08.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.55</strong></li>
+<li>使用建议：根据具体需求，优先使用前两种。</li>
+<li>说明：前两种代码性能更高，代码更简洁。同时，空列表a并不等于None，所以使用if a is None无法实现对空列表的判断。</li>
+</ul>
+<h3 id="例子9：判断object是否为空"><a href="#例子9：判断object是否为空" class="headerlink" title="例子9：判断object是否为空"></a>例子9：判断object是否为空</h3><p><img src="/upload/20181008_09.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.00</strong></li>
+<li>使用建议：根据具体需求，优先使用前两种。</li>
+<li>说明：理由同上一个例子。</li>
+</ul>
+<h3 id="例子10：遍历可迭代对象"><a href="#例子10：遍历可迭代对象" class="headerlink" title="例子10：遍历可迭代对象"></a>例子10：遍历可迭代对象</h3><p><img src="/upload/20181008_10.png"></p>
+<ul>
+<li>最差/最优时间比：<strong>1.12</strong></li>
+<li>使用建议：根据具体情况选择。</li>
+<li>说明：两者性能差别不大，使用enumerate方法，可以不需要取对象的长度，可以直接获取到对象的index。</li>
+</ul>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://pythonfasterway.org/">Python Faster Way</a></li>
+</ul>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/09/14/how-to-use-defer-in-go/">Go语言中defer的一些坑</a>
         </h1>
 
@@ -289,57 +370,6 @@
 <p><img src="/upload/20180715_05.jpg"></p>
 <p><em>* 在Ubuntu 16.04中也是类似的逻辑，只不过systemd-resolved换成了dnsmasq，监听地址是127.0.1.1</em><br><em>* 在具体实践过程中，也顺便探究了CoreDNS和KubeDNS架构和解析逻辑上的区别，不过不在此问题的讨论范围，有兴趣的朋友可以自己看一下。</em><br><em>* 如果Kubernetes集群是安装在NAT网络下的虚拟机上，虚拟机（也就是Kubernetes集群中的Node）中/etc/resolv.conf文件可能被修改为NAT的地址，也就不会出现上面这个问题。</em></p>
 <h1 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h1><p> <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/</a><br><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/">https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/</a><br><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/">https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/</a><br><a target="_blank" rel="noopener" href="https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html">https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html</a><br><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/issues/49411">https://github.com/kubernetes/kubernetes/issues/49411</a><br><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/issues/45828">https://github.com/kubernetes/kubernetes/issues/45828</a></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/07/10/build-golang-environment/">Golang环境安装和依赖管理</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-07-10
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>2015年，Go 1.5加入了一个试验性的vendor机制（到2016年的Go 1.6版变为默认开启），vendor机制就是在项目中加入了vendor文件夹，用于存放依赖，这样就可以将不同项目的依赖隔离开。<br><img src="/upload/20180710_02.png"></p>
-<p>Golang一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。Golang提供了方便的安装包，支持Windows、Linux、Mac系统。</p>
-<h1 id="下载安装包"><a href="#下载安装包" class="headerlink" title="下载安装包"></a>下载安装包</h1><p>Golang的官网是<a target="_blank" rel="noopener" href="https://golang.org/">https://golang.org/</a>，如果官网打不开，可以访问<a target="_blank" rel="noopener" href="https://golang.google.cn/">https://golang.google.cn/</a>这个域名。在官网点击Download Go会进入下载页，可以看到这里提供了针对各个系统的安装包，也提供了源码，可以下载源码编译安装。</p>
-<p><img src="/upload/20180710_03.png"></p>
-<p>下载运行安装包后，在terminal中执行go env命令，如果出现下面的输出说明已经安装成功。</p>
-<p><img src="/upload/20180710_04.png"></p>
-<h1 id="GOROOT与GOPATH"><a href="#GOROOT与GOPATH" class="headerlink" title="GOROOT与GOPATH"></a>GOROOT与GOPATH</h1><p>仔细看上面的输出，会发现其中有一个GOPATH，又有一个GOROOT，那么到底哪个才是Golang的运行环境呢。</p>
-<p>首先访问一下GOROOT这个路径，会发现其中包含bin、lib等文件夹。GOROOT就是Golang的安装路径，其中包含Golang编译、工具、标准库等，在安装后就会存在。</p>
-<p>和GOROOT不同，GOPATH是工作空间路径，从go 1.8开始，如果GOPATH没有被设置，会有一个默认值，在Unix上为$HOME/go，在Windows上为%USERPROFILE%/go，当调用go build时，它会在GOPATH中寻找源码。访问一下GOPATH这个路径，会发现其中只有pkg、bin、src三个文件夹，并且里面基本是空的，这是一个约定的目录结构，src文件夹用来存放源码、pkg存放编译后生成的文件，bin存放编译后生成的可执行文件。项目代码需要在GOPATH/src路径下。</p>
-<p>GOPATH路径下出了存放项目代码，还存放所有通过go get安装的依赖，项目代码和依赖代码是平级的，当各个项目都有很多依赖的时候，这个GOPATH路径下的代码量会多的吓人，并且难以拆分。</p>
-<h1 id="Vendor"><a href="#Vendor" class="headerlink" title="Vendor"></a>Vendor</h1><p>当使用go run或者go build命令时，会首先从当前路径下的vendor文件夹中查找依赖，如果vendor不存在，才会从GOPATH中查找依赖。</p>
-<p>然而我们安装依赖通常使用go get或者go install命令，这两个命令依旧会把依赖安装到GOPATH路径下。</p>
-<h1 id="包管理工具dep"><a href="#包管理工具dep" class="headerlink" title="包管理工具dep"></a>包管理工具dep</h1><p>Vendor只是go官方提供的一个机制，但是包管理的问题依然没有解决，并且也没有对依赖进行版本管理。如果要实现上述的功能，还需要借助包管理工具。</p>
-<p>Go官方给出了包管理工具的对比：<a target="_blank" rel="noopener" href="https://github.com/golang/go/wiki/PackageManagementTools">https://github.com/golang/go/wiki/PackageManagementTools</a></p>
-<p>dep是官方的试验性包管理工具，可以通过如下脚本安装</p>
-<p>curl <a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/golang/dep/master/install.sh">https://raw.githubusercontent.com/golang/dep/master/install.sh</a> | sh</p>
-<p>安装完成后，进入项目路径，执行</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep <span class="keyword">init</span></span><br></pre></td></tr></table></figure>
-
-<p>项目中会出现两个文件一个目录</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">Gopkg</span>.</span></span>toml</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">Gopkg</span>.</span></span>lock</span><br><span class="line">vendor</span><br></pre></td></tr></table></figure>
-
-<p>dep包管理的流程如图</p>
-<p><img src="/upload/20180710_05.jpg"></p>
-<ul>
-<li><p>solving功能，它将当前项目中的导入包和Gopkg.toml中的规则作为输入，不可变的依赖关系图作为传递完成后的输出，形成Gopkg.lock。</p>
-</li>
-<li><p>vendor功能，将Gopkg.lock中的信息作为输入，确保项目编译时能使用在Gopkg.lock文件中锁定的版本。</p>
-</li>
-</ul>
-<p>使用如下命令添加依赖</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep ensure -add [github.com<span class="regexp">/gin-gonic/gi</span>n](http:<span class="regexp">//gi</span>thub.com<span class="regexp">/gin-gonic/gi</span>n)</span><br></pre></td></tr></table></figure>
-
-<p>使用如下命令更新Gopkg.lock</p>
-<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep <span class="keyword">ensure</span> -update</span><br></pre></td></tr></table></figure>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/5/">

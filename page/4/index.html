@@ -98,6 +98,28 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">JWT 避坑指南：nbf 验签失效问题的解决</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-03-26
+        </span><span class="post-category">
+            <a href="/categories/Tech/">Tech</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h3><p>刚签发的 JWT，在下一个请求使用时候会失效，请求会报 422 错误。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;msg&quot;</span>: <span class="string">&quot;The token is not yet valid (nbf)&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果隔几秒再请求（例如使用 Chrome 开发者工具中的 Replay XHR），就会成功。</p>
+          <div class="read-more">
+            <a href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/" class="read-more-link">阅读更多</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路</a>
         </h1>
 
@@ -174,26 +196,6 @@
 <p>HTTP 是一个无状态的协议，一次请求结束后，下次在发送服务器就不知道这个请求是谁发来的了（同一个 IP 不代表同一个用户），在 Web 应用中，用户的认证和鉴权是非常重要的一环，实践中有多种可用方案，并且各有千秋。</p>
           <div class="read-more">
             <a href="/2018/12/13/combining-jwt-with-refresh-token/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/12/10/ssh-via-ngrok/">通过 ngrok 实现 ssh 内网穿透</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-12-10
-        </span><span class="post-category">
-            <a href="/categories/Tech/">Tech</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h3 id="ngrok"><a href="#ngrok" class="headerlink" title="ngrok"></a>ngrok</h3><p>用 ssh 访问一台主机，如果和主机在一个局域网中或者主机拥有公网 IP，就可以使用 ssh 命令直接连接主机的 IP 地址，但是大部分公司和家庭内部都是局域网，并不能给局域网内的每一台主机都分配一个公网 IP，这时候就需要进行内网穿透，才能从外部连接到局域网内的主机。</p>
-<p>ngrok 是一个反向代理工具，可以实现将内网的端口暴露到公网，通过 ngrok，也能将 ssh 使用的端口暴露出去，以此实现 ssh 的内网穿透。</p>
-          <div class="read-more">
-            <a href="/2018/12/10/ssh-via-ngrok/" class="read-more-link">阅读更多</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/3/">
