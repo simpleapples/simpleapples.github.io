@@ -98,6 +98,41 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/10/19/macos-vmware-fusion-centos-network-setting/">MacOS+VMware Fusion安装CentOS网络设置</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-10-19
+        </span><span class="post-category">
+            <a href="/categories/Mac-Linux/">Mac&Linux</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在vmware中最小化安装centos6.3后发现无论vmware设置城共享还是桥接形式都无法连接网络，在网络上查询到vmware workstation下安装centos的设置方法，尝试后发现并不适用mac os下的vmware fusion。<br>经过尝试，发现fusion下centos网络配置非常简单。方法如下：</p>
+<ol>
+<li><p>将vmware设置成桥接网络</p>
+</li>
+<li><p>改变网卡设置</p>
+<p> $vi /etc/sysconfig/network-scripts/ifcfg-eth0</p>
+</li>
+</ol>
+<p>修改为如下值：</p>
+<pre><code>BOOTPROTO=&quot;dhcp&quot; //使用dhcp配置ip地址  
+ONBOOT=&quot;yes&quot; //使设备启动  
+</code></pre>
+<p>3.重启网络服务</p>
+<pre><code>$service network restart
+</code></pre>
+<p>4.查看网络</p>
+<pre><code>$ifconfig
+</code></pre>
+<p>查看设备eth0是否分配到正确ip，网络是否可以ping通。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/10/19/ios-push-notification-certificate/">iOS 推送证书制作 （JAVA/PHP）</a>
         </h1>
 

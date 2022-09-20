@@ -98,6 +98,35 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/">15行Python代码，帮你理解令牌桶算法</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-20
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180320_01.jpg"></p>
+<p>在网络中传输数据时，为了防止网络拥塞，需限制流出网络的流量，使流量以比较均匀的速度向外发送，令牌桶算法就实现了这个功能，<strong>可控制发送到网络上数据的数目，并允许突发数据的发送。</strong></p>
+<h1 id="什么是令牌"><a href="#什么是令牌" class="headerlink" title="什么是令牌"></a>什么是令牌</h1><p>从名字上看令牌桶，大概就是一个装有令牌的桶吧，那么什么是令牌呢？</p>
+<p>紫薇格格拿的令箭，可以发号施令，令行禁止。在计算机的世界中，令牌也有令行禁止的意思，有令牌，则相当于得到了进行操作的授权，没有令牌，就什么都不能做。</p>
+<h1 id="用令牌实现限速器"><a href="#用令牌实现限速器" class="headerlink" title="用令牌实现限速器"></a>用令牌实现限速器</h1><p>我们用1块令牌来代表发送1字节数据的资格，假设我们源源不断的发放令牌给程序，程序就有资格源源不断的发送数据，当我们不发放令牌给程序，程序就相当于被限流，无法发送数据了。接下来我们说说限速器，所谓限速器，就是让程序在单位时间内，最多只能发送一定大小的数据。假设在1秒发放10块令牌，那么程序发送数据的速度就会被限制在10bytes/s。如果1秒内有大于10bytes的数据需要发送，就会因为没有令牌而被丢弃。</p>
+<h1 id="改进限速器——加个桶"><a href="#改进限速器——加个桶" class="headerlink" title="改进限速器——加个桶"></a>改进限速器——加个桶</h1><p><img src="/upload/20180320_02.jpg"></p>
+<p>我们实现的限速器，速度是恒定的，但是在实际的应用中，往往会有突发的传输需求（需要更快速的发送，但是不会持续太久，也不会引起网络拥塞），这种数据碰上我们的限速器，就因为拿不到令牌而无法发送。</p>
+<p>对限速器进行一下改动，依然1秒产生10块令牌，但是我们把产生出来的令牌先放到一个桶里，当程序需要发送的时候，从桶里取令牌，不需要的时候，令牌就会在桶里沉淀下来，假设桶里沉淀了10块令牌，程序最多就可以在1秒内发送20bytes的数据，满足了突发数据传输的要求，并且由于桶里的令牌被用完，下一秒最多依然只能发10bytes的数据，不会因为持续发送大量数据，对网络造成压力。</p>
+<p><img src="/upload/20180320_03.jpg"></p>
+<h1 id="15行Python代码实践令牌桶"><a href="#15行Python代码实践令牌桶" class="headerlink" title="15行Python代码实践令牌桶"></a>15行Python代码实践令牌桶</h1><p>令牌桶需要以一定的速度生成令牌放入桶中，当程序要发送数据时，再从桶中取出令牌。这里似乎有点问题，如果我们使用一个死循环，来不停地发放令牌，程序就被阻塞住了，有没有更好的办法？</p>
+<p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
+<p>接下来看代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenBucket</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, rate, capacity</span>):</span></span><br><span class="line">        self._rate = rate</span><br><span class="line">        self._capacity = capacity</span><br><span class="line">        self._current_amount = <span class="number">0</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">consume</span>(<span class="params">self, token_amount</span>):</span></span><br><span class="line">        increment = (<span class="built_in">int</span>(time.time()) - self._last_consume_time) * self._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        self._current_amount = <span class="built_in">min</span>(</span><br><span class="line">            increment + self._current_amount, self._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; self._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line">        self._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/03/14/understanding-blockchain/">最爱你的人，会让你不费脑细胞的理解区块链原理</a>
         </h1>
 
@@ -244,70 +273,6 @@
 <h2 id="关于「贪吃蛇大作战」的一些猜测"><a href="#关于「贪吃蛇大作战」的一些猜测" class="headerlink" title="关于「贪吃蛇大作战」的一些猜测"></a>关于「贪吃蛇大作战」的一些猜测</h2><p>签名方法已经获取到，本以为可以安心刷分了，但是只成功刷了一次4000分160击杀。猜测可能进入排行版需要人工审核，一个理由是刷完后过了几分钟才显示到排行版，另一个理由是，刷完4000分169击杀后，很快刷了一个高的离谱的分，但是并没有显示在排行榜，后面无论刷多少分都再也没有显示出来过，怀疑可能被人工屏蔽。</p>
 <p>另外整个游戏和API的交互只有登录、获取用户信息、获取排行版最高分、提交分数等几种，所以游戏也不是真正的实时。</p>
 <p><img src="/upload/snake-4.png" alt="图4"></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2015/06/11/configure-nginx-supervisor-gunicorn-flask/">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-06-11
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。</p>
-<h2 id="配置Centos7"><a href="#配置Centos7" class="headerlink" title="配置Centos7"></a>配置Centos7</h2><p>root登录后，首先新建一个普通用户并设置密码</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser <span class="keyword">user</span></span><br><span class="line"><span class="title">passwd</span> user</span><br></pre></td></tr></table></figure>
-
-<p>接下来将用户的公钥复制到~/.ssh中，命名为authorised_keys，修改/etc/ssh/sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Port</span> <span class="number">65535</span></span><br><span class="line">PasswordAuthentication <span class="literal">no</span></span><br><span class="line">PermitRootLogin <span class="literal">no</span></span><br></pre></td></tr></table></figure>
-
-<p>配置完成后重启ssh服务</p>
-<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">restart</span> sshd.service</span><br></pre></td></tr></table></figure>
-
-<p>CentOS7中用firewalld替换了iptables，需要手动将80端口和修改后的ssh端口添加到firewalld中</p>
-<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">80/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">add</span><span class="literal">-</span><span class="comment">port</span> <span class="comment">65535/tcp</span> --<span class="comment">permanent</span></span><br><span class="line"><span class="comment">firewalld</span> --<span class="comment">reload</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><p>yum中可以直接安装nginx</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> nginx</span><br></pre></td></tr></table></figure>
-
-<p>安装好后在/etc/nginx/default.d中添加location的配置，并指向8001端口，以后Flask会监听8001端口</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">location</span> <span class="title">/ &#123;</span></span><br><span class="line"><span class="title">	proxy_pass</span> http://<span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">8001</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>配置好后重新载入nginx配置</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="keyword">reload</span> nginx.service</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装Python"><a href="#安装Python" class="headerlink" title="安装Python"></a>安装Python</h2><p>CentOS自带Python2.7，如果使用Python3，需要单独安装。</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https:<span class="regexp">//</span>www.python.org<span class="regexp">/ftp/</span>python<span class="regexp">/3.4.3/</span>Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line">tar xf Python-<span class="number">3.4</span>.<span class="number">3</span>.tgz</span><br><span class="line">cd Python-<span class="number">3.4</span>.<span class="number">3</span></span><br><span class="line">.<span class="regexp">/configure --prefix=/u</span>sr/local --enable-shared</span><br><span class="line">make</span><br><span class="line">make altinstall</span><br></pre></td></tr></table></figure>
-
-<p>接下来在项目中搭建虚拟环境，Python2虚拟环境使用virtualenv安装（使用pip install virtualenv命令安装），Python3环境使用pyvenv安装（Python3自带pyvenv），以Python3环境为例，在Web项目中，建立虚拟环境文件夹venv</p>
-<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pyvenv venv</span></span><br></pre></td></tr></table></figure>
-
-<p>接下来在项目路径下启用虚拟环境</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">source</span> venv<span class="regexp">/bin/</span>active</span><br></pre></td></tr></table></figure>
-
-<p>退出虚拟环境使用Ctrl+C或deactive命令</p>
-<h2 id="安装配置Gunicorn"><a href="#安装配置Gunicorn" class="headerlink" title="安装配置Gunicorn"></a>安装配置Gunicorn</h2><p>Gunicorn使用pip install gunicorn安装，注意需要在虚拟环境中使用pip安装，这样才对应虚拟环境中的Python版本。安装好后，新建一个Gunicorn的配置文件，比如deploy_config.py，加入内容如下</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line"><span class="attribute">bind</span>=<span class="string">&#x27;127.0.0.1:8001&#x27;</span> #绑定的端口</span><br><span class="line"><span class="attribute">workers</span>=4	#worker数量</span><br><span class="line"><span class="attribute">backlog</span>=2048</span><br><span class="line"><span class="attribute">debug</span>=<span class="literal">True</span></span><br><span class="line"><span class="attribute">proc_name</span>=<span class="string">&#x27;gunicorn.pid&#x27;</span></span><br><span class="line"><span class="attribute">pidfile</span>=<span class="string">&#x27;/var/log/gunicorn/debug.log&#x27;</span></span><br><span class="line"><span class="attribute">loglevel</span>=<span class="string">&#x27;debug&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>保存文件后在虚拟环境中使用Gunicorn尝试启动</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gunicorn -c <span class="keyword">deploy</span>_config.py myapp<span class="function">:app</span></span><br></pre></td></tr></table></figure>
-
-<p>myapp是入口Python文件名，app是函数名。如果输出worker相关信息，表明启动成功。</p>
-<h2 id="安装配置Supervisor"><a href="#安装配置Supervisor" class="headerlink" title="安装配置Supervisor"></a>安装配置Supervisor</h2><p>yum可以直接安装Supervisor，需要注意的是Supervisor只支持Python2，所以不要在虚拟环境中使用pip安装supervisor。</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> supervisor</span><br></pre></td></tr></table></figure>
-
-<p>安装后，在/etc/supervisord.d中建立配置文件xxx.ini，内容如下</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[program:xxx]</span><br><span class="line">command=<span class="regexp">/var/</span>proj<span class="regexp">/xxx/</span>venv<span class="regexp">/bin/</span>python <span class="regexp">/usr/</span>bin<span class="regexp">/gunicorn -c /</span>var<span class="regexp">/proj/</span>xxx/deploy_config.py myapp:app</span><br><span class="line">autorstart=<span class="keyword">true</span></span><br><span class="line">directory=<span class="regexp">/var/</span>proj/xxx</span><br><span class="line">autorestart=<span class="keyword">true</span></span><br><span class="line">startsecs=<span class="number">10</span></span><br><span class="line">startretries=<span class="number">20</span></span><br></pre></td></tr></table></figure>
-
-<p>xxx是项目名称，注意command中最好都写全路径，以区别系统环境和项目虚拟环境。完成后启动supervisord，使配置生效</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisord -c <span class="regexp">/etc/</span>supervisord.conf</span><br></pre></td></tr></table></figure>
-
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/9/">

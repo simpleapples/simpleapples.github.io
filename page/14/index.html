@@ -98,6 +98,33 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2013/05/21/ios6-screen-rotation/">iOS6屏幕旋转问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-05-21
+        </span><span class="post-category">
+            <a href="/categories/Mobile/">Mobile</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>使用iOS6 SDK创建xib文件时，会默认启用AutoLayout功能，AutoLayout是iOS6中新推出的自动布局功能，通过相对定位来实现适应多种屏幕分辩率的自动布局（iOS设备分辨率会朝着多样化的方向发展？）。<br>当使用AutoLayout的项目在iOS6以下的系统中运行时，程序执行会报错，于是，关闭所有xib的AutoLayout选项，再次运行，发现原本设置为横屏显示的项目变成了竖屏，所有横屏设置失效。<br>解决办法是，在需要横屏的Controller中添加如下代码，最好在将self.window设定成一个RootViewController，然后在RootViewController中添加如下代码：</p>
+<pre><code>// ios5下的旋屏
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation &#123;
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+&#125;
+
+// ios6下的旋屏
+-(BOOL)shouldAutorotate &#123;
+    return YES;
+&#125;
+</code></pre>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/04/24/actionscript3-download-manager/">AS3下载管理器</a>
         </h1>
 
@@ -206,31 +233,6 @@ alert(coder.lang);  // Javascript
 Person.apply(this, [name, age]);
 </code></pre>
 <p>到这里就完成了Javascript中最简单的类的构造和继承。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/12/19/a-problem-with-nettop/">nettop命令引发的一个小问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-12-19
-        </span><span class="post-category">
-            <a href="/categories/Mac-Linux/">Mac&Linux</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>在网上看到一篇帖子，是说Mac OSX 10.7中新加入了一个nettop命令，可以实时查看当前网络链接和数据流量。这是nettop命令的描述：  </p>
-<blockquote>
-<p>The nettop program displays a list of sockets or routes. The counts for network structures are updated periodically.</p>
-</blockquote>
-<p>于是在Terminal中尝试了一下。<br>尝鲜过后就再也没管。但是关闭Terminal大概一两分钟后，Mac的风扇突然疯狂的转了起来。iStatMenu上看达到了5300rpm左右。一般情况下，除非开游戏或者看Flash，才有可能出现风扇飞转的情况，但是看了一下dock发现只开了Chrome、iMessage和iTunes，也没有开Apache之类的服务。打开活动检测器，发现CPU四个核心都已经爆表，查看进程，有两个nettop进程几乎占用了所有CPU资源。</p>
-<p><img src="/upload/nettop1.png" alt="Alt text"></p>
-<p>关闭nettop之后，CPU占用率迅速下降，风扇飞转的情况也逐渐消失。</p>
-<p><img src="/upload/nettop2.png" alt="Alt text"></p>
-<p>回想一下，可能是使用nettop命令后没有退出nettop，而直接关闭Terminal造成的。经过尝试，发现问题确实出在没有正确退出nettop上。可能这是一个设计中没有考虑到的小bug。<br>使用man nettop查看文档，文档说明中退出nettop应该采用q，但没有说必须这样退出，而且很多时候，直接关闭Terminal确实是一些人的习惯，比如我：）</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/13/">

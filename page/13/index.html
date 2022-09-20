@@ -98,6 +98,26 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2013/09/27/hack-google-doodle-game/">破解Google Doodle小游戏</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2013-09-27
+        </span><span class="post-category">
+            <a href="/categories/%E7%94%9F%E6%B4%BB/">生活</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>今天貌似是Google十五周年纪念日，照例他们在首页上挂了一个JS小游戏，用棒子打一个五角星（十次机会），时机控制的好的话，会掉下糖果。各种刷分之后，最高分停留在了173分。</p>
+<p><img src="/upload/googledoodle1.jpg" alt="Alt text"></p>
+<p>本以为这是一个很高的分数了，可上微博一查竟然有不少180分以上的，并且180分以上有彩蛋，这不能忍，于是又是一通刷，不过一直没能达到173以上。<br>无奈之下，想从程序上下手。既然是JS游戏，理论上只要修改可以打的次数，就能提高分数。<br>去Google首页找JS文件，很容易发现一个<a target="_blank" rel="noopener" href="https://www.google.com.hk/logos/2013/bday13/bday13.js">https://www.google.com.hk/logos/2013/bday13/bday13.js</a>文件，在这里查找数字10，可以发现很多搜索结果，经过直觉判断，感觉<code>bd=10</code>这个赋值比较可疑，于是改之。刷新，成功！<br>下面是改为99次之后的分数：</p>
+<p><img src="/upload/googledoodle2.png" alt="Alt text"></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2013/08/27/flex-sdk-4-9-1-cant-not-find-base-class-bitmapasset/">升级到Flex SDK 4.9.1后无法找到基类BitmapAsset的问题</a>
         </h1>
 
@@ -192,33 +212,6 @@
 <p>我很少写博客，写也是写技术类的文章，最多再记录下不疼不痒的事情，不写个人观点明显的东西。之前读到好书时候想写书评，最后也不了了之了，除了怕写出的东西没价值，还有一个担心就是怕被笑话。应该说，在网络上发表自己的观点，有一部分目的就是为了获得认同感，如果发的东西被大家各种喷，会一下子兴致全无，尤其是现在很多人喜欢当公知、喜欢喷人，所以很难放心的在互联网上说话。就算没有人喷，如果不小心说了误导性的东西，对别人产生了不好的影响，自己心里也会不好受。<br>现在觉得这事情得辩证的想，写出没水平的东西是容易被笑话，但是如果不写不交流，水平也没法提高，总不能把自己藏在暗处一辈子。现在的东西被笑话，坚持个一两年，也许自己写的东西就没那么幼稚，坚持个十年八年，恐怕也成了半个大师。关键在于，要敢于迈出这一步。</p>
 <p>3.写不出来</p>
 <p>写作这件事，我也有点体会，越写越能写。有的人读书很多，但是不喜欢动笔，时间一长，脑子里惊涛骇浪，就是表达不到纸上，非常捉急。所以有些时候要拿出小学生写日记的劲头，强迫自己写，笔头子是能练出来的。<br>我说过，我基本不写除技术类文章之外的博客，之所以这次破例，很大程度上受了《暗时间》中关于这部分内容的启发。我甚至没有想到一写写了这么一大堆，所以在这里要感谢作者刘未鹏，如果不是拜读了这本大作，现在还把自己禁锢在牢笼中。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2013/05/21/ios6-screen-rotation/">iOS6屏幕旋转问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2013-05-21
-        </span><span class="post-category">
-            <a href="/categories/Mobile/">Mobile</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>使用iOS6 SDK创建xib文件时，会默认启用AutoLayout功能，AutoLayout是iOS6中新推出的自动布局功能，通过相对定位来实现适应多种屏幕分辩率的自动布局（iOS设备分辨率会朝着多样化的方向发展？）。<br>当使用AutoLayout的项目在iOS6以下的系统中运行时，程序执行会报错，于是，关闭所有xib的AutoLayout选项，再次运行，发现原本设置为横屏显示的项目变成了竖屏，所有横屏设置失效。<br>解决办法是，在需要横屏的Controller中添加如下代码，最好在将self.window设定成一个RootViewController，然后在RootViewController中添加如下代码：</p>
-<pre><code>// ios5下的旋屏
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation &#123;
-    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
-&#125;
-
-// ios6下的旋屏
--(BOOL)shouldAutorotate &#123;
-    return YES;
-&#125;
-</code></pre>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/12/">

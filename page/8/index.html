@@ -98,6 +98,52 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/06/20/wegame-causing-bsod-on-xps-15-9560/">大毒瘤！卸载WeGame解决XPS 15蓝屏问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-06-20
+        </span><span class="post-category">
+            <a href="/categories/Tech/">Tech</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h1 id="潜伏期"><a href="#潜伏期" class="headerlink" title="潜伏期"></a>潜伏期</h1><p>去年4月底买了一台美版XPS 15 9560，用了几个月之后就会偶尔出现蓝屏问题，由于之前就在论坛上看到很多吐槽XPS品控的帖子，以为自己也中了枪，好在蓝屏也不频繁，不影响使用也就没管。</p>
+<h1 id="上升期"><a href="#上升期" class="headerlink" title="上升期"></a>上升期</h1><p>进入今年5月，升级了Win10 1803后（基本上软件有更新我都会第一时间升级，体验最新的改进），蓝屏的次数开始多了起来，开始变得影响使用，于是开始着手查找问题。</p>
+<p>由于心急，并没有看转储文件，而是直接Google了XPS 15的蓝屏问题，希望能尽快找到方案。很快发现具有类似问题的人不在少数，也有很大一部分人以此说XPS 15品控不好，看了很多内容后，把怀疑的方向放在了驱动层面（Dell有一个Dell Update软件，一有更新提示我就会更新驱动），于是从更新频率最高的显卡驱动入手，降级显卡驱动到上一个版本，然而并没有什么用。于是又降级了Wifi驱动，因为Wifi驱动也是最近更新的，并且XPS 15的Killer显卡兼容性似乎没有那么好。</p>
+<p><img src="/upload/20180620_01.png" alt="XPS 15的驱动列表，可以看到Wifi和显卡驱动都是最近发布的"></p>
+<p>降级完驱动之后，电脑进入了短暂的回光返照阶段，用了几个小时都没有蓝屏，然而紧接着更加不幸的问题就要发生了。</p>
+<h1 id="爆发期"><a href="#爆发期" class="headerlink" title="爆发期"></a>爆发期</h1><p>用QQ接收一个大文件，大概1G，进行到一半的时候忽然蓝屏，重启后重新接收，准备传完之后再解决蓝屏问题，然而不幸的是传了一半又蓝屏了… 这时我把怀疑的方向转向了硬盘，于是降级了Intel RST驱动，心想降级要是没用的话，有可能是SSD跪了… 降级后怀着忐忑的心情再次重试，竟然…又蓝屏了…</p>
+<p>这次把怀疑的方向转到了QQ或者Wifi上，毕竟是一用QQ接收大文件就出问题，那么不是QQ就是Wifi了，于是卸载QQ，用迅雷下载一个大文件，果不其然，又跪了…</p>
+<p><img src="/upload/20180620_02.png"></p>
+<p>然而已经降级了Wifi驱动，之前也一直没有什么问题，难道真的是硬件出了问题？这个时候，我内心已经有点放弃PC，转而在京东上看MBP的价格了…</p>
+<p>然而MBP高企的售价让我冷静了下来，回来死马当活马医，继续找问题吧。</p>
+<p>既然自己怀疑的方向都不对，只能信仰科学了，安装了WinDbg和BlueScreenView这两款软件来查看和分析转储文件（具体过程不再赘述，可以参考文末的相关资源）。</p>
+<p><img src="/upload/20180620_03.jpeg" alt="从BlueScreenView里可以看到，机器以近乎疯狂的频率蓝屏"></p>
+<p>从BlueScreenView里并没有看到太多信息，现在只剩下WinDbg这一根救命稻草了。</p>
+<p><img src="/upload/20180620_04.jpeg"></p>
+<p>不过好在WinDbg非常给力，分析了几个不同时间的转储文件，都提示问题可能是由tdx.sys文件造成的。</p>
+<p><img src="/upload/20180620_05.png"></p>
+<p>tdx是TDI Translation Driver的意思，TDI是传输层驱动接口的意思，那么可以肯定问题来自于网络，这也印证了每次使用网络传输大文件就会蓝屏的现象。紧接着，看到了另外一段话：</p>
+<blockquote>
+<p>WARNING: Unable to verify timestamp for QMTgpNetFlow764.sys</p>
+</blockquote>
+<p>这个QMTgpNetFlow764.sys又是什么，看前缀似乎像第三方的文件，先Google一下。</p>
+<h1 id="真相大白"><a href="#真相大白" class="headerlink" title="真相大白"></a>真相大白</h1><p>Google了一下这个QMTgpNetFlow764.sys，终于拨云见日。</p>
+<p><img src="/upload/20180620_06.png" alt="原来早有人发现了QMTgpNetFlow764.sys引发蓝屏问题的秘密"></p>
+<p>根据网友们的分析（具体可以查看文末的相关资源），这5个文件来自于腾讯的游戏平台WeGame，于是卸载了腾讯系的游戏，并且重启删除了C:\Windows\system32\drivers目录下以QMT开头的5个文件，没关机使用至今（大约半个月）再也没有出现过蓝屏的情况，至此可以证明，腾讯WeGame平台是引起蓝屏的主要原因。</p>
+<p><img src="/upload/20180620_07.png" alt="毒瘤们"></p>
+<h1 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h1><p>BlueScreenView下载地址：<a target="_blank" rel="noopener" href="https://www.nirsoft.net/utils/blue_screen_view.html">https://www.nirsoft.net/utils/blue_screen_view.html</a></p>
+<p>WinDbg下载地址：<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools">https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools</a></p>
+<p>WinDbg使用说明：<a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html">https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html</a></p>
+<p>知乎用户<a target="_blank" rel="noopener" href="https://www.zhihu.com/people/weasley-frank">Weasley Frank</a>的专栏文章<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33723838">TGP/WeGame驱动导致WSL网络服务异常
+</a>对这个问题进行了简单分析</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/06/11/things-you-dont-know-about-python/">你所不知道的Python | 字符串格式化的演进之路</a>
         </h1>
 
@@ -438,54 +484,6 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_file</span>(<span class="params">file_path</span>):</span></span><br><span class="line">    <span class="keyword">assert</span> is_instance(file_path, <span class="built_in">str</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> check_exist(file_path):</span><br><span class="line">        <span class="keyword">raise</span> NotFoundError()</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> has_privilege(file_path):</span><br><span class="line">        <span class="keyword">raise</span> PermissionError()</span><br></pre></td></tr></table></figure>
 
 <p>文件不存在和没有权限，这两种情况并不属于代码bug，是代码逻辑的一部分，上层代码捕获异常后可能会执行其他逻辑，因此我们不能接受这部分代码在生产环境中被忽略。并且，相比于assert语句只能抛出AssertionError，使用异常可以抛出更细致的错误，方便上层代码针对不同错误执行不同的逻辑。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/04/26/using-decorators-to-validate-form/">用装饰器封装Flask-WTF表单验证逻辑</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-04-26
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><blockquote>
-<p>Don’t repeat yourself</p>
-</blockquote>
-<p>在使用Flask-WTF的时候，常会用下面这样的代码来验证表单数据的合法性：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">	form = TestForm()</span><br><span class="line">	<span class="comment"># 判断是否合法</span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit():</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&#x27;err&#x27;</span>, <span class="number">400</span></span><br><span class="line">	<span class="comment"># 主要逻辑</span></span><br></pre></td></tr></table></figure>
-
-<p>对于有很多提交接口的项目来说，需要在每个路由下写相同的的逻辑，造成了大量的代码重复。在Flask-Login中，要把一个路由设置为登录后才能访问，只需要在路由上加一个@login_required装饰器，不需要额外的代码。能不能像Flask-Login一样，用装饰器来封装对表单的验证逻辑呢？</p>
-<h1 id="实现表单验证装饰器"><a href="#实现表单验证装饰器" class="headerlink" title="实现表单验证装饰器"></a>实现表单验证装饰器</h1><p>由于不同路由使用的表单类不一样，所以需要为装饰器传入一个表单类参数，并且在路由函数中需要用到表单中的值，所以还需要将验证通过的表单传给路由函数。</p>
-<p>上代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">        @wraps(<span class="params">fn</span>)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit():</span><br><span class="line">                <span class="keyword">return</span> <span class="string">&#x27;error&#x27;</span>, <span class="number">400</span></span><br><span class="line">            <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br></pre></td></tr></table></figure>
-
-<p>使用方式如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@validate_form(<span class="params">TestForm</span>)  </span><span class="comment"># 需要传入要验证的表单类</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">form</span>):</span></span><br><span class="line">    <span class="comment"># 执行到这里说明表单验证通过</span></span><br></pre></td></tr></table></figure>
-
-<p>经过在项目中的应用，发现装饰器还是有一些缺陷：</p>
-<ul>
-<li>无法自定义处理非法表单的逻辑</li>
-<li>不支持get方式提交的表单（查看validate_on_submit()源码可知其只支持对post和put方式提交的表单进行验证）</li>
-</ul>
-<h1 id="丰富一下"><a href="#丰富一下" class="headerlink" title="丰富一下"></a>丰富一下</h1><p>要自定义处理非法表单的逻辑，需要增加一个可以传入自定义逻辑的接口。表单非法时接口的返回往往是一致的，所以我们为所有应用装饰器的路由传入一个统一的处理逻辑。将装饰器封装在一个类中，在类中添加一个配置处理逻辑的方法。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FormValidator</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, error_handler=<span class="literal">None</span></span>):</span></span><br><span class="line">        self._error_handler = error_handler</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">            @wraps(<span class="params">fn</span>)</span></span><br><span class="line">            <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit() <span class="keyword">and</span> self._error_handler:</span><br><span class="line">                    <span class="keyword">return</span> self._error_handler(form.errors)</span><br><span class="line">                <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">            <span class="keyword">return</span> wrapper</span><br><span class="line">        <span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">error_handler</span>(<span class="params">self, fn</span>):</span></span><br><span class="line">        self._error_handler = fn</span><br><span class="line">        <span class="keyword">return</span> fn</span><br></pre></td></tr></table></figure>
-
-<p>error_handler也是一个装饰器，被它修饰的方法就是处理非法表单的方法。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@form_validator.error_handler</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">error_handler</span>(<span class="params">errors</span>):</span></span><br><span class="line">    <span class="keyword">return</span> jsonify(&#123;<span class="string">&#x27;errors&#x27;</span>: errors&#125;), <span class="number">400</span></span><br></pre></td></tr></table></figure>
-
-<p>接下来支持get方法，在flask中，我们可以通过request.args来获取到get方法提交的参数。思路是用获取到的参数生成一个表单类的实例，然后就可以通过调用表单类的validate()方法来判断是否合法了。修改validate_form装饰器：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">        @wraps(<span class="params">fn</span>)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">            <span class="keyword">if</span> request.method == <span class="string">&#x27;GET&#x27;</span>:</span><br><span class="line">                form = form_cls(formdata=request.args)</span><br><span class="line">            <span class="keyword">elif</span> request.method <span class="keyword">in</span> (<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;PUT&#x27;</span>):</span><br><span class="line">                form = form_cls()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> fn(*args, **kwargs)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> form.validate() <span class="keyword">and</span> self._error_handler:</span><br><span class="line">                <span class="keyword">return</span> self._error_handler(form.errors)</span><br><span class="line">            <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br></pre></td></tr></table></figure>
-
-<p>大功告成！使用上面的装饰器，就可以免除在路由函数中重复写表单验证逻辑，并且同时支持put、post和get方法提交的表单。</p>
-<h1 id="开箱即用"><a href="#开箱即用" class="headerlink" title="开箱即用"></a>开箱即用</h1><p>笔者已经把上面的代码封装成了一个库发布到了PyPI，想直接用的朋友可以使用<code>pip install flask-wtf-decorators</code>安装，项目源码也已经发布到Github。</p>
-<p><a target="_blank" rel="noopener" href="https://pypi.org/project/Flask-WTF-Decorators/">查看PyPI</a></p>
-<p><a target="_blank" rel="noopener" href="https://github.com/simpleapples/flask-wtf-decorators">查看Github</a></p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/7/">

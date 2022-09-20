@@ -98,6 +98,46 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2020/04/16/viper-read-from-etcd-failed/">viper从etcd读取配置失败的问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2020-04-16
+        </span><span class="post-category">
+            <a href="/categories/Golang/">Golang</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p><a target="_blank" rel="noopener" href="https://github.com/spf13/viper">Viper</a> （本文环境是Viper 1.1.0）是Go应用程序的完整配置解决方案，在很多项目中都有应用。<a target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd">etcd</a>是一个分布式KV存储，最直接的应用是配置中心。</p>
+<p>Viper除了支持从文件中读取配置，还支持从远程的配置中心读取配置，使用下面的代码进行配置。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">viper.AddRemoteProvider(<span class="string">&quot;etcd&quot;</span>,</span><br><span class="line">        <span class="string">&quot;http://127.0.0.1:2379&quot;</span>,</span><br><span class="line">        <span class="string">&quot;conf.toml&quot;</span>)</span><br><span class="line">viper.SetConfigType(<span class="string">&quot;toml&quot;</span>)</span><br><span class="line">err := viper.ReadRemoteConfig()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行后报错<code>panic: Remote Configurations Error: No Files Found</code>，检查后发现etcd开启了tls，所以需要用https协议访问etcd的API，更新代码如下。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">viper.AddSecureRemoteProvider(<span class="string">&quot;etcd&quot;</span>,</span><br><span class="line">        <span class="string">&quot;https://127.0.0.1:2379&quot;</span>,</span><br><span class="line">        <span class="string">&quot;conf.toml&quot;</span>,</span><br><span class="line">        <span class="string">&quot;key_path&quot;</span>)</span><br><span class="line">viper.SetConfigType(<span class="string">&quot;toml&quot;</span>)</span><br><span class="line">err := viper.ReadRemoteConfig()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>AddSecureRemoteProvider</code>方法替换<code>AddRemoteProvider</code>方法，问题依旧。</p>
+<h3 id="定位问题"><a href="#定位问题" class="headerlink" title="定位问题"></a>定位问题</h3><p>跟踪源码发现，最终像etcd发送请求的是<a target="_blank" rel="noopener" href="https://github.com/coreos/go-etcd/">go-etcd</a>包（目前go-etcd已经不维护），在go-etcd的requests.go文件中找到了相关的源码，go-etcd调用了net/http包向etcd发送请求。</p>
+<p><img src="/upload/20200416_01.jpg"></p>
+<p>这个时候忽然想到etcd的证书是自签名的，访问自签名证书的https接口应该会报错啊，怎么会请求到内容呢？如下图，在Chrome中访问etcd的自签名https接口，会提示证书无效。</p>
+<p><img src="/upload/20200416_02.jpg"></p>
+<p>我们自己使用go实现一段请求etcd https接口的代码，看看到底是什么回事，代码如下。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">resp, err := http.Get(<span class="string">&quot;https://127.0.0.1:2379/v2/keys/conf.toml?quorum=false&amp;recursive=false&amp;sorted=false&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="comment">// handle error</span></span><br><span class="line">        fmt.Println(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> resp.Body.Close()</span><br><span class="line">    body, err := ioutil.ReadAll(resp.Body)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">    &#125;</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(body))</span><br></pre></td></tr></table></figure>
+
+<p>果然不一样，我们的代码会报错<code>x509: certificate signed by unknown authority</code>，因为是自签名证书，客户端无法验证证书真假，所以这个报错是可以理解的，go-etcd代码和我们的测试代码表现不一致，一定是我们落下了什么，重新梳理go-etcd源码终于发现了原因。</p>
+<p><img src="/upload/20200416_03.jpg"></p>
+<p>在client.go文件的initHTTPSClient方法中，发现允许绕过证书验证，这就可以解释为什么证书无效也能获取到数据了，绕过了证书的验证环节，相当于不管证书真假都拿来用。现在可以解释使用<code>AddRemoteProvider</code>方法访问https接口为什么可以获取到内容，但是无法解释<code>AddSecureRemoteProvider</code>方法为什么无法从https接口获取内容，因为两个方法在发送http请求阶段的代码是一致的，都忽略了证书验证。</p>
+<p>查看<code>AddSecureRemoteProvider</code>的注释，发现了原因。</p>
+<p><img src="/upload/20200416_04.jpg"></p>
+<p>原来…<code>AddSecureRemoteProvider</code>这个Secure指的并不是使用安全链接https，而是在请求到内容后加了一个解密的步骤（Secure指请求的是加密过的内容，而不是使用加密链接请求），最后一个参数接收的也并不是客户端证书，而是解密的gpg key… 根据viper的文档，这个gpg key是可选的，我们这个例子中，如果给gpg key传入一个空字符串，也是可以正常执行的…</p>
+<p>必须吐槽一下viper的命名，哪里是<code>AddSecureRemoteProvider</code>，明明应该叫<code>AddEncryptedRemoteProvider</code></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>出现这个问题，主要是误会了<code>AddSecureRemoteProvider</code>接口表达的意思，并且go-etcd允许忽略证书验证，也让问题变得更加离奇。</p>
+<p>当然go-etcd的这种配置是非常合理的，内部系统使用自签名证书是一个很正常的行为。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2020/03/31/use-pipfile-instead-of-requirements/">使用Pipfile代替reqirements.txt</a>
         </h1>
 
@@ -191,25 +231,6 @@
 <p>国内一般网络环境下，curl <a target="_blank" rel="noopener" href="http://www.google.com/">www.google.com</a> 是无法正常返回的，加入 –max-time 让 curl 的耗时不要太长。</p>
           <div class="read-more">
             <a href="/2019/04/18/building-docker-image-behind-proxy/" class="read-more-link">阅读更多</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2019/04/16/understanding-postgres-count-function/">理解 PostgreSQL 的 count 函数的行为</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2019-04-16
-        </span><span class="post-category">
-            <a href="/categories/DevOps/">DevOps</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>关于 count 函数的使用一直存在争议，尤其是在 MySQL 中，作为流行度越来越高的 PostgreSQL 是否也有类似的问题呢，我们通过实践来理解一下 PostgreSQL 中 count 函数的行为。</p>
-          <div class="read-more">
-            <a href="/2019/04/16/understanding-postgres-count-function/" class="read-more-link">阅读更多</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/2/">

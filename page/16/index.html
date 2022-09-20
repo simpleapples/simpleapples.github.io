@@ -98,6 +98,44 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/">在Flash中载入swf文件并逐帧播放</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-11-22
+        </span><span class="post-category">
+            <a href="/categories/Actionscript/">Actionscript</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在Flash中导入swf并且播放，使用ActionScript中的loadMovie()函数就可以完成，但是如果要逐帧播放就比较麻烦了。因为逐帧播放时，要么给每帧定一个播放时间，要么然手动设置按钮控制。</p>
+<p>这里以按时间逐帧播放为例，介绍一下如何使用ActionScript控制。</p>
+<p>控制逐帧播放的代码如下：</p>
+<pre><code>var currentPage = _root._currentframe;  //设定当前页变量
+var i = 0;
+function timer() &#123;
+    if(currentPage == _root._currentframe) &#123;  //如果播放到当前页则跳到下一页
+        gotoAndPlay(currentPage + 1);
+        currentPage = _root._currentframe;
+    &#125;
+&#125;
+timeInter = setInterval(timer, 3000);  //设置定时器3000ms
+</code></pre>
+<p>载入影片代码：</p>
+<pre><code>loadMovie(&quot;XXX.swf&quot;,_root);
+</code></pre>
+<p>具体效果图：</p>
+<p><img src="/upload/flash.png" alt="Alt text"></p>
+<p>Interval层第一帧为计时器代码，Interval最后一帧代码非常重要：</p>
+<pre><code>ClearInterval(timeInter);
+</code></pre>
+<p>最后一帧清除掉计时器，是防止循环播放后重复添加多个计时器。<br>Stop层每一帧添加stop();命令。Content层为具体内容。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/11/14/compass-web-app/">指南针WebApp</a>
         </h1>
 
@@ -209,33 +247,6 @@
 <p><img src="/upload/timer-300x69.png" alt="Alt text"></p>
 <p>演示地址：<a target="_blank" rel="noopener" href="http://labs.simpleapples.com/timer/">http://labs.simpleapples.com/timer/</a></p>
 <p>github：<a target="_blank" rel="noopener" href="https://github.com/simpleapples/javascripttimer">https://github.com/simpleapples/javascripttimer</a></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/11/01/the-first-offer-and-the-first-rejection-letter/">人生中的第一个offer和第一份拒信</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-11-01
-        </span><span class="post-category">
-            <a href="/categories/%E7%94%9F%E6%B4%BB/">生活</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>人生中第一个offer是3个小时前收到的，来自国内某大型软件公司。</p>
-<p>两天前打酱油似的参加了该公司在学校的宣讲，紧接着带着积攒经验的心态参加了现场笔试、面试。</p>
-<p>就在3个小时前，一份热腾腾的offer摆在了面前。</p>
-<p>哦，原来offer是这个样子的啊。</p>
-<p>哦，原来发offer时的hr这么和蔼啊。</p>
-<p>顿时，人生阅历丰富了一截。</p>
-<p>我仔细地打量了它，像一张精致的贺卡，比我的大学录取通知书好看的多。</p>
-<p>时间到了3个小时后的现在，我即将发出人生中的第一份拒信。</p>
-<p>对，拒掉刚拿到的offer。</p>
-<p>一个理由。</p>
-<p>趁年轻，给自己一个拼的机会。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/15/">

@@ -98,6 +98,54 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/04/26/using-decorators-to-validate-form/">用装饰器封装Flask-WTF表单验证逻辑</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-04-26
+        </span><span class="post-category">
+            <a href="/categories/Python/">Python</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><blockquote>
+<p>Don’t repeat yourself</p>
+</blockquote>
+<p>在使用Flask-WTF的时候，常会用下面这样的代码来验证表单数据的合法性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">	form = TestForm()</span><br><span class="line">	<span class="comment"># 判断是否合法</span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit():</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&#x27;err&#x27;</span>, <span class="number">400</span></span><br><span class="line">	<span class="comment"># 主要逻辑</span></span><br></pre></td></tr></table></figure>
+
+<p>对于有很多提交接口的项目来说，需要在每个路由下写相同的的逻辑，造成了大量的代码重复。在Flask-Login中，要把一个路由设置为登录后才能访问，只需要在路由上加一个@login_required装饰器，不需要额外的代码。能不能像Flask-Login一样，用装饰器来封装对表单的验证逻辑呢？</p>
+<h1 id="实现表单验证装饰器"><a href="#实现表单验证装饰器" class="headerlink" title="实现表单验证装饰器"></a>实现表单验证装饰器</h1><p>由于不同路由使用的表单类不一样，所以需要为装饰器传入一个表单类参数，并且在路由函数中需要用到表单中的值，所以还需要将验证通过的表单传给路由函数。</p>
+<p>上代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">        @wraps(<span class="params">fn</span>)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit():</span><br><span class="line">                <span class="keyword">return</span> <span class="string">&#x27;error&#x27;</span>, <span class="number">400</span></span><br><span class="line">            <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br></pre></td></tr></table></figure>
+
+<p>使用方式如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@validate_form(<span class="params">TestForm</span>)  </span><span class="comment"># 需要传入要验证的表单类</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">form</span>):</span></span><br><span class="line">    <span class="comment"># 执行到这里说明表单验证通过</span></span><br></pre></td></tr></table></figure>
+
+<p>经过在项目中的应用，发现装饰器还是有一些缺陷：</p>
+<ul>
+<li>无法自定义处理非法表单的逻辑</li>
+<li>不支持get方式提交的表单（查看validate_on_submit()源码可知其只支持对post和put方式提交的表单进行验证）</li>
+</ul>
+<h1 id="丰富一下"><a href="#丰富一下" class="headerlink" title="丰富一下"></a>丰富一下</h1><p>要自定义处理非法表单的逻辑，需要增加一个可以传入自定义逻辑的接口。表单非法时接口的返回往往是一致的，所以我们为所有应用装饰器的路由传入一个统一的处理逻辑。将装饰器封装在一个类中，在类中添加一个配置处理逻辑的方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FormValidator</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, error_handler=<span class="literal">None</span></span>):</span></span><br><span class="line">        self._error_handler = error_handler</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">            @wraps(<span class="params">fn</span>)</span></span><br><span class="line">            <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> form.validate_on_submit() <span class="keyword">and</span> self._error_handler:</span><br><span class="line">                    <span class="keyword">return</span> self._error_handler(form.errors)</span><br><span class="line">                <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">            <span class="keyword">return</span> wrapper</span><br><span class="line">        <span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">error_handler</span>(<span class="params">self, fn</span>):</span></span><br><span class="line">        self._error_handler = fn</span><br><span class="line">        <span class="keyword">return</span> fn</span><br></pre></td></tr></table></figure>
+
+<p>error_handler也是一个装饰器，被它修饰的方法就是处理非法表单的方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@form_validator.error_handler</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">error_handler</span>(<span class="params">errors</span>):</span></span><br><span class="line">    <span class="keyword">return</span> jsonify(&#123;<span class="string">&#x27;errors&#x27;</span>: errors&#125;), <span class="number">400</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来支持get方法，在flask中，我们可以通过request.args来获取到get方法提交的参数。思路是用获取到的参数生成一个表单类的实例，然后就可以通过调用表单类的validate()方法来判断是否合法了。修改validate_form装饰器：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_form</span>(<span class="params">self, form_cls</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span>(<span class="params">fn</span>):</span></span><br><span class="line"><span class="meta">        @wraps(<span class="params">fn</span>)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">            <span class="keyword">if</span> request.method == <span class="string">&#x27;GET&#x27;</span>:</span><br><span class="line">                form = form_cls(formdata=request.args)</span><br><span class="line">            <span class="keyword">elif</span> request.method <span class="keyword">in</span> (<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;PUT&#x27;</span>):</span><br><span class="line">                form = form_cls()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> fn(*args, **kwargs)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> form.validate() <span class="keyword">and</span> self._error_handler:</span><br><span class="line">                <span class="keyword">return</span> self._error_handler(form.errors)</span><br><span class="line">            <span class="keyword">return</span> fn(form, *args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br></pre></td></tr></table></figure>
+
+<p>大功告成！使用上面的装饰器，就可以免除在路由函数中重复写表单验证逻辑，并且同时支持put、post和get方法提交的表单。</p>
+<h1 id="开箱即用"><a href="#开箱即用" class="headerlink" title="开箱即用"></a>开箱即用</h1><p>笔者已经把上面的代码封装成了一个库发布到了PyPI，想直接用的朋友可以使用<code>pip install flask-wtf-decorators</code>安装，项目源码也已经发布到Github。</p>
+<p><a target="_blank" rel="noopener" href="https://pypi.org/project/Flask-WTF-Decorators/">查看PyPI</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/simpleapples/flask-wtf-decorators">查看Github</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/04/22/python-parameter-passing/">Python参数传递，既不是传值也不是传引用</a>
         </h1>
 
@@ -259,35 +307,6 @@
 <p><img src="/upload/20180326_03.png" alt="在代码文件旁新建一个wallpapers文件夹"></p>
 <p>执行上面这段Python代码，再打开wallpapers文件夹，就可以看到提取出的锁屏图片了。</p>
 <p><img src="/upload/20180326_04.png"></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/">15行Python代码，帮你理解令牌桶算法</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-03-20
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20180320_01.jpg"></p>
-<p>在网络中传输数据时，为了防止网络拥塞，需限制流出网络的流量，使流量以比较均匀的速度向外发送，令牌桶算法就实现了这个功能，<strong>可控制发送到网络上数据的数目，并允许突发数据的发送。</strong></p>
-<h1 id="什么是令牌"><a href="#什么是令牌" class="headerlink" title="什么是令牌"></a>什么是令牌</h1><p>从名字上看令牌桶，大概就是一个装有令牌的桶吧，那么什么是令牌呢？</p>
-<p>紫薇格格拿的令箭，可以发号施令，令行禁止。在计算机的世界中，令牌也有令行禁止的意思，有令牌，则相当于得到了进行操作的授权，没有令牌，就什么都不能做。</p>
-<h1 id="用令牌实现限速器"><a href="#用令牌实现限速器" class="headerlink" title="用令牌实现限速器"></a>用令牌实现限速器</h1><p>我们用1块令牌来代表发送1字节数据的资格，假设我们源源不断的发放令牌给程序，程序就有资格源源不断的发送数据，当我们不发放令牌给程序，程序就相当于被限流，无法发送数据了。接下来我们说说限速器，所谓限速器，就是让程序在单位时间内，最多只能发送一定大小的数据。假设在1秒发放10块令牌，那么程序发送数据的速度就会被限制在10bytes/s。如果1秒内有大于10bytes的数据需要发送，就会因为没有令牌而被丢弃。</p>
-<h1 id="改进限速器——加个桶"><a href="#改进限速器——加个桶" class="headerlink" title="改进限速器——加个桶"></a>改进限速器——加个桶</h1><p><img src="/upload/20180320_02.jpg"></p>
-<p>我们实现的限速器，速度是恒定的，但是在实际的应用中，往往会有突发的传输需求（需要更快速的发送，但是不会持续太久，也不会引起网络拥塞），这种数据碰上我们的限速器，就因为拿不到令牌而无法发送。</p>
-<p>对限速器进行一下改动，依然1秒产生10块令牌，但是我们把产生出来的令牌先放到一个桶里，当程序需要发送的时候，从桶里取令牌，不需要的时候，令牌就会在桶里沉淀下来，假设桶里沉淀了10块令牌，程序最多就可以在1秒内发送20bytes的数据，满足了突发数据传输的要求，并且由于桶里的令牌被用完，下一秒最多依然只能发10bytes的数据，不会因为持续发送大量数据，对网络造成压力。</p>
-<p><img src="/upload/20180320_03.jpg"></p>
-<h1 id="15行Python代码实践令牌桶"><a href="#15行Python代码实践令牌桶" class="headerlink" title="15行Python代码实践令牌桶"></a>15行Python代码实践令牌桶</h1><p>令牌桶需要以一定的速度生成令牌放入桶中，当程序要发送数据时，再从桶中取出令牌。这里似乎有点问题，如果我们使用一个死循环，来不停地发放令牌，程序就被阻塞住了，有没有更好的办法？</p>
-<p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
-<p>接下来看代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenBucket</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, rate, capacity</span>):</span></span><br><span class="line">        self._rate = rate</span><br><span class="line">        self._capacity = capacity</span><br><span class="line">        self._current_amount = <span class="number">0</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">consume</span>(<span class="params">self, token_amount</span>):</span></span><br><span class="line">        increment = (<span class="built_in">int</span>(time.time()) - self._last_consume_time) * self._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        self._current_amount = <span class="built_in">min</span>(</span><br><span class="line">            increment + self._current_amount, self._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; self._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        self._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line">        self._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/8/">

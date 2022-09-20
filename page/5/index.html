@@ -98,6 +98,26 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/12/13/combining-jwt-with-refresh-token/">基于 JWT + Refresh Token 的用户认证实践</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-12-13
+        </span><span class="post-category">
+            <a href="/categories/Tech/">Tech</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20181213_01.jpg"></p>
+<p>HTTP 是一个无状态的协议，一次请求结束后，下次在发送服务器就不知道这个请求是谁发来的了（同一个 IP 不代表同一个用户），在 Web 应用中，用户的认证和鉴权是非常重要的一环，实践中有多种可用方案，并且各有千秋。</p>
+          <div class="read-more">
+            <a href="/2018/12/13/combining-jwt-with-refresh-token/" class="read-more-link">阅读更多</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/12/10/ssh-via-ngrok/">通过 ngrok 实现 ssh 内网穿透</a>
         </h1>
 
@@ -178,33 +198,6 @@
           <div class="read-more">
             <a href="/2018/10/25/faster-python-part-2/" class="read-more-link">阅读更多</a>
           </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/10/11/stacks-in-go/">Go的栈空间管理</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-10-11
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p><img src="/upload/20181011_01.jpg"></p>
-<h3 id="栈空间管理的基本逻辑"><a href="#栈空间管理的基本逻辑" class="headerlink" title="栈空间管理的基本逻辑"></a>栈空间管理的基本逻辑</h3><p>go语言通过goroutine提供了并发编程支持，goroutine是go运行库的功能，而不是操作系统线程实现的，goroutine可以被理解成一个用户态的线程。</p>
-<p>既然goroutine是由go运行库管理的，那么go运行库也需要为每个goroutine创建并管理相应的栈空间，为每个goroutine分配的栈空间不能太大，goroutine开多时会浪费大量空间，也不能太小，会导致栈溢出。go语言选择栈的栈空间管理的方式是，一开始给一个比较小的空间，随着需要自动增长。当goroutine不需要那么大的空间时，栈空间也要自动缩小。</p>
-<h3 id="分段栈-Segment-Stacks"><a href="#分段栈-Segment-Stacks" class="headerlink" title="分段栈 Segment Stacks"></a>分段栈 Segment Stacks</h3><p>在go 1.3之前，go使用分段栈。</p>
-<p>分段栈实现了一种不连续但是可以持续增长的栈，开始时，栈只有一个段，当需要更多的栈空间时，会分配一个新的段，和上一个栈双向链接。这样，一个栈就是由多个双向链接的段所组成的。当新分配的段使用完毕后，新段会被释放掉。</p>
-<p><img src="/upload/20181011_02.png"></p>
-<p>分段栈实现了栈的按需收缩，在增加新分段时也不需要对原有分段中的数据进行拷贝，使得goroutine的使用代价非常低廉。</p>
-<p>分段栈的好处是可以按需增长，空间利用率比较高，然而分段栈在某些情况下也存在一定的瑕疵。当一个段即将用尽，这时使用for循环执行一个比较耗空间的函数，会导致函数执行时goroutine进行段的分配，而执行完成返回时，进行段的销毁，这样就会导致在循环中出现多次栈的扩容和收缩，造成很大的性能损失，这种情况被称作栈分裂（Stack Split）。</p>
-<h3 id="连续栈-Contiguous-Stacks"><a href="#连续栈-Contiguous-Stacks" class="headerlink" title="连续栈 Contiguous Stacks"></a>连续栈 Contiguous Stacks</h3><p>go 1.3推出了连续栈，连续栈使用了另外一种策略，不再把栈分成一段一段的，当栈空间不够时，直接new一个2倍大的栈空间，并将原先栈空间中的数据拷贝到新的栈空间中，而后销毁旧栈。这样当出现栈空间触及边界时，不会产生栈分裂的情况。</p>
-<p>继续假设当前栈空间即将用尽，并且需要在for循环中执行一个比较消耗空间的函数。当该函数执行时，栈空间发生了扩容，变成原先2倍大小，函数执行完成一次后，栈空间的使用量缩小回执行前的大小，但是栈空间的使用量并没有小于栈大小的1/4，不会触发栈收缩，所以在整个for循环执行过程中，不会反复触发栈空间的收缩扩容。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>相比于分段栈，连续栈避免了某些场景下栈空间的的频繁伸缩。有一点需要注意的是，连续栈的收缩也是需要重新申请一段空间（原先的1/2大小），并进行栈拷贝操作的。</p>
-
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/4/">
         <i class="iconfont icon-left"></i>

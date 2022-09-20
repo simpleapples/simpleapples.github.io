@@ -98,6 +98,31 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2012/12/19/a-problem-with-nettop/">nettop命令引发的一个小问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2012-12-19
+        </span><span class="post-category">
+            <a href="/categories/Mac-Linux/">Mac&Linux</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>在网上看到一篇帖子，是说Mac OSX 10.7中新加入了一个nettop命令，可以实时查看当前网络链接和数据流量。这是nettop命令的描述：  </p>
+<blockquote>
+<p>The nettop program displays a list of sockets or routes. The counts for network structures are updated periodically.</p>
+</blockquote>
+<p>于是在Terminal中尝试了一下。<br>尝鲜过后就再也没管。但是关闭Terminal大概一两分钟后，Mac的风扇突然疯狂的转了起来。iStatMenu上看达到了5300rpm左右。一般情况下，除非开游戏或者看Flash，才有可能出现风扇飞转的情况，但是看了一下dock发现只开了Chrome、iMessage和iTunes，也没有开Apache之类的服务。打开活动检测器，发现CPU四个核心都已经爆表，查看进程，有两个nettop进程几乎占用了所有CPU资源。</p>
+<p><img src="/upload/nettop1.png" alt="Alt text"></p>
+<p>关闭nettop之后，CPU占用率迅速下降，风扇飞转的情况也逐渐消失。</p>
+<p><img src="/upload/nettop2.png" alt="Alt text"></p>
+<p>回想一下，可能是使用nettop命令后没有退出nettop，而直接关闭Terminal造成的。经过尝试，发现问题确实出在没有正确退出nettop上。可能这是一个设计中没有考虑到的小bug。<br>使用man nettop查看文档，文档说明中退出nettop应该采用q，但没有说必须这样退出，而且很多时候，直接关闭Terminal确实是一些人的习惯，比如我：）</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2012/12/11/browser-js/">browser.js-浏览器和操作系统识别</a>
         </h1>
 
@@ -204,44 +229,6 @@ var b = [3]; //正确！
 <p>至于进入其它搜索引擎之后如何不能返回默认的google搜索的时候，只要点击右边的搜索引擎图标就可以了。</p>
 <h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>添加字典、发电子邮件和计算四则运算功能。<br>字典功能：输入dict 加上要查的单词或词。<br>发电子邮件功能：输入mail 加上电子邮件地址。<br>四则运算功能：直接输入算式，见图。</p>
 <p><img src="/upload/magicsearch2.png" alt="Alt text"></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/">在Flash中载入swf文件并逐帧播放</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-11-22
-        </span><span class="post-category">
-            <a href="/categories/Actionscript/">Actionscript</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>在Flash中导入swf并且播放，使用ActionScript中的loadMovie()函数就可以完成，但是如果要逐帧播放就比较麻烦了。因为逐帧播放时，要么给每帧定一个播放时间，要么然手动设置按钮控制。</p>
-<p>这里以按时间逐帧播放为例，介绍一下如何使用ActionScript控制。</p>
-<p>控制逐帧播放的代码如下：</p>
-<pre><code>var currentPage = _root._currentframe;  //设定当前页变量
-var i = 0;
-function timer() &#123;
-    if(currentPage == _root._currentframe) &#123;  //如果播放到当前页则跳到下一页
-        gotoAndPlay(currentPage + 1);
-        currentPage = _root._currentframe;
-    &#125;
-&#125;
-timeInter = setInterval(timer, 3000);  //设置定时器3000ms
-</code></pre>
-<p>载入影片代码：</p>
-<pre><code>loadMovie(&quot;XXX.swf&quot;,_root);
-</code></pre>
-<p>具体效果图：</p>
-<p><img src="/upload/flash.png" alt="Alt text"></p>
-<p>Interval层第一帧为计时器代码，Interval最后一帧代码非常重要：</p>
-<pre><code>ClearInterval(timeInter);
-</code></pre>
-<p>最后一帧清除掉计时器，是防止循环播放后重复添加多个计时器。<br>Stop层每一帧添加stop();命令。Content层为具体内容。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/14/">

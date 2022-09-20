@@ -98,6 +98,49 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2018/07/15/solving-kubernetes-dns-problem/">搭建Kubernetes集群时DNS无法解析问题的处理过程</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-07-15
+        </span><span class="post-category">
+            <a href="/categories/DevOps/">DevOps</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p><img src="/upload/20180715_01.jpg"></p>
+<h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>在搭建Kubernetes集群过程中，安装了kube-dns插件后，运行一个ubuntu容器，发现容器内无法解析集群外域名，一开始可以解析集群内域名，一段时间后也无法解析集群内域名。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ nslookup kubernetes.default</span><br><span class="line">Server:    10.99.0.2</span><br><span class="line">Address 1: 10.99.0.2 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">nslookup: can<span class="string">&#x27;t resolve &#x27;</span>kubernetes.default<span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="排查过程"><a href="#排查过程" class="headerlink" title="排查过程"></a>排查过程</h1><p>在排查问题前，先思考一下Kubernetes集群中的DNS解析过程，在安装好kube-dns的集群中，普通Pod的dnsPolicy属性是默认值ClusterFirst，也就是会指向集群内部的DNS服务器，kube-dns负责解析集群内部的域名，kube-dns Pod的dnsPolicy值是Default，意思是从所在Node继承DNS服务器，对于无法解析的外部域名，kube-dns会继续向集群外部的dns进行查询，过程如图。</p>
+<p><img src="/upload/20180715_02.jpg"></p>
+<p>Ubuntu容器是一个普通的Pod，在Linux系统中，/etc/resolv.conf是存储DNS服务器的文件，普通Pod的/etc/resolv.conf文件应该存储的是kube-dns的Service IP。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nameserver 10.99.0.2  <span class="comment"># 这里存储的是kube-dns的Service IP</span></span><br><span class="line">search default.svc.cluster.local. svc.cluster.local. cluster.local.</span><br><span class="line">options ndots:5</span><br></pre></td></tr></table></figure>
+
+<p>查看后发现/etc/resolv.conf文件中存储的是kube-dns的Service IP，证明这一步没有问题，接下来查看一下kube-dns的Pod，先进入kube-dns的Pod中检查一下/etc/resolv.conf文件，这里存储的应该是集群外部的DNS服务器地址，查看后发现，这里存储的地址是127.0.0.53，进一步查看kube-dns Pod的log，发现出现了非常多的i/o timeout错误。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> 2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:38019-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:57567-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:52599-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:42539-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:46885-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:44189-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:56505-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:47320-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:42464-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:49203-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:58103-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:47148-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:36883-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:40968-&gt;127.0.0.53:53: i/o timeout</span><br><span class="line">2018/07/11 07:12:47 [ERROR] 2 [www.baidu.com](http://www.baidu.com/). A: unreachable backend: <span class="built_in">read</span> udp 127.0.0.1:55672-&gt;127.0.0.53:53: i/o timeout</span><br></pre></td></tr></table></figure>
+
+<p>现在基本上可以发现问题的原因了，kube-dns只能解析集群内部地址，而集群外部地址应该发给外部DNS服务器进行解析，由于kube-dns Pod中的/etc/resolv.conf文件存储的DNS服务器地址是127.0.0.53，127.<em>.</em>.*都是回环地址，也就是集群外域名的DNS解析请求会再次发送回kube-dns，导致形成一个循环，这也是一秒钟会出现几十次i/o timeout日志的原因，请求会不断的在kube-dns中循环，kube-dns就像一个黑洞一样，吃掉了所有dns解析请求，不断累积的请求最终会导致整个集群的网络出现卡顿。</p>
+<p><img src="/upload/20180715_03.jpg"></p>
+<h1 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h1><p>虽然问题的原因找到了，但是为什么kube-dns Pod中/etc/resolv.conf文件存储的DNS服务器是127.0.0.53？</p>
+<p>kube-dns Pod的dnsPolicy值是Default，查看一下Kubernetes文档。</p>
+<blockquote>
+<p>“<code>Default</code>“: The Pod inherits the name resolution configuration from the node that the pods run on. See <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#inheriting-dns-from-the-node">related discussion</a> for more details.</p>
+</blockquote>
+<p>所以kube-dns的/etc/resolv.conf文件是从Node中继承来的，查看Node中的/etc/resolv.conf文件，存储的DNS服务器地址确实是127.0.0.53，那么下一个问题出现了，在Node中发送DNS解析请求为什么不会产生回环的问题呢？</p>
+<p>Node使用的是Ubuntu 18.04 Server，在这个版本的系统中，DNS解析请求并不是直接发给所在网络的DNS服务器的，Ubuntu 18.04中有一个systemd-resolved服务，为本地应用程序提供了DNS解析服务，例如nslookup localhost，解析程序从/etc/resolv.conf文件中找到DNS服务器127.0.0.53，发送解析请求，systemd-resolved会监听在53端口上，捕获到解析请求后，如果是自己可以解析的，例如localhost，会直接返回127.0.0.1，如果不能解析，才会发送给外部服务器，而外部服务器的地址存储在/run/systemd/resolve/resolv.conf文件中，这个文件是systemd-resolved服务器的配置文件，过程如图。</p>
+<p><img src="/upload/20180715_04.jpg"></p>
+<h1 id="怎么破"><a href="#怎么破" class="headerlink" title="怎么破"></a>怎么破</h1><p>理解了问题的来龙去脉，解决问题的办法也就应运而生。在Kubernetes集群中，kubelet是worker组建，负责管理Pod，根据kubernetes文档，kubelet默认会从Node的/etc/resolv.conf文件读取DNS服务器地址，使得dnsPolicy是Default的Pod得以继承，kubelet中的–resolv-conf参数可以指定这个配置文件的地址。在Ubuntu 18.04中，将这个参数设置为systemd-resolved的DNS服务器配置文件/run/systemd/resolve/resolv.conf，Pod就会继承真正的外部DNS服务器。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过对问题的探究，也理解了Kubernetes集群中DNS解析的完整过程，如图。</p>
+<p><img src="/upload/20180715_05.jpg"></p>
+<p><em>* 在Ubuntu 16.04中也是类似的逻辑，只不过systemd-resolved换成了dnsmasq，监听地址是127.0.1.1</em><br><em>* 在具体实践过程中，也顺便探究了CoreDNS和KubeDNS架构和解析逻辑上的区别，不过不在此问题的讨论范围，有兴趣的朋友可以自己看一下。</em><br><em>* 如果Kubernetes集群是安装在NAT网络下的虚拟机上，虚拟机（也就是Kubernetes集群中的Node）中/etc/resolv.conf文件可能被修改为NAT的地址，也就不会出现上面这个问题。</em></p>
+<h1 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h1><p> <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/">https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/</a><br><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/">https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/</a><br><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/">https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/</a><br><a target="_blank" rel="noopener" href="https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html">https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html</a><br><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/issues/49411">https://github.com/kubernetes/kubernetes/issues/49411</a><br><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/issues/45828">https://github.com/kubernetes/kubernetes/issues/45828</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2018/07/10/build-golang-environment/">Golang环境安装和依赖管理</a>
         </h1>
 
@@ -322,52 +365,6 @@
 <figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">sudo</span> virsh vncdisplay ubuntu_<span class="number">3</span>  # ubuntu_<span class="number">3</span>是虚拟机名称</span><br></pre></td></tr></table></figure>
 
 <p>知道了VNC端口号，就可以使用VNC客户端连接到虚拟机完成安装了。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2018/06/20/wegame-causing-bsod-on-xps-15-9560/">大毒瘤！卸载WeGame解决XPS 15蓝屏问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-06-20
-        </span><span class="post-category">
-            <a href="/categories/Tech/">Tech</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h1 id="潜伏期"><a href="#潜伏期" class="headerlink" title="潜伏期"></a>潜伏期</h1><p>去年4月底买了一台美版XPS 15 9560，用了几个月之后就会偶尔出现蓝屏问题，由于之前就在论坛上看到很多吐槽XPS品控的帖子，以为自己也中了枪，好在蓝屏也不频繁，不影响使用也就没管。</p>
-<h1 id="上升期"><a href="#上升期" class="headerlink" title="上升期"></a>上升期</h1><p>进入今年5月，升级了Win10 1803后（基本上软件有更新我都会第一时间升级，体验最新的改进），蓝屏的次数开始多了起来，开始变得影响使用，于是开始着手查找问题。</p>
-<p>由于心急，并没有看转储文件，而是直接Google了XPS 15的蓝屏问题，希望能尽快找到方案。很快发现具有类似问题的人不在少数，也有很大一部分人以此说XPS 15品控不好，看了很多内容后，把怀疑的方向放在了驱动层面（Dell有一个Dell Update软件，一有更新提示我就会更新驱动），于是从更新频率最高的显卡驱动入手，降级显卡驱动到上一个版本，然而并没有什么用。于是又降级了Wifi驱动，因为Wifi驱动也是最近更新的，并且XPS 15的Killer显卡兼容性似乎没有那么好。</p>
-<p><img src="/upload/20180620_01.png" alt="XPS 15的驱动列表，可以看到Wifi和显卡驱动都是最近发布的"></p>
-<p>降级完驱动之后，电脑进入了短暂的回光返照阶段，用了几个小时都没有蓝屏，然而紧接着更加不幸的问题就要发生了。</p>
-<h1 id="爆发期"><a href="#爆发期" class="headerlink" title="爆发期"></a>爆发期</h1><p>用QQ接收一个大文件，大概1G，进行到一半的时候忽然蓝屏，重启后重新接收，准备传完之后再解决蓝屏问题，然而不幸的是传了一半又蓝屏了… 这时我把怀疑的方向转向了硬盘，于是降级了Intel RST驱动，心想降级要是没用的话，有可能是SSD跪了… 降级后怀着忐忑的心情再次重试，竟然…又蓝屏了…</p>
-<p>这次把怀疑的方向转到了QQ或者Wifi上，毕竟是一用QQ接收大文件就出问题，那么不是QQ就是Wifi了，于是卸载QQ，用迅雷下载一个大文件，果不其然，又跪了…</p>
-<p><img src="/upload/20180620_02.png"></p>
-<p>然而已经降级了Wifi驱动，之前也一直没有什么问题，难道真的是硬件出了问题？这个时候，我内心已经有点放弃PC，转而在京东上看MBP的价格了…</p>
-<p>然而MBP高企的售价让我冷静了下来，回来死马当活马医，继续找问题吧。</p>
-<p>既然自己怀疑的方向都不对，只能信仰科学了，安装了WinDbg和BlueScreenView这两款软件来查看和分析转储文件（具体过程不再赘述，可以参考文末的相关资源）。</p>
-<p><img src="/upload/20180620_03.jpeg" alt="从BlueScreenView里可以看到，机器以近乎疯狂的频率蓝屏"></p>
-<p>从BlueScreenView里并没有看到太多信息，现在只剩下WinDbg这一根救命稻草了。</p>
-<p><img src="/upload/20180620_04.jpeg"></p>
-<p>不过好在WinDbg非常给力，分析了几个不同时间的转储文件，都提示问题可能是由tdx.sys文件造成的。</p>
-<p><img src="/upload/20180620_05.png"></p>
-<p>tdx是TDI Translation Driver的意思，TDI是传输层驱动接口的意思，那么可以肯定问题来自于网络，这也印证了每次使用网络传输大文件就会蓝屏的现象。紧接着，看到了另外一段话：</p>
-<blockquote>
-<p>WARNING: Unable to verify timestamp for QMTgpNetFlow764.sys</p>
-</blockquote>
-<p>这个QMTgpNetFlow764.sys又是什么，看前缀似乎像第三方的文件，先Google一下。</p>
-<h1 id="真相大白"><a href="#真相大白" class="headerlink" title="真相大白"></a>真相大白</h1><p>Google了一下这个QMTgpNetFlow764.sys，终于拨云见日。</p>
-<p><img src="/upload/20180620_06.png" alt="原来早有人发现了QMTgpNetFlow764.sys引发蓝屏问题的秘密"></p>
-<p>根据网友们的分析（具体可以查看文末的相关资源），这5个文件来自于腾讯的游戏平台WeGame，于是卸载了腾讯系的游戏，并且重启删除了C:\Windows\system32\drivers目录下以QMT开头的5个文件，没关机使用至今（大约半个月）再也没有出现过蓝屏的情况，至此可以证明，腾讯WeGame平台是引起蓝屏的主要原因。</p>
-<p><img src="/upload/20180620_07.png" alt="毒瘤们"></p>
-<h1 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h1><p>BlueScreenView下载地址：<a target="_blank" rel="noopener" href="https://www.nirsoft.net/utils/blue_screen_view.html">https://www.nirsoft.net/utils/blue_screen_view.html</a></p>
-<p>WinDbg下载地址：<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools">https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools</a></p>
-<p>WinDbg使用说明：<a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html">https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html</a></p>
-<p>知乎用户<a target="_blank" rel="noopener" href="https://www.zhihu.com/people/weasley-frank">Weasley Frank</a>的专栏文章<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33723838">TGP/WeGame驱动导致WSL网络服务异常
-</a>对这个问题进行了简单分析</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/6/">

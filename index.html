@@ -98,6 +98,35 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2022/09/20/cat-match-crack/">羊了个羊科技通关攻略</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2022-09-20
+        </span><span class="post-category">
+            <a href="/categories/Life/">Life</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>最近羊了个羊比较火，但是难度非常高，打了几天几十盘都通不过，所以犯了职业病，想看看有没有科技手段，实践有效后整理出来方便大家科技通关。</p>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>科技通关的原理比较简单，游戏每天都有两幅地图，第一个地图是练手的可以无脑通过，第二个是难度爆表的版本，所以只要能够把第二个地图改成第一个，就可以实现通关。</p>
+<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p>实现科技通关需要一个 Web 调试代理 App，在 iOS 上可以用 HTTP Catcher（需要内购），Storm Sniffer（三天试用），Android 上也可以找类似的软件。以 HTTP Catcher 为例，安装好之后需要安装并启用 Root 证书，以实现 HTTPS 解密。</p>
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><p>首先需要启动 HTTP Catcher，打开羊了个羊进入游戏开始挑战，然后返回 HTTP Catcher，筛选 JSON 类型的请求，找到包含 map_info_ex 的请求。</p>
+<p><img src="/upload/20220920_01.png"></p>
+<p>点进这个请求里的 Response，可以看到返回内容里有个 map_md5 的列表，里面有两个 md5 值，分别对应第一个地图和第二个地图，我们要做的就是把返回值里第二个地图的 md5 替换成第一个的。</p>
+<p><img src="/upload/20220920_02.png"></p>
+<p>接下来返回上一个界面，左滑选择更多，新建重写，在弹出的界面中新增规则。</p>
+<p><img src="/upload/20220920_03.png"></p>
+<p>按下图的选择 Response 和 Body，将第二张地图的 md5（可以提前复制好）填入 Find，将第二张地图的 md5 填入 Replace，然后一路保存。</p>
+<p><img src="/upload/20220920_04.png"></p>
+<p>接下来重新启动 HTTP Catcher，回到羊了个羊重新开始游戏，第二关就变成和第一关一样简单的地图了。</p>
+<p><img src="/upload/20220920_05.jpg"></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2021/12/12/go-project-with-clean-architecture/">基于Clean Architecture的Go项目架构实践</a>
         </h1>
 
@@ -317,48 +346,6 @@
 
 <p>上面这段代码中，第一行创建的timer由于超时时间是0，所以会立刻触发select中的第一个case，导致和期望不符合的行为。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>Go的特性使得线程的创建和数据传递都非常容易，但是容易的背后线程间通信的那些坑依然是存在的，论文认为go的消息传递机制会导致更多的bug出现。在我看来，go的消息传递机制相比于传统的共享内存机制，相当于多了一层逻辑层面的封装，这种特性有时会让传统的多线程编程经验不能直接发挥价值，但是只要把握住底层的机制，可以很快积累基于go的语言特性的并发编程经验。</p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2021/07/29/orderby-invalid-in-subquery/">MySQL 子查询中order by不生效问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2021-07-29
-        </span><span class="post-category">
-            <a href="/categories/MySQL/">MySQL</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>一个偶然的机会，发现一条SQL语句在不同的MySQL实例上执行得到了不同的结果。</p>
-<h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>创建商品表product_tbl和商品操作记录表product_operation_tbl两个表，来模拟下业务场景，结构和数据如下：</p>
-<p><img src="/upload/20210729_01.png"></p>
-<p><img src="/upload/20210729_02.png"></p>
-<p>接下来需要查询所有商品最新的修改时间，使用如下语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> t1.id, t1.name, t2.product_id, t2.created_at  <span class="keyword">from</span> product_tbl t1 <span class="keyword">left</span> <span class="keyword">join</span> (<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> product_operation_log_tbl <span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span>) t2 <span class="keyword">on</span> t1.id <span class="operator">=</span> t2.product_id <span class="keyword">group</span> <span class="keyword">by</span> t1.id;</span><br></pre></td></tr></table></figure>
-
-<p>通过结果可以看到，子查询先将product_operation_log_tbl里的所有记录按创建时间(created_at)逆序，然后和product_tbl进行join操作，进而查询出的商品的最新修改时间。</p>
-<p><img src="/upload/20210729_03.png"></p>
-<p>在区域A的MySQL实例上，查询商品最新修改时间可以得到正确结果，但是在区域B的MySQL实例上，得到的修改时间并不是最新的，而是最老的。通过对语句进行简化，发现是子查询中的order by created_at desc语句在区域B的实例上没有生效。</p>
-<h1 id="排查过程"><a href="#排查过程" class="headerlink" title="排查过程"></a>排查过程</h1><p>难道区域会影响MySQL的行为？经过DBA排查，区域A的MySQL是5.6版，区域B的MySQL是5.7版，并且找到了这篇文章：</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42121058/article/details/113588551?utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromMachineLearnPai2~default-3.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromMachineLearnPai2~default-3.control">mysql 5.7 5.6排序_mysql 5.6升级到5.7之后 子查询里面的order排序无效_火锅与理想的博客-CSDN博客</a></p>
-<p>根据文章的描述，MySQL 5.7版会忽略掉子查询中的order by语句，可令人疑惑的是，我们模拟业务场景的MySQL是8.0版，并没有出现这个问题。使用docker分别启动MySQL 5.6、5.7、8.0三个实例，来重复上面的操作，结果如下：</p>
-<p><img src="/upload/20210729_04.png"></p>
-<p>可以看到，只有MySQL 5.7版忽略了子查询中的order by。有没有可能是5.7引入了bug，后续版本又修复了呢？</p>
-<h1 id="问题根因"><a href="#问题根因" class="headerlink" title="问题根因"></a>问题根因</h1><p>继续搜索文档和资料，发现官方论坛中有这样一段描述：</p>
-<blockquote>
-<p>A “table” (and subquery in the FROM clause too) is - according to the SQL standard - an unordered set of rows. Rows in a table (or in a subquery in the FROM clause) do not come in any specific order. That’s why the optimizer can ignore the ORDER BY clause that you have specified. In fact, SQL standard does not even allow the ORDER BY clause to appear in this subquery (we allow it, because ORDER BY … LIMIT … changes the result, the set of rows, not only their order).<br>You need to treat the subquery in the FROM clause, as a set of rows in some unspecified and undefined order, and put the ORDER BY on the top-level SELECT.</p>
-</blockquote>
-<p>问题的原因清晰了，原来SQL标准中，table的定义是一个未排序的数据集合，而一个SQL子查询是一个临时的table，根据这个定义，子查询中的order by会被忽略。同时，官方回复也给出了解决方案：将子查询的order by移动到最外层的select语句中。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
-<li>在SQL标准中，子查询中的order by是不生效的</li>
-<li>MySQL 5.7由于在这个点上遵循了SQL标准导致问题暴露，而在MySQL 5.6/8.0中这种写法依然是生效的</li>
-</ul>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/26372511/mysql-mariadb-order-by-inside-subquery">https://stackoverflow.com/questions/26372511/mysql-mariadb-order-by-inside-subquery</a></p>
-<p><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/why-is-order-by-in-a-from-subquery-ignored/">https://mariadb.com/kb/en/why-is-order-by-in-a-from-subquery-ignored/</a></p>
 
         </div></article>
       <nav class="pagination"><a class="next" href="/page/2/">

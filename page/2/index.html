@@ -98,6 +98,48 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/2021/07/29/orderby-invalid-in-subquery/">MySQL 子查询中order by不生效问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2021-07-29
+        </span><span class="post-category">
+            <a href="/categories/MySQL/">MySQL</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>一个偶然的机会，发现一条SQL语句在不同的MySQL实例上执行得到了不同的结果。</p>
+<h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>创建商品表product_tbl和商品操作记录表product_operation_tbl两个表，来模拟下业务场景，结构和数据如下：</p>
+<p><img src="/upload/20210729_01.png"></p>
+<p><img src="/upload/20210729_02.png"></p>
+<p>接下来需要查询所有商品最新的修改时间，使用如下语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> t1.id, t1.name, t2.product_id, t2.created_at  <span class="keyword">from</span> product_tbl t1 <span class="keyword">left</span> <span class="keyword">join</span> (<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> product_operation_log_tbl <span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span>) t2 <span class="keyword">on</span> t1.id <span class="operator">=</span> t2.product_id <span class="keyword">group</span> <span class="keyword">by</span> t1.id;</span><br></pre></td></tr></table></figure>
+
+<p>通过结果可以看到，子查询先将product_operation_log_tbl里的所有记录按创建时间(created_at)逆序，然后和product_tbl进行join操作，进而查询出的商品的最新修改时间。</p>
+<p><img src="/upload/20210729_03.png"></p>
+<p>在区域A的MySQL实例上，查询商品最新修改时间可以得到正确结果，但是在区域B的MySQL实例上，得到的修改时间并不是最新的，而是最老的。通过对语句进行简化，发现是子查询中的order by created_at desc语句在区域B的实例上没有生效。</p>
+<h1 id="排查过程"><a href="#排查过程" class="headerlink" title="排查过程"></a>排查过程</h1><p>难道区域会影响MySQL的行为？经过DBA排查，区域A的MySQL是5.6版，区域B的MySQL是5.7版，并且找到了这篇文章：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42121058/article/details/113588551?utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromMachineLearnPai2~default-3.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromMachineLearnPai2~default-3.control">mysql 5.7 5.6排序_mysql 5.6升级到5.7之后 子查询里面的order排序无效_火锅与理想的博客-CSDN博客</a></p>
+<p>根据文章的描述，MySQL 5.7版会忽略掉子查询中的order by语句，可令人疑惑的是，我们模拟业务场景的MySQL是8.0版，并没有出现这个问题。使用docker分别启动MySQL 5.6、5.7、8.0三个实例，来重复上面的操作，结果如下：</p>
+<p><img src="/upload/20210729_04.png"></p>
+<p>可以看到，只有MySQL 5.7版忽略了子查询中的order by。有没有可能是5.7引入了bug，后续版本又修复了呢？</p>
+<h1 id="问题根因"><a href="#问题根因" class="headerlink" title="问题根因"></a>问题根因</h1><p>继续搜索文档和资料，发现官方论坛中有这样一段描述：</p>
+<blockquote>
+<p>A “table” (and subquery in the FROM clause too) is - according to the SQL standard - an unordered set of rows. Rows in a table (or in a subquery in the FROM clause) do not come in any specific order. That’s why the optimizer can ignore the ORDER BY clause that you have specified. In fact, SQL standard does not even allow the ORDER BY clause to appear in this subquery (we allow it, because ORDER BY … LIMIT … changes the result, the set of rows, not only their order).<br>You need to treat the subquery in the FROM clause, as a set of rows in some unspecified and undefined order, and put the ORDER BY on the top-level SELECT.</p>
+</blockquote>
+<p>问题的原因清晰了，原来SQL标准中，table的定义是一个未排序的数据集合，而一个SQL子查询是一个临时的table，根据这个定义，子查询中的order by会被忽略。同时，官方回复也给出了解决方案：将子查询的order by移动到最外层的select语句中。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>在SQL标准中，子查询中的order by是不生效的</li>
+<li>MySQL 5.7由于在这个点上遵循了SQL标准导致问题暴露，而在MySQL 5.6/8.0中这种写法依然是生效的</li>
+</ul>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/26372511/mysql-mariadb-order-by-inside-subquery">https://stackoverflow.com/questions/26372511/mysql-mariadb-order-by-inside-subquery</a></p>
+<p><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/why-is-order-by-in-a-from-subquery-ignored/">https://mariadb.com/kb/en/why-is-order-by-in-a-from-subquery-ignored/</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/2020/06/30/one-click-setting-proxy-for-wsl2/">为 WSL2 一键设置代理</a>
         </h1>
 
@@ -322,46 +364,6 @@
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a target="_blank" rel="noopener" href="https://code.visualstudio.com/docs/editor/debugging">Debugging in Visual Studio Code</a></p>
 <p><a target="_blank" rel="noopener" href="https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options">Node.js v13.13.0 Documentation</a></p>
 <p><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-go/issues/3096">Debug: add “go run .” support #3096</a></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/2020/04/16/viper-read-from-etcd-failed/">viper从etcd读取配置失败的问题</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2020-04-16
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p><a target="_blank" rel="noopener" href="https://github.com/spf13/viper">Viper</a> （本文环境是Viper 1.1.0）是Go应用程序的完整配置解决方案，在很多项目中都有应用。<a target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd">etcd</a>是一个分布式KV存储，最直接的应用是配置中心。</p>
-<p>Viper除了支持从文件中读取配置，还支持从远程的配置中心读取配置，使用下面的代码进行配置。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">viper.AddRemoteProvider(<span class="string">&quot;etcd&quot;</span>,</span><br><span class="line">        <span class="string">&quot;http://127.0.0.1:2379&quot;</span>,</span><br><span class="line">        <span class="string">&quot;conf.toml&quot;</span>)</span><br><span class="line">viper.SetConfigType(<span class="string">&quot;toml&quot;</span>)</span><br><span class="line">err := viper.ReadRemoteConfig()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行后报错<code>panic: Remote Configurations Error: No Files Found</code>，检查后发现etcd开启了tls，所以需要用https协议访问etcd的API，更新代码如下。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">viper.AddSecureRemoteProvider(<span class="string">&quot;etcd&quot;</span>,</span><br><span class="line">        <span class="string">&quot;https://127.0.0.1:2379&quot;</span>,</span><br><span class="line">        <span class="string">&quot;conf.toml&quot;</span>,</span><br><span class="line">        <span class="string">&quot;key_path&quot;</span>)</span><br><span class="line">viper.SetConfigType(<span class="string">&quot;toml&quot;</span>)</span><br><span class="line">err := viper.ReadRemoteConfig()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用<code>AddSecureRemoteProvider</code>方法替换<code>AddRemoteProvider</code>方法，问题依旧。</p>
-<h3 id="定位问题"><a href="#定位问题" class="headerlink" title="定位问题"></a>定位问题</h3><p>跟踪源码发现，最终像etcd发送请求的是<a target="_blank" rel="noopener" href="https://github.com/coreos/go-etcd/">go-etcd</a>包（目前go-etcd已经不维护），在go-etcd的requests.go文件中找到了相关的源码，go-etcd调用了net/http包向etcd发送请求。</p>
-<p><img src="/upload/20200416_01.jpg"></p>
-<p>这个时候忽然想到etcd的证书是自签名的，访问自签名证书的https接口应该会报错啊，怎么会请求到内容呢？如下图，在Chrome中访问etcd的自签名https接口，会提示证书无效。</p>
-<p><img src="/upload/20200416_02.jpg"></p>
-<p>我们自己使用go实现一段请求etcd https接口的代码，看看到底是什么回事，代码如下。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">resp, err := http.Get(<span class="string">&quot;https://127.0.0.1:2379/v2/keys/conf.toml?quorum=false&amp;recursive=false&amp;sorted=false&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="comment">// handle error</span></span><br><span class="line">        fmt.Println(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> resp.Body.Close()</span><br><span class="line">    body, err := ioutil.ReadAll(resp.Body)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">    &#125;</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(body))</span><br></pre></td></tr></table></figure>
-
-<p>果然不一样，我们的代码会报错<code>x509: certificate signed by unknown authority</code>，因为是自签名证书，客户端无法验证证书真假，所以这个报错是可以理解的，go-etcd代码和我们的测试代码表现不一致，一定是我们落下了什么，重新梳理go-etcd源码终于发现了原因。</p>
-<p><img src="/upload/20200416_03.jpg"></p>
-<p>在client.go文件的initHTTPSClient方法中，发现允许绕过证书验证，这就可以解释为什么证书无效也能获取到数据了，绕过了证书的验证环节，相当于不管证书真假都拿来用。现在可以解释使用<code>AddRemoteProvider</code>方法访问https接口为什么可以获取到内容，但是无法解释<code>AddSecureRemoteProvider</code>方法为什么无法从https接口获取内容，因为两个方法在发送http请求阶段的代码是一致的，都忽略了证书验证。</p>
-<p>查看<code>AddSecureRemoteProvider</code>的注释，发现了原因。</p>
-<p><img src="/upload/20200416_04.jpg"></p>
-<p>原来…<code>AddSecureRemoteProvider</code>这个Secure指的并不是使用安全链接https，而是在请求到内容后加了一个解密的步骤（Secure指请求的是加密过的内容，而不是使用加密链接请求），最后一个参数接收的也并不是客户端证书，而是解密的gpg key… 根据viper的文档，这个gpg key是可选的，我们这个例子中，如果给gpg key传入一个空字符串，也是可以正常执行的…</p>
-<p>必须吐槽一下viper的命名，哪里是<code>AddSecureRemoteProvider</code>，明明应该叫<code>AddEncryptedRemoteProvider</code></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>出现这个问题，主要是误会了<code>AddSecureRemoteProvider</code>接口表达的意思，并且go-etcd允许忽略证书验证，也让问题变得更加离奇。</p>
-<p>当然go-etcd的这种配置是非常合理的，内部系统使用自签名证书是一个很正常的行为。</p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/">
