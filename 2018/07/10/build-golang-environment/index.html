@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-
+<!-- Disable transformation -->
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -13,42 +16,62 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="Golang环境安装和依赖管理"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/07/10/build-golang-environment/"/>
+<!-- Website description -->
+
+<meta name="description" content="Golang环境安装和依赖管理" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/2018/07/10/build-golang-environment/" />
+
+<!-- Fancybox styling -->
 
 <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-116134610-1');
-</script><script id="baidu_push">
-(function(){
-    var bp = document.createElement('script');
-    var curProtocol = window.location.protocol.split(':')[0];
-    if (curProtocol === 'https') {
-        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-    }
-    else {
-        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-    }
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(bp, s);
-})();
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
 </script>
-<script>
-  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
-</script>
+  
+  <title>Golang环境安装和依赖管理 - simpleapples</title>
 
-    <title>Golang环境安装和依赖管理 - simpleapples</title>
-  <meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
-  <body><div id="mobile-navbar" class="mobile-navbar">
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
     <a href="/." class="logo">simpleapples</a>
   </div>
@@ -60,62 +83,96 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"><a href="/">
-        <li class="mobile-menu-item">首页
-          </li>
-      </a><a href="/archives/">
-        <li class="mobile-menu-item">归档
-          </li>
-      </a><a href="/about/">
-        <li class="mobile-menu-item">关于
-          </li>
-      </a></ul>
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        首页              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        关于              </li>
+    </a>
+    
+  </ul>
 </nav>
-<div class="container" id="mobile-panel">
-      <header id="header" class="header"><div class="logo-wrapper">
-  <a href="/." class="logo">simpleapples</a>
-</div>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              首页  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              关于  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
 
-<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
-          <a class="menu-item-link" href="/">
-            首页
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/archives/">
-            归档
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/about/">
-            关于
-            </a>
-        </li>
-      </ul></nav>
-</header>
-
-      <main id="main" class="main">
-        <div class="content-wrapper">
-          <div id="content" class="content"><article class="post">
-    <header class="post-header">
-      <h1 class="post-title">Golang环境安装和依赖管理
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-07-10
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
     </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      Golang环境安装和依赖管理
+      
+    </h1>
 
-    <div class="post-toc" id="post-toc">
+    <div class="post-meta">
+      <span class="post-time">
+        2018-07-11
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Golang/">Golang</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E5%AE%89%E8%A3%85%E5%8C%85"><span class="toc-text">下载安装包</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GOROOT%E4%B8%8EGOPATH"><span class="toc-text">GOROOT与GOPATH</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Vendor"><span class="toc-text">Vendor</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8C%85%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7dep"><span class="toc-text">包管理工具dep</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E5%AE%89%E8%A3%85%E5%8C%85"><span class="toc-number">1.</span> <span class="toc-text">下载安装包</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GOROOT%E4%B8%8EGOPATH"><span class="toc-number">2.</span> <span class="toc-text">GOROOT与GOPATH</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Vendor"><span class="toc-number">3.</span> <span class="toc-text">Vendor</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8C%85%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7dep"><span class="toc-number">4.</span> <span class="toc-text">包管理工具dep</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p>2015年，Go 1.5加入了一个试验性的vendor机制（到2016年的Go 1.6版变为默认开启），vendor机制就是在项目中加入了vendor文件夹，用于存放依赖，这样就可以将不同项目的依赖隔离开。<br><img src="/upload/20180710_02.png"></p>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p>2015年，Go 1.5加入了一个试验性的vendor机制（到2016年的Go 1.6版变为默认开启），vendor机制就是在项目中加入了vendor文件夹，用于存放依赖，这样就可以将不同项目的依赖隔离开。<br><img src="/upload/20180710_02.png"></p>
 <p>Golang一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。Golang提供了方便的安装包，支持Windows、Linux、Mac系统。</p>
 <h1 id="下载安装包"><a href="#下载安装包" class="headerlink" title="下载安装包"></a>下载安装包</h1><p>Golang的官网是<a target="_blank" rel="noopener" href="https://golang.org/">https://golang.org/</a>，如果官网打不开，可以访问<a target="_blank" rel="noopener" href="https://golang.google.cn/">https://golang.google.cn/</a>这个域名。在官网点击Download Go会进入下载页，可以看到这里提供了针对各个系统的安装包，也提供了源码，可以下载源码编译安装。</p>
 <p><img src="/upload/20180710_03.png"></p>
@@ -123,7 +180,7 @@
 <p><img src="/upload/20180710_04.png"></p>
 <h1 id="GOROOT与GOPATH"><a href="#GOROOT与GOPATH" class="headerlink" title="GOROOT与GOPATH"></a>GOROOT与GOPATH</h1><p>仔细看上面的输出，会发现其中有一个GOPATH，又有一个GOROOT，那么到底哪个才是Golang的运行环境呢。</p>
 <p>首先访问一下GOROOT这个路径，会发现其中包含bin、lib等文件夹。GOROOT就是Golang的安装路径，其中包含Golang编译、工具、标准库等，在安装后就会存在。</p>
-<p>和GOROOT不同，GOPATH是工作空间路径，从go 1.8开始，如果GOPATH没有被设置，会有一个默认值，在Unix上为$HOME/go，在Windows上为%USERPROFILE%/go，当调用go build时，它会在GOPATH中寻找源码。访问一下GOPATH这个路径，会发现其中只有pkg、bin、src三个文件夹，并且里面基本是空的，这是一个约定的目录结构，src文件夹用来存放源码、pkg存放编译后生成的文件，bin存放编译后生成的可执行文件。项目代码需要在GOPATH/src路径下。</p>
+<p>和GOROOT不同，GOPATH是工作空间路径，从go 1.8开始，如果GOPATH没有被设置，会有一个默认值，在Unix上为$HOME&#x2F;go，在Windows上为%USERPROFILE%&#x2F;go，当调用go build时，它会在GOPATH中寻找源码。访问一下GOPATH这个路径，会发现其中只有pkg、bin、src三个文件夹，并且里面基本是空的，这是一个约定的目录结构，src文件夹用来存放源码、pkg存放编译后生成的文件，bin存放编译后生成的可执行文件。项目代码需要在GOPATH&#x2F;src路径下。</p>
 <p>GOPATH路径下出了存放项目代码，还存放所有通过go get安装的依赖，项目代码和依赖代码是平级的，当各个项目都有很多依赖的时候，这个GOPATH路径下的代码量会多的吓人，并且难以拆分。</p>
 <h1 id="Vendor"><a href="#Vendor" class="headerlink" title="Vendor"></a>Vendor</h1><p>当使用go run或者go build命令时，会首先从当前路径下的vendor文件夹中查找依赖，如果vendor不存在，才会从GOPATH中查找依赖。</p>
 <p>然而我们安装依赖通常使用go get或者go install命令，这两个命令依旧会把依赖安装到GOPATH路径下。</p>
@@ -132,10 +189,10 @@
 <p>dep是官方的试验性包管理工具，可以通过如下脚本安装</p>
 <p>curl <a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/golang/dep/master/install.sh">https://raw.githubusercontent.com/golang/dep/master/install.sh</a> | sh</p>
 <p>安装完成后，进入项目路径，执行</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep <span class="keyword">init</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep init</span><br></pre></td></tr></table></figure>
 
 <p>项目中会出现两个文件一个目录</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">Gopkg</span>.</span></span>toml</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">Gopkg</span>.</span></span>lock</span><br><span class="line">vendor</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Gopkg.toml</span><br><span class="line">Gopkg.lock</span><br><span class="line">vendor</span><br></pre></td></tr></table></figure>
 
 <p>dep包管理的流程如图</p>
 <p><img src="/upload/20180710_05.jpg"></p>
@@ -146,56 +203,198 @@
 </li>
 </ul>
 <p>使用如下命令添加依赖</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep ensure -add [github.com<span class="regexp">/gin-gonic/gi</span>n](http:<span class="regexp">//gi</span>thub.com<span class="regexp">/gin-gonic/gi</span>n)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep ensure -add [github.com/gin-gonic/gin](http://github.com/gin-gonic/gin)</span><br></pre></td></tr></table></figure>
 
 <p>使用如下命令更新Gopkg.lock</p>
-<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep <span class="keyword">ensure</span> -update</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep ensure -update</span><br></pre></td></tr></table></figure>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>原文作者: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>原文链接: </span>
+    <a href="http://www.simpleapples.com/2018/07/10/build-golang-environment/">http://www.simpleapples.com/2018/07/10/build-golang-environment/</a>
+  </p>
+  <p class="copyright-item">
+    <span>许可协议: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2018/07/15/solving-kubernetes-dns-problem/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">搭建Kubernetes集群时DNS无法解析问题的处理过程</span>  
+        <span class="prev-text nav-mobile">上一篇</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2018/07/10/transition-of-parameters-of-functions-in-python/">  
+        <span class="next-text nav-default">你所不知道的Python | 函数参数的演进之路</span>  
+        <span class="prev-text nav-mobile">下一篇</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
 
       </div>
-      
-      <footer class="post-footer">
-        
-        <nav class="post-nav"><a class="prev" href="/2018/07/15/solving-kubernetes-dns-problem/">
-        <i class="iconfont icon-left"></i>
-        <span class="prev-text nav-default">搭建Kubernetes集群时DNS无法解析问题的处理过程</span>
-        <span class="prev-text nav-mobile">上一篇</span>
-      </a>
-    <a class="next" href="/2018/07/10/transition-of-parameters-of-functions-in-python/">
-        <span class="next-text nav-default">你所不知道的Python | 函数参数的演进之路</span>
-        <span class="prev-text nav-mobile">下一篇</span>
-        <i class="iconfont icon-right"></i>
-      </a>
-    </nav></footer>
-    </article></div><div class="comments" id="comments"></div></div>
-      </main>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
 
-      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
-        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
-        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
-        </div><div class="copyright">
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    主题 -
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2012 - 2022<span class="heart">
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
+
     <span class="author">simpleapples</span>
   </span>
-</div>
-</footer>
 
-      <div class="back-to-top" id="back-to-top">
-        <i class="iconfont icon-up"></i>
-      </div>
-    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
 </body>
+
 </html>

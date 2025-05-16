@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-
+<!-- Disable transformation -->
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -13,42 +16,62 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="你所不知道的Python | 函数参数的演进之路"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/07/10/transition-of-parameters-of-functions-in-python/"/>
+<!-- Website description -->
+
+<meta name="description" content="你所不知道的Python | 函数参数的演进之路" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/2018/07/10/transition-of-parameters-of-functions-in-python/" />
+
+<!-- Fancybox styling -->
 
 <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-116134610-1');
-</script><script id="baidu_push">
-(function(){
-    var bp = document.createElement('script');
-    var curProtocol = window.location.protocol.split(':')[0];
-    if (curProtocol === 'https') {
-        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-    }
-    else {
-        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-    }
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(bp, s);
-})();
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
 </script>
-<script>
-  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
-</script>
+  
+  <title>你所不知道的Python | 函数参数的演进之路 - simpleapples</title>
 
-    <title>你所不知道的Python | 函数参数的演进之路 - simpleapples</title>
-  <meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
-  <body><div id="mobile-navbar" class="mobile-navbar">
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
     <a href="/." class="logo">simpleapples</a>
   </div>
@@ -60,66 +83,100 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"><a href="/">
-        <li class="mobile-menu-item">首页
-          </li>
-      </a><a href="/archives/">
-        <li class="mobile-menu-item">归档
-          </li>
-      </a><a href="/about/">
-        <li class="mobile-menu-item">关于
-          </li>
-      </a></ul>
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        首页              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        关于              </li>
+    </a>
+    
+  </ul>
 </nav>
-<div class="container" id="mobile-panel">
-      <header id="header" class="header"><div class="logo-wrapper">
-  <a href="/." class="logo">simpleapples</a>
-</div>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              首页  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              关于  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
 
-<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
-          <a class="menu-item-link" href="/">
-            首页
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/archives/">
-            归档
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/about/">
-            关于
-            </a>
-        </li>
-      </ul></nav>
-</header>
-
-      <main id="main" class="main">
-        <div class="content-wrapper">
-          <div id="content" class="content"><article class="post">
-    <header class="post-header">
-      <h1 class="post-title">你所不知道的Python | 函数参数的演进之路
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-07-10
-        </span><span class="post-category">
-            <a href="/categories/Python/">Python</a>
-            </span>
-        </div>
     </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      你所不知道的Python | 函数参数的演进之路
+      
+    </h1>
 
-    <div class="post-toc" id="post-toc">
+    <div class="post-meta">
+      <span class="post-time">
+        2018-07-10
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Python/">Python</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%82%E6%95%B0"><span class="toc-text">关键字参数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%85%E9%99%90%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%82%E6%95%B0"><span class="toc-text">仅限关键字参数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E9%BB%98%E8%AE%A4%E5%80%BC"><span class="toc-text">参数默认值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0"><span class="toc-text">可变长参数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E6%B3%A8%E8%A7%A3"><span class="toc-text">函数注解</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%82%E6%95%B0"><span class="toc-number">1.</span> <span class="toc-text">关键字参数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%85%E9%99%90%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%82%E6%95%B0"><span class="toc-number">2.</span> <span class="toc-text">仅限关键字参数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E9%BB%98%E8%AE%A4%E5%80%BC"><span class="toc-number">3.</span> <span class="toc-text">参数默认值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0"><span class="toc-number">4.</span> <span class="toc-text">可变长参数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E6%B3%A8%E8%A7%A3"><span class="toc-number">5.</span> <span class="toc-text">函数注解</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p><img src="/upload/20180710_01.png"></p>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p><img src="/upload/20180710_01.png"></p>
 <p>函数参数处理机制是Python中一个非常重要的知识点，随着Python的演进，参数处理机制的灵活性和丰富性也在不断增加，使得我们不仅可以写出简化的代码，也能处理复杂的调用。</p>
 <h1 id="关键字参数"><a href="#关键字参数" class="headerlink" title="关键字参数"></a>关键字参数</h1><p><strong>调用时指定参数的名称，且与函数声明时的参数名称一致。</strong></p>
 <p>关键字参数是Python函数中最基础也最常见的，我们写一个记账的函数，参数是需要记录的时间和金额。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_record</span>(<span class="params">date, amount</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="string">&#x27;date:&#x27;</span>, date, <span class="string">&#x27;amount:&#x27;</span>, amount)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">add_record</span>(<span class="params">date, amount</span>):</span><br><span class="line">	<span class="built_in">print</span>(<span class="string">&#x27;date:&#x27;</span>, date, <span class="string">&#x27;amount:&#x27;</span>, amount)</span><br></pre></td></tr></table></figure>
 
 <p>这里的amount参数就是一个关键字参数，关键字参数支持两种调用方式：</p>
 <ul>
@@ -133,18 +190,18 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add_record(amount=<span class="number">10</span>, date=<span class="string">&#x27;2018-07-06&#x27;</span>)  <span class="comment"># 虽然参数顺序反了，但是使用了关键字调用，所以依然输出date: 2018-07-06 amount: 10</span></span><br></pre></td></tr></table></figure>
 
 <h1 id="仅限关键字参数"><a href="#仅限关键字参数" class="headerlink" title="仅限关键字参数"></a>仅限关键字参数</h1><p>我们定义一个Person类，并实现它的<code>__init__</code>方法</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, age,  gender, height, weight</span>):</span></span><br><span class="line">		self._name = name</span><br><span class="line">		self._age = age</span><br><span class="line">		self._gender = gender</span><br><span class="line">		self._height = height</span><br><span class="line">		self._weight = weight</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">	<span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, name, age,  gender, height, weight</span>):</span><br><span class="line">		<span class="variable language_">self</span>._name = name</span><br><span class="line">		<span class="variable language_">self</span>._age = age</span><br><span class="line">		<span class="variable language_">self</span>._gender = gender</span><br><span class="line">		<span class="variable language_">self</span>._height = height</span><br><span class="line">		<span class="variable language_">self</span>._weight = weight</span><br></pre></td></tr></table></figure>
 
 <p>当初始化这个类的时候，我们可以使用关键字调用，也可以使用位置调用。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Person(<span class="string">&#x27;Wendy&#x27;</span>, <span class="number">24</span>, <span class="string">&#x27;female&#x27;</span>, <span class="number">160</span>, <span class="number">48</span>)</span><br><span class="line">Person(<span class="string">&#x27;John&#x27;</span>, age=<span class="number">27</span>, gender=<span class="string">&#x27;male&#x27;</span>, height=<span class="number">170</span>, weight=<span class="number">52</span>)</span><br></pre></td></tr></table></figure>
 
 <p>对比上面两种方式，我们会发现参数多的时候通过关键字指定参数不仅更加清晰，也更具有可读性。如果我们希望函数只允许关键字调用，该如何做呢？Python 3.0中，引入了一种新的仅限关键字参数，能实现我们的需求。</p>
 <p>下面将age以后的参数修改为只允许关键字调用，定义函数时想指定仅限关键字参数，要把它们放到前面有星号的参数后面，在Python中有星号的参数是可变参数的意思，如果不想支持可变参数，可以在参数中放一个星号作为分割。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">        <span class="comment"># 参数中的星号作为关键字参数和仅限关键字参数的分割</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, *, age=<span class="string">&#x27;22&#x27;</span>, gender=<span class="string">&#x27;female&#x27;</span>, height=<span class="number">160</span>, weight=<span class="number">50</span></span>):</span></span><br><span class="line">		self._name = name</span><br><span class="line">		self._age = age</span><br><span class="line">		self._gender = gender</span><br><span class="line">		self._height = height</span><br><span class="line">		self._weight = weight</span><br><span class="line"></span><br><span class="line">Person(<span class="string">&#x27;Wendy&#x27;</span>, <span class="number">24</span>, <span class="string">&#x27;female&#x27;</span>, <span class="number">160</span>, <span class="number">48</span>)  <span class="comment"># 报错，age以后参数不允许位置调用</span></span><br><span class="line">Person(<span class="string">&#x27;John&#x27;</span>, age=<span class="number">27</span>, gender=<span class="string">&#x27;male&#x27;</span>, height=<span class="number">170</span>, weight=<span class="number">52</span>)  <span class="comment"># 正常执行</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">        <span class="comment"># 参数中的星号作为关键字参数和仅限关键字参数的分割</span></span><br><span class="line">	<span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, name, *, age=<span class="string">&#x27;22&#x27;</span>, gender=<span class="string">&#x27;female&#x27;</span>, height=<span class="number">160</span>, weight=<span class="number">50</span></span>):</span><br><span class="line">		<span class="variable language_">self</span>._name = name</span><br><span class="line">		<span class="variable language_">self</span>._age = age</span><br><span class="line">		<span class="variable language_">self</span>._gender = gender</span><br><span class="line">		<span class="variable language_">self</span>._height = height</span><br><span class="line">		<span class="variable language_">self</span>._weight = weight</span><br><span class="line"></span><br><span class="line">Person(<span class="string">&#x27;Wendy&#x27;</span>, <span class="number">24</span>, <span class="string">&#x27;female&#x27;</span>, <span class="number">160</span>, <span class="number">48</span>)  <span class="comment"># 报错，age以后参数不允许位置调用</span></span><br><span class="line">Person(<span class="string">&#x27;John&#x27;</span>, age=<span class="number">27</span>, gender=<span class="string">&#x27;male&#x27;</span>, height=<span class="number">170</span>, weight=<span class="number">52</span>)  <span class="comment"># 正常执行</span></span><br></pre></td></tr></table></figure>
 
 <p>普通参数和仅限关键字参数中间由一个星号隔离开，星号以后的都是仅限关键字参数，只可以通过关键字指定，而不能通过位置指定。</p>
 <h1 id="参数默认值"><a href="#参数默认值" class="headerlink" title="参数默认值"></a>参数默认值</h1><p><strong>在函数声明时，指定参数默认值，调用时不传入参数则使用默认值，相当于可选参数。</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_record</span>(<span class="params">date, amount=<span class="number">0</span></span>):</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="string">&#x27;date:&#x27;</span>, date, <span class="string">&#x27;amount:&#x27;</span>, amount)</span><br><span class="line"></span><br><span class="line">add_record(<span class="string">&#x27;2018-07-06&#x27;</span>)  <span class="comment"># 输出date: 2018-07-06 amount: 0</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">add_record</span>(<span class="params">date, amount=<span class="number">0</span></span>):</span><br><span class="line">	<span class="built_in">print</span>(<span class="string">&#x27;date:&#x27;</span>, date, <span class="string">&#x27;amount:&#x27;</span>, amount)</span><br><span class="line"></span><br><span class="line">add_record(<span class="string">&#x27;2018-07-06&#x27;</span>)  <span class="comment"># 输出date: 2018-07-06 amount: 0</span></span><br></pre></td></tr></table></figure>
 
 <p>上面代码中没有传入amount参数，所以amount直接被置为默认值0。有一点需要注意的是，<strong>默认参数需要设置在必选参数后面</strong>，并且默认参数既可以通过位置调用，也可以通过关键字调用。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add_record(<span class="string">&#x27;2018-07-06&#x27;</span>, <span class="number">10</span>)  <span class="comment"># 通过位置指定参数</span></span><br><span class="line">add_record(<span class="string">&#x27;2018-07-06&#x27;</span>, amount=<span class="number">10</span>)  <span class="comment"># 通过位置指定参数</span></span><br><span class="line">add_record(amount=<span class="number">10</span>, <span class="string">&#x27;2018-07-06&#x27;</span>)  <span class="comment"># 报错，默认参数必须在必选参数后面</span></span><br></pre></td></tr></table></figure>
@@ -152,13 +209,13 @@
 <p>参数默认值既支持关键字参数，也支持仅限关键字参数。</p>
 <h1 id="可变长参数"><a href="#可变长参数" class="headerlink" title="可变长参数"></a>可变长参数</h1><p><strong>“可变长”顾名思义是允许在调用时传入多个参数，可变长参数适用于参数数量不确定的场景，可变参数有两种，一种是关键字可变长参数，另一种是非关键字可变长参数。</strong></p>
 <p>非关键字可变长参数的写法是在参数名前加一个星号，Python会将这些多出来的参数的值放入一个元组中，由于元组中只有参数值而没有参数名称，所以是关键字参数。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_args</span>(<span class="params">*args</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(args)</span><br><span class="line"></span><br><span class="line">print_args(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)  <span class="comment"># 输出元组(1, 2, 3, 4, 5)</span></span><br><span class="line"></span><br><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">print_args(a)  <span class="comment"># 直接传入时，列表a会被当作一个元素，所以输出([1, 2, 3, 4, 5],)</span></span><br><span class="line">print_args(*a)  <span class="comment"># 在传参时加星号可以将可迭代参数解包，所以列表a中每一个元素都被当作一个参数传入，输出(1, 2, 3, 4, 5)</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">print_args</span>(<span class="params">*args</span>):</span><br><span class="line">	<span class="built_in">print</span>(args)</span><br><span class="line"></span><br><span class="line">print_args(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)  <span class="comment"># 输出元组(1, 2, 3, 4, 5)</span></span><br><span class="line"></span><br><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">print_args(a)  <span class="comment"># 直接传入时，列表a会被当作一个元素，所以输出([1, 2, 3, 4, 5],)</span></span><br><span class="line">print_args(*a)  <span class="comment"># 在传参时加星号可以将可迭代参数解包，所以列表a中每一个元素都被当作一个参数传入，输出(1, 2, 3, 4, 5)</span></span><br></pre></td></tr></table></figure>
 
 <p>关键字可变长参数的写法是在参数名前加两个星号，Python会将这些多出来的参数的值放入一个字典中，由于字典中只有参数值而没有参数名称，所以是非关键字参数。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_kwargs</span>(<span class="params">**kw_args</span>):</span></span><br><span class="line">	<span class="built_in">print</span>(kw_args)</span><br><span class="line"></span><br><span class="line">a = &#123;<span class="string">&#x27;a&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;b&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;c&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;d&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;e&#x27;</span>: <span class="number">5</span>&#125;</span><br><span class="line">print_kwargs(**a)  <span class="comment"># 使用关键字可变参数时， &#123;&#x27;a&#x27;: 1, &#x27;c&#x27;: 3, &#x27;b&#x27;: 2, &#x27;e&#x27;: 5, &#x27;d&#x27;: 4&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">print_kwargs</span>(<span class="params">**kw_args</span>):</span><br><span class="line">	<span class="built_in">print</span>(kw_args)</span><br><span class="line"></span><br><span class="line">a = &#123;<span class="string">&#x27;a&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;b&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;c&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;d&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;e&#x27;</span>: <span class="number">5</span>&#125;</span><br><span class="line">print_kwargs(**a)  <span class="comment"># 使用关键字可变参数时， &#123;&#x27;a&#x27;: 1, &#x27;c&#x27;: 3, &#x27;b&#x27;: 2, &#x27;e&#x27;: 5, &#x27;d&#x27;: 4&#125;</span></span><br></pre></td></tr></table></figure>
 
 <h1 id="函数注解"><a href="#函数注解" class="headerlink" title="函数注解"></a>函数注解</h1><p>Python 3中为函数定义增加的另一个新功能是函数注解，所谓函数注解，就是可以在函数参数和返回值上添加任意的元数据。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_person</span>(<span class="params">name: <span class="built_in">str</span>, age: <span class="built_in">int</span>, gender: <span class="built_in">str</span> = <span class="string">&#x27;female&#x27;</span>, height: <span class="built_in">int</span> = <span class="number">160</span></span>)  -&gt; <span class="built_in">bool</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">create_person</span>(<span class="params">name: <span class="built_in">str</span>, age: <span class="built_in">int</span>, gender: <span class="built_in">str</span> = <span class="string">&#x27;female&#x27;</span>, height: <span class="built_in">int</span> = <span class="number">160</span></span>)  -&gt; <span class="built_in">bool</span>:</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
 
 <p>用create_person方法举例，可以看到在每个参数后面都跟了一个参数类型，在函数后面则是返回值类型，函数注解可以用在文档编写、类型检查中，在支持函数注解的IDE中，如果传入参数和返回的类型不符合函数注解中的类型，IDE会提示错误。</p>
 <p>但是函数注解只是一个元数据，Python解释器执行时候并不会去检查类型，所以下面这种情况也是合法的。</p>
@@ -166,51 +223,193 @@
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>Python有着非常好入门的特点，但是随着语言本身的演进，很多高级功能也在持续加入，用好这些功能可以使我们的Python代码拥有更高的可读性，适应更加复杂的应用场景。</p>
 
-      </div>
-      
-      <footer class="post-footer">
-        
-        <nav class="post-nav"><a class="prev" href="/2018/07/10/build-golang-environment/">
-        <i class="iconfont icon-left"></i>
-        <span class="prev-text nav-default">Golang环境安装和依赖管理</span>
-        <span class="prev-text nav-mobile">上一篇</span>
-      </a>
-    <a class="next" href="/2018/06/28/the-secret-of-string-concatenation/">
-        <span class="next-text nav-default">你所不知道的Python | 字符串连接的秘密</span>
-        <span class="prev-text nav-mobile">下一篇</span>
-        <i class="iconfont icon-right"></i>
-      </a>
-    </nav></footer>
-    </article></div><div class="comments" id="comments"></div></div>
-      </main>
+    
+  </div>
 
-      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
-        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
-        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
-        </div><div class="copyright">
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>原文作者: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>原文链接: </span>
+    <a href="http://www.simpleapples.com/2018/07/10/transition-of-parameters-of-functions-in-python/">http://www.simpleapples.com/2018/07/10/transition-of-parameters-of-functions-in-python/</a>
+  </p>
+  <p class="copyright-item">
+    <span>许可协议: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2018/07/10/build-golang-environment/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">Golang环境安装和依赖管理</span>  
+        <span class="prev-text nav-mobile">上一篇</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2018/06/28/the-secret-of-string-concatenation/">  
+        <span class="next-text nav-default">你所不知道的Python | 字符串连接的秘密</span>  
+        <span class="prev-text nav-mobile">下一篇</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    主题 -
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2012 - 2022<span class="heart">
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
+
     <span class="author">simpleapples</span>
   </span>
-</div>
-</footer>
 
-      <div class="back-to-top" id="back-to-top">
-        <i class="iconfont icon-up"></i>
-      </div>
-    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
 </body>
+
 </html>

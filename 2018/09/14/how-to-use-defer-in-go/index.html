@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-
+<!-- Disable transformation -->
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -13,42 +16,62 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="Go语言中defer的一些坑"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2018/09/14/how-to-use-defer-in-go/"/>
+<!-- Website description -->
+
+<meta name="description" content="Go语言中defer的一些坑" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/2018/09/14/how-to-use-defer-in-go/" />
+
+<!-- Fancybox styling -->
 
 <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-116134610-1');
-</script><script id="baidu_push">
-(function(){
-    var bp = document.createElement('script');
-    var curProtocol = window.location.protocol.split(':')[0];
-    if (curProtocol === 'https') {
-        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-    }
-    else {
-        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-    }
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(bp, s);
-})();
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
 </script>
-<script>
-  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
-</script>
+  
+  <title>Go语言中defer的一些坑 - simpleapples</title>
 
-    <title>Go语言中defer的一些坑 - simpleapples</title>
-  <meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
-  <body><div id="mobile-navbar" class="mobile-navbar">
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
     <a href="/." class="logo">simpleapples</a>
   </div>
@@ -60,62 +83,96 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"><a href="/">
-        <li class="mobile-menu-item">首页
-          </li>
-      </a><a href="/archives/">
-        <li class="mobile-menu-item">归档
-          </li>
-      </a><a href="/about/">
-        <li class="mobile-menu-item">关于
-          </li>
-      </a></ul>
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        首页              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        关于              </li>
+    </a>
+    
+  </ul>
 </nav>
-<div class="container" id="mobile-panel">
-      <header id="header" class="header"><div class="logo-wrapper">
-  <a href="/." class="logo">simpleapples</a>
-</div>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              首页  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              关于  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
 
-<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
-          <a class="menu-item-link" href="/">
-            首页
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/archives/">
-            归档
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/about/">
-            关于
-            </a>
-        </li>
-      </ul></nav>
-</header>
-
-      <main id="main" class="main">
-        <div class="content-wrapper">
-          <div id="content" class="content"><article class="post">
-    <header class="post-header">
-      <h1 class="post-title">Go语言中defer的一些坑
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-09-14
-        </span><span class="post-category">
-            <a href="/categories/Golang/">Golang</a>
-            </span>
-        </div>
     </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      Go语言中defer的一些坑
+      
+    </h1>
 
-    <div class="post-toc" id="post-toc">
+    <div class="post-meta">
+      <span class="post-time">
+        2018-09-14
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Golang/">Golang</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#defer%E8%A7%A6%E5%8F%91%E6%97%B6%E6%9C%BA"><span class="toc-text">defer触发时机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#defer%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="toc-text">defer执行顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%911%EF%BC%9Adefer%E5%9C%A8%E5%8C%BF%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC%E5%92%8C%E5%91%BD%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC%E5%87%BD%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%8D%E5%90%8C%E8%A1%A8%E7%8E%B0"><span class="toc-text">坑1：defer在匿名返回值和命名返回值函数中的不同表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%912%EF%BC%9A%E5%9C%A8for%E5%BE%AA%E7%8E%AF%E4%B8%AD%E4%BD%BF%E7%94%A8defer%E5%8F%AF%E8%83%BD%E5%AF%BC%E8%87%B4%E7%9A%84%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98"><span class="toc-text">坑2：在for循环中使用defer可能导致的性能问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%913%EF%BC%9A%E5%88%A4%E6%96%AD%E6%89%A7%E8%A1%8C%E6%B2%A1%E6%9C%89err%E4%B9%8B%E5%90%8E%EF%BC%8C%E5%86%8Ddefer%E9%87%8A%E6%94%BE%E8%B5%84%E6%BA%90"><span class="toc-text">坑3：判断执行没有err之后，再defer释放资源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%914%EF%BC%9A%E8%B0%83%E7%94%A8os-Exit%E6%97%B6defer%E4%B8%8D%E4%BC%9A%E8%A2%AB%E6%89%A7%E8%A1%8C"><span class="toc-text">坑4：调用os.Exit时defer不会被执行</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#defer%E8%A7%A6%E5%8F%91%E6%97%B6%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">defer触发时机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#defer%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="toc-number">2.</span> <span class="toc-text">defer执行顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%911%EF%BC%9Adefer%E5%9C%A8%E5%8C%BF%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC%E5%92%8C%E5%91%BD%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC%E5%87%BD%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%8D%E5%90%8C%E8%A1%A8%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">坑1：defer在匿名返回值和命名返回值函数中的不同表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%912%EF%BC%9A%E5%9C%A8for%E5%BE%AA%E7%8E%AF%E4%B8%AD%E4%BD%BF%E7%94%A8defer%E5%8F%AF%E8%83%BD%E5%AF%BC%E8%87%B4%E7%9A%84%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98"><span class="toc-number">4.</span> <span class="toc-text">坑2：在for循环中使用defer可能导致的性能问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%913%EF%BC%9A%E5%88%A4%E6%96%AD%E6%89%A7%E8%A1%8C%E6%B2%A1%E6%9C%89err%E4%B9%8B%E5%90%8E%EF%BC%8C%E5%86%8Ddefer%E9%87%8A%E6%94%BE%E8%B5%84%E6%BA%90"><span class="toc-number">5.</span> <span class="toc-text">坑3：判断执行没有err之后，再defer释放资源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%914%EF%BC%9A%E8%B0%83%E7%94%A8os-Exit%E6%97%B6defer%E4%B8%8D%E4%BC%9A%E8%A2%AB%E6%89%A7%E8%A1%8C"><span class="toc-number">6.</span> <span class="toc-text">坑4：调用os.Exit时defer不会被执行</span></a></li></ol>
     </div>
-  </div><div class="post-content"><p><img src="/upload/20180914_01.png"></p>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p><img src="/upload/20180914_01.png"></p>
 <p>defer语句是Go中一个非常有用的特性，可以将一个方法延迟到包裹该方法的方法返回时执行，在实际应用中，defer语句可以充当其他语言中try…catch…的角色，也可以用来处理关闭文件句柄等收尾操作。</p>
 <h3 id="defer触发时机"><a href="#defer触发时机" class="headerlink" title="defer触发时机"></a>defer触发时机</h3><blockquote>
 <p>A “defer” statement invokes a function whose execution is deferred to the moment the surrounding function returns, either because the surrounding function executed a return statement, reached the end of its function body, or because the corresponding goroutine is panicking.</p>
@@ -131,12 +188,12 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">stackingDefers</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        fmt.Println(<span class="string">&quot;1&quot;</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        fmt.Println(<span class="string">&quot;2&quot;</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        fmt.Println(<span class="string">&quot;3&quot;</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="坑1：defer在匿名返回值和命名返回值函数中的不同表现"><a href="#坑1：defer在匿名返回值和命名返回值函数中的不同表现" class="headerlink" title="坑1：defer在匿名返回值和命名返回值函数中的不同表现"></a>坑1：defer在匿名返回值和命名返回值函数中的不同表现</h3><p>先看下面两个方法执行的结果。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">returnValues</span><span class="params">()</span> <span class="title">int</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> result <span class="keyword">int</span></span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        result++</span><br><span class="line">        fmt.Println(<span class="string">&quot;defer&quot;</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">namedReturnValues</span><span class="params">()</span> <span class="params">(result <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        result++</span><br><span class="line">        fmt.Println(<span class="string">&quot;defer&quot;</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">returnValues</span><span class="params">()</span></span> <span class="type">int</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> result <span class="type">int</span></span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        result++</span><br><span class="line">        fmt.Println(<span class="string">&quot;defer&quot;</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">namedReturnValues</span><span class="params">()</span></span> (result <span class="type">int</span>) &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        result++</span><br><span class="line">        fmt.Println(<span class="string">&quot;defer&quot;</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>上面的方法会输出0，下面的方法输出1。上面的方法使用了匿名返回值，下面的使用了命名返回值，除此之外其他的逻辑均相同，为什么输出的结果会有区别呢？</p>
 <p>要搞清这个问题首先需要了解defer的执行逻辑，文档中说defer语句在方法返回“时”触发，也就是说return和defer是“同时”执行的。以匿名返回值方法举例，过程如下。</p>
 <ul>
-<li>将result赋值给返回值（可以理解成Go自动创建了一个返回值retValue，相当于执行retValue = result）</li>
+<li>将result赋值给返回值（可以理解成Go自动创建了一个返回值retValue，相当于执行retValue &#x3D; result）</li>
 <li>然后检查是否有defer，如果有则执行</li>
 <li>返回刚才创建的返回值（retValue）</li>
 </ul>
@@ -154,51 +211,193 @@
 
 <p>上面的defer并不会输出。</p>
 
-      </div>
-      
-      <footer class="post-footer">
-        
-        <nav class="post-nav"><a class="prev" href="/2018/10/08/faster-python-part-1/">
-        <i class="iconfont icon-left"></i>
-        <span class="prev-text nav-default">翻译 | 更快的Python（一）</span>
-        <span class="prev-text nav-mobile">上一篇</span>
-      </a>
-    <a class="next" href="/2018/08/05/implementation-of-reservoir-sample-in-python/">
-        <span class="next-text nav-default">用Python写算法 | 蓄水池算法实现随机抽样</span>
-        <span class="prev-text nav-mobile">下一篇</span>
-        <i class="iconfont icon-right"></i>
-      </a>
-    </nav></footer>
-    </article></div><div class="comments" id="comments"></div></div>
-      </main>
+    
+  </div>
 
-      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
-        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
-        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
-        </div><div class="copyright">
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>原文作者: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>原文链接: </span>
+    <a href="http://www.simpleapples.com/2018/09/14/how-to-use-defer-in-go/">http://www.simpleapples.com/2018/09/14/how-to-use-defer-in-go/</a>
+  </p>
+  <p class="copyright-item">
+    <span>许可协议: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2018/10/08/faster-python-part-1/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">翻译 | 更快的Python（一）</span>  
+        <span class="prev-text nav-mobile">上一篇</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2018/08/05/implementation-of-reservoir-sample-in-python/">  
+        <span class="next-text nav-default">用Python写算法 | 蓄水池算法实现随机抽样</span>  
+        <span class="prev-text nav-mobile">下一篇</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    主题 -
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2012 - 2022<span class="heart">
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
+
     <span class="author">simpleapples</span>
   </span>
-</div>
-</footer>
 
-      <div class="back-to-top" id="back-to-top">
-        <i class="iconfont icon-up"></i>
-      </div>
-    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
 </body>
+
 </html>

@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-
+<!-- Disable transformation -->
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -13,42 +16,62 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="nettop命令引发的一个小问题"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2012/12/19/a-problem-with-nettop/"/>
+<!-- Website description -->
+
+<meta name="description" content="nettop命令引发的一个小问题" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/2012/12/19/a-problem-with-nettop/" />
+
+<!-- Fancybox styling -->
 
 <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-116134610-1');
-</script><script id="baidu_push">
-(function(){
-    var bp = document.createElement('script');
-    var curProtocol = window.location.protocol.split(':')[0];
-    if (curProtocol === 'https') {
-        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-    }
-    else {
-        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-    }
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(bp, s);
-})();
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
 </script>
-<script>
-  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
-</script>
+  
+  <title>nettop命令引发的一个小问题 - simpleapples</title>
 
-    <title>nettop命令引发的一个小问题 - simpleapples</title>
-  <meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
-  <body><div id="mobile-navbar" class="mobile-navbar">
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
     <a href="/." class="logo">simpleapples</a>
   </div>
@@ -60,57 +83,89 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"><a href="/">
-        <li class="mobile-menu-item">首页
-          </li>
-      </a><a href="/archives/">
-        <li class="mobile-menu-item">归档
-          </li>
-      </a><a href="/about/">
-        <li class="mobile-menu-item">关于
-          </li>
-      </a></ul>
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        首页              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        关于              </li>
+    </a>
+    
+  </ul>
 </nav>
-<div class="container" id="mobile-panel">
-      <header id="header" class="header"><div class="logo-wrapper">
-  <a href="/." class="logo">simpleapples</a>
-</div>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              首页  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              关于  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
 
-<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
-          <a class="menu-item-link" href="/">
-            首页
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/archives/">
-            归档
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/about/">
-            关于
-            </a>
-        </li>
-      </ul></nav>
-</header>
-
-      <main id="main" class="main">
-        <div class="content-wrapper">
-          <div id="content" class="content"><article class="post">
-    <header class="post-header">
-      <h1 class="post-title">nettop命令引发的一个小问题
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2012-12-19
-        </span><span class="post-category">
-            <a href="/categories/Mac-Linux/">Mac&Linux</a>
-            </span>
-        </div>
     </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      nettop命令引发的一个小问题
+      
+    </h1>
 
-    <div class="post-content"><p>在网上看到一篇帖子，是说Mac OSX 10.7中新加入了一个nettop命令，可以实时查看当前网络链接和数据流量。这是nettop命令的描述：  </p>
+    <div class="post-meta">
+      <span class="post-time">
+        2012-12-19
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Mac-Linux/">Mac&amp;Linux</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+
+  <div class="post-content">
+    
+    <p>在网上看到一篇帖子，是说Mac OSX 10.7中新加入了一个nettop命令，可以实时查看当前网络链接和数据流量。这是nettop命令的描述：  </p>
 <blockquote>
 <p>The nettop program displays a list of sockets or routes. The counts for network structures are updated periodically.</p>
 </blockquote>
@@ -120,51 +175,193 @@
 <p><img src="/upload/nettop2.png" alt="Alt text"></p>
 <p>回想一下，可能是使用nettop命令后没有退出nettop，而直接关闭Terminal造成的。经过尝试，发现问题确实出在没有正确退出nettop上。可能这是一个设计中没有考虑到的小bug。<br>使用man nettop查看文档，文档说明中退出nettop应该采用q，但没有说必须这样退出，而且很多时候，直接关闭Terminal确实是一些人的习惯，比如我：）</p>
 
-      </div>
-      
-      <footer class="post-footer">
-        
-        <nav class="post-nav"><a class="prev" href="/2013/01/06/classes-and-inheritance-in-javascript/">
-        <i class="iconfont icon-left"></i>
-        <span class="prev-text nav-default">Javascript学习笔记--伪类和继承</span>
-        <span class="prev-text nav-mobile">上一篇</span>
-      </a>
-    <a class="next" href="/2012/12/11/browser-js/">
-        <span class="next-text nav-default">browser.js-浏览器和操作系统识别</span>
-        <span class="prev-text nav-mobile">下一篇</span>
-        <i class="iconfont icon-right"></i>
-      </a>
-    </nav></footer>
-    </article></div><div class="comments" id="comments"></div></div>
-      </main>
+    
+  </div>
 
-      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
-        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
-        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
-        </div><div class="copyright">
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>原文作者: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>原文链接: </span>
+    <a href="http://www.simpleapples.com/2012/12/19/a-problem-with-nettop/">http://www.simpleapples.com/2012/12/19/a-problem-with-nettop/</a>
+  </p>
+  <p class="copyright-item">
+    <span>许可协议: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2013/01/06/classes-and-inheritance-in-javascript/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">Javascript学习笔记--伪类和继承</span>  
+        <span class="prev-text nav-mobile">上一篇</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2012/12/11/browser-js/">  
+        <span class="next-text nav-default">browser.js-浏览器和操作系统识别</span>  
+        <span class="prev-text nav-mobile">下一篇</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    主题 -
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2012 - 2022<span class="heart">
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
+
     <span class="author">simpleapples</span>
   </span>
-</div>
-</footer>
 
-      <div class="back-to-top" id="back-to-top">
-        <i class="iconfont icon-up"></i>
-      </div>
-    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
 </body>
+
 </html>

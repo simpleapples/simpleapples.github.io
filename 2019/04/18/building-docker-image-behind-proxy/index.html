@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"/>
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-
+<!-- Disable transformation -->
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -13,42 +16,62 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
-<meta name="description" content="使用代理进行 docker build 问题的解决思路"/><link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
-<link rel="canonical" href="http://www.simpleapples.com/2019/04/18/building-docker-image-behind-proxy/"/>
+<!-- Website description -->
+
+<meta name="description" content="使用代理进行 docker build 问题的解决思路" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/2019/04/18/building-docker-image-behind-proxy/" />
+
+<!-- Fancybox styling -->
 
 <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
-<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116134610-1"></script>
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-116134610-1');
-</script><script id="baidu_push">
-(function(){
-    var bp = document.createElement('script');
-    var curProtocol = window.location.protocol.split(':')[0];
-    if (curProtocol === 'https') {
-        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-    }
-    else {
-        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-    }
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(bp, s);
-})();
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
 </script>
-<script>
-  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
-</script>
+  
+  <title>使用代理进行 docker build 问题的解决思路 - simpleapples</title>
 
-    <title>使用代理进行 docker build 问题的解决思路 - simpleapples</title>
-  <meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
-  <body><div id="mobile-navbar" class="mobile-navbar">
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
     <a href="/." class="logo">simpleapples</a>
   </div>
@@ -60,63 +83,97 @@
 </div>
 
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list"><a href="/">
-        <li class="mobile-menu-item">首页
-          </li>
-      </a><a href="/archives/">
-        <li class="mobile-menu-item">归档
-          </li>
-      </a><a href="/about/">
-        <li class="mobile-menu-item">关于
-          </li>
-      </a></ul>
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        首页              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        关于              </li>
+    </a>
+    
+  </ul>
 </nav>
-<div class="container" id="mobile-panel">
-      <header id="header" class="header"><div class="logo-wrapper">
-  <a href="/." class="logo">simpleapples</a>
-</div>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              首页  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              关于  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
 
-<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
-          <a class="menu-item-link" href="/">
-            首页
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/archives/">
-            归档
-            </a>
-        </li>
-      <li class="menu-item">
-          <a class="menu-item-link" href="/about/">
-            关于
-            </a>
-        </li>
-      </ul></nav>
-</header>
-
-      <main id="main" class="main">
-        <div class="content-wrapper">
-          <div id="content" class="content"><article class="post">
-    <header class="post-header">
-      <h1 class="post-title">使用代理进行 docker build 问题的解决思路
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2019-04-18
-        </span><span class="post-category">
-            <a href="/categories/DevOps/">DevOps</a>
-            </span>
-        </div>
     </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      使用代理进行 docker build 问题的解决思路
+      
+    </h1>
 
-    <div class="post-toc" id="post-toc">
+    <div class="post-meta">
+      <span class="post-time">
+        2019-04-18
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/DevOps/">DevOps</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="toc-text">问题描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE-http-proxy-%E5%8F%98%E9%87%8F"><span class="toc-text">配置 http_proxy 变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE%E5%AE%BF%E4%B8%BB%E6%9C%BA"><span class="toc-text">访问宿主机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="toc-text">配置网络模式</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">问题描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE-http-proxy-%E5%8F%98%E9%87%8F"><span class="toc-number">2.</span> <span class="toc-text">配置 http_proxy 变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE%E5%AE%BF%E4%B8%BB%E6%9C%BA"><span class="toc-number">3.</span> <span class="toc-text">访问宿主机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="toc-number">4.</span> <span class="toc-text">配置网络模式</span></a></li></ol>
     </div>
-  </div><div class="post-content"><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>在使用 docker build 打包镜像时，遇到了需要使用代理访问网络的需求。使用如下的 Dockerfile 来模拟这个场景：</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>在使用 docker build 打包镜像时，遇到了需要使用代理访问网络的需求。使用如下的 Dockerfile 来模拟这个场景：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
 
 <p>国内一般网络环境下，curl <a target="_blank" rel="noopener" href="http://www.google.com/">www.google.com</a> 是无法正常返回的，加入 –max-time 让 curl 的耗时不要太长。</p>
 <span id="more"></span>
@@ -124,11 +181,11 @@
 <h3 id="配置-http-proxy-变量"><a href="#配置-http-proxy-变量" class="headerlink" title="配置 http_proxy 变量"></a>配置 http_proxy 变量</h3><p>首先需要在环境变量中设置 http_proxy 和 https_proxy，使得访问网络的命令（这里使用 curl 来代表）能够通过环境变量中配置的代理服务器访问 <a target="_blank" rel="noopener" href="http://www.google.com./">www.google.com。</a></p>
 <p>docker build 命令虽然是在 docker 所在的宿主机上执行的，看上去像是直接使用了宿主机的网络环境，但实际上 docker build 也是启动了一个 container 进行构建，所以在构建过程中的所有命令都是在 container 中执行的，http_proxy 和 https_proxy 的配置也应该是在 container 中进行的。可以使用 ENV 来配置 container 中的环境变量。</p>
 <p>代理服务器启动在宿主机的 1087 端口上，修改 dockerfile 文件：</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> http_proxy <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTP_PROXY <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> https_proxy <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTPS_PROXY <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> http_proxy <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTP_PROXY <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> https_proxy <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTPS_PROXY <span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
 
 <p>重新执行 docker build 会发现 curl 依旧无法访问 <a target="_blank" rel="noopener" href="http://www.google.com,从报错信息上可以看到/">www.google.com，从报错信息上可以看到</a> 127.0.0.1 上的 1087 端口上并没有服务。</p>
-<h3 id="访问宿主机"><a href="#访问宿主机" class="headerlink" title="访问宿主机"></a>访问宿主机</h3><p>由于 container 默认是桥接网络，宿主机和 container 是平级的，被放在了一个虚拟的网段里。访问宿主机上的代理服务器，对于 container 来说实际上是访问另一台机器上的服务器，127.0.0.1 指向的是 container 本身。在 docker 默认的桥接网络中，宿主机的 IP 一般是 172.17.0.1（Linux），或者 192.168.65.1（MacOS），可以将 http_proxy 中的 IP 换成 172.17.0.1/192.168.65.1，来实现通过宿主的代理服务器访问网络，修改 dockerfile：</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> http_proxy <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTP_PROXY <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> https_proxy <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTPS_PROXY <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
+<h3 id="访问宿主机"><a href="#访问宿主机" class="headerlink" title="访问宿主机"></a>访问宿主机</h3><p>由于 container 默认是桥接网络，宿主机和 container 是平级的，被放在了一个虚拟的网段里。访问宿主机上的代理服务器，对于 container 来说实际上是访问另一台机器上的服务器，127.0.0.1 指向的是 container 本身。在 docker 默认的桥接网络中，宿主机的 IP 一般是 172.17.0.1（Linux），或者 192.168.65.1（MacOS），可以将 http_proxy 中的 IP 换成 172.17.0.1&#x2F;192.168.65.1，来实现通过宿主的代理服务器访问网络，修改 dockerfile：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> http_proxy <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTP_PROXY <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> https_proxy <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"><span class="keyword">ENV</span> HTTPS_PROXY <span class="string">&quot;http://172.17.0.1:1087&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
 
 <p>虽然使用这种方式可以达到目的，但是如果编译环境变了或者代理服务器的配置变了，哪怕只是操作系统从 Linux 变成了 MacOS，都得修改 dockerfile，显然不够解耦，也不方便。</p>
 <h3 id="配置网络模式"><a href="#配置网络模式" class="headerlink" title="配置网络模式"></a>配置网络模式</h3><p>docker 中还有一种 host 网络模式，就是让 container 使用宿主机的网络，相当于 container 在网络层面和宿主机不做隔离，使用这种网络模式执行 docker build，就不需要在 dockerfile 中添加 http_proxy 环境变量，container 可以直接读取宿主上的环境变量。</p>
@@ -136,58 +193,200 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> http_proxy=<span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="built_in">export</span> HTTP_PROXY=<span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="built_in">export</span> https_proxy=<span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br><span class="line"><span class="built_in">export</span> HTTPS_PROXY=<span class="string">&quot;http://127.0.0.1:1087&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>接下来将 dockerfile 简化：</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.12</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> curl www.google.com --max-time 3</span></span><br></pre></td></tr></table></figure>
 
 <p>重新执行 docker build，加上参数 –network host，使用宿主网络：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build --network host .</span><br></pre></td></tr></table></figure>
 
 <p>执行后 curl 就可以像在宿主上直接执行一样，通过代理访问 <a target="_blank" rel="noopener" href="http://www.google.com/">www.google.com</a> 了。</p>
 
-      </div>
-      
-      <footer class="post-footer">
-        
-        <nav class="post-nav"><a class="prev" href="/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/">
-        <i class="iconfont icon-left"></i>
-        <span class="prev-text nav-default">探究 Pandas 读取 Excel 文件报错问题</span>
-        <span class="prev-text nav-mobile">上一篇</span>
-      </a>
-    <a class="next" href="/2019/04/16/understanding-postgres-count-function/">
-        <span class="next-text nav-default">理解 PostgreSQL 的 count 函数的行为</span>
-        <span class="prev-text nav-mobile">下一篇</span>
-        <i class="iconfont icon-right"></i>
-      </a>
-    </nav></footer>
-    </article></div><div class="comments" id="comments"></div></div>
-      </main>
+    
+  </div>
 
-      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
-        <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
-        <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
-        </div><div class="copyright">
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>原文作者: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>原文链接: </span>
+    <a href="http://www.simpleapples.com/2019/04/18/building-docker-image-behind-proxy/">http://www.simpleapples.com/2019/04/18/building-docker-image-behind-proxy/</a>
+  </p>
+  <p class="copyright-item">
+    <span>许可协议: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2019/08/22/solution-for-pandas-assertion-error-while-reading-an-excel-file/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">探究 Pandas 读取 Excel 文件报错问题</span>  
+        <span class="prev-text nav-mobile">上一篇</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2019/04/16/understanding-postgres-count-function/">  
+        <span class="next-text nav-default">理解 PostgreSQL 的 count 函数的行为</span>  
+        <span class="prev-text nav-mobile">下一篇</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
   <span class="power-by">
     由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    主题 -
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
-  <span class="copyright-year">&copy;2012 - 2022<span class="heart">
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
+
     <span class="author">simpleapples</span>
   </span>
-</div>
-</footer>
 
-      <div class="back-to-top" id="back-to-top">
-        <i class="iconfont icon-up"></i>
-      </div>
-    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
-  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
 </body>
+
 </html>
