@@ -5,7 +5,7 @@ date: 2022-01-06 21:55:03
 
 ### 个人简介
 
-网名 simpleapples，目前在字节跳动任职资深研发工程师，曾供职于多贝网、创新工场AI工程院等，有一段创业经历[窄门集团](https://www.zhaimenxueshe.com/about)。
+网名 simpleapples，目前在字节跳动任职资深研发工程师，曾供职于多贝网、创新工场 AI 工程院等，有一段创业经历[番茄资本](https://fanqieziben.com/)。
 
 ### 开源贡献
 
