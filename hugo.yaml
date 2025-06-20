@@ -57,6 +57,7 @@ params:
   ShowAllPagesInArchive: true
   ShowPageNums: true
   ShowToc: true
+  tocopen: true
   socialIcons:
     - name: github
       url: "https://github.com/simpleapples"
