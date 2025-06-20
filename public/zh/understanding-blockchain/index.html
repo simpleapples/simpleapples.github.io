@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>最爱你的人，会让你不费脑细胞的理解区块链原理 | simpleapples</title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="
+区块链是一个近期非常火的概念，随便走进一个写字楼的电梯，都会听到有人谈论区块链，或者炒币: ) 希望通过这篇文章，能让你对区块链的概念有一个整体的认识，在理解概念后，下一篇文章将用大约 300 行 Python 代码，实现一个区块链网络。
+区块 和 链
+所谓区块，就是一个块咯（要不然还是什么？），把这些块一个一个连在一起，像链条一样，就称为区块链（别急着打我，先往下看）。
+
+这是一些链条，链条的价值更多的体现在锁楼下小电动车的时候，不过我们再仔细看一下这个链条是不是有点像那什么？⛓
+
+很聪明，高中生物老师在冲你微笑！这就是传说中的脱氧核糖核酸（DNA），DNA 也是一种链式结构，携带了遗传信息。区块链中的“区块”，就好比 DNA 分子中的脱氧核糖核苷酸（我也不知道自己在说什么），而区块链中的“链”，就好比 DNA 分子的链式结构。
+DNA 和链条的价值差异，关键在于 DNA 携带了大量遗传信息，而链条什么都没有携带。对于区块链来说，携带信息也是它的一个重要特点（不携带信息连锁电动车的作用都没有）。
+当区块链携带的是账务信息的时候，它就变成了一个特别厉害的东西——账本（我们给他起了个 00 后的名字——比特币）。
+Peer-to-Peer
+为了显得专业一些，我们祭出比特币的创造者，中本聪的论文《Bitcoin: A Peer-to-Peer Electronic Cash System》，从这篇论文的题目我们可以看到，区块链是基于Peer-to-Peer的，下面就来了解一下什么是 Peer-to-Peer。
+Peer-to-Peer，简称 P2P（不是互联网借贷的那个 P2P），它是一种点对点网络，看图（我也不知道该怎么讲）。
+
+图中每一个方脑袋就是一个 Peer（节点），注意一下，这些方脑袋有一个共同点，他们都一毛一样（不仅长得一样，每一个脑袋都跟其它脑袋相连）。这也是 P2P 网络的最大特点——去中心化，P2P 网络中不存在中心节点，所有节点都是平等的，任何一个节点，想跟谁说话就跟谁说话，并且谁（节点）都不能说了算。
+共识机制
+你和好基友老王，还有你们共同喜欢的一个姑娘阿圆（对，就是圆滚滚的圆），组成了一个三节点的 P2P 网络，根据 P2P 网络定义你们三个人谁都不能说了算。这一天，阿圆生日，你和老王同时给阿圆送了一个大蛋糕，那么问题来了，阿圆先吃哪个呢？
+既然没有人能说了算，也不能让你和老王决斗（计算机这么做恐怕人类会毁灭），那么就需要采用一个文明的办法决定——商量。既然商量，就要有规矩，这个规矩叫共识机制。
+
+Proof-of-work
+区块链共识机制有很多种，Proof-of-work（POW，工作量证明）是其中一种，所谓工作量证明，有点像是比武招亲。你和老王对阿圆都很好，阿圆也很难抉择到底先吃谁的蛋糕，于是她请了两位武力相当的武林高手，让你和老王分别与高手过招，谁赢了高手，就先吃谁的蛋糕，如果你们都赢了高手，那么谁先赢算数。
+
+把这些捏在一起
+了解了 POW、共识机制、P2P、区块、链的概念，我们就可以把他们拼在一起，看看会发生什么了。
+
+我们把 P2P 网络中的每一个节点，赋予一条链，这样网络中所有的链都是平等的了，接下来在其中一条链上增加一个带有信息的区块，P2P 网络会将这个区块同步到所有的链上，也就是这条信息会被存储在所有节点。
+把上面的一段话缩成一句（会显得比较厉害）：
+区块链是用分布式数据库识别、传播和记载信息的智能化对等网络, 也称为价值互联网。
+看到这里是不是对区块链略知一二了？"
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/understanding-blockchain/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/understanding-blockchain/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">
+            最爱你的人，会让你不费脑细胞的理解区块链原理
+          </h1>
+          <div class="post-meta">
+            <span title="2018-03-14 21:00:00 +0000 GMT">三月 14, 2018</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <p><img loading="lazy" src="/images/20180314_01.png" /></p>
+          <p>
+            区块链是一个近期非常火的概念，随便走进一个写字楼的电梯，都会听到有人谈论区块链，或者炒币:
+            )
+            希望通过这篇文章，能让你对区块链的概念有一个整体的认识，在理解概念后，<strong
+              >下一篇文章将用大约 300 行 Python
+              代码，实现一个区块链网络。</strong
+            >
+          </p>
+          <h1 id="区块-和-链">
+            区块 和 链<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#区块-和-链"
+              >#</a
+            >
+          </h1>
+          <p>
+            所谓区块，就是一个块咯（要不然还是什么？），把这些块一个一个连在一起，像链条一样，就称为区块链（别急着打我，先往下看）。
+          </p>
+          <p>
+            <img
+              alt="区块和区块链"
+              loading="lazy"
+              src="/images/20180314_02.jpg"
+            />
+          </p>
+          <p>
+            这是一些链条，链条的价值更多的体现在锁楼下小电动车的时候，不过我们再仔细看一下这个链条是不是有点像那什么？⛓
+          </p>
+          <p>
+            <img
+              alt="脱氧核糖核酸"
+              loading="lazy"
+              src="/images/20180314_03.gif"
+            />
+          </p>
+          <p>
+            很聪明，高中生物老师在冲你微笑！这就是传说中的脱氧核糖核酸（DNA），DNA
+            也是一种链式结构，<strong>携带了遗传信息</strong>。区块链中的“区块”，就好比
+            DNA
+            分子中的脱氧核糖核苷酸（我也不知道自己在说什么），而区块链中的“链”，就好比
+            DNA 分子的链式结构。
+          </p>
+          <p>
+            DNA 和链条的价值差异，关键在于 DNA
+            携带了大量遗传<strong>信息</strong>，而链条什么都没有携带。对于区块链来说，携带信息也是它的一个重要特点（不携带信息连锁电动车的作用都没有）。
+          </p>
+          <p>
+            当区块链携带的是账务信息的时候，它就变成了一个特别厉害的东西——账本（我们给他起了个
+            00 后的名字——比特币）。
+          </p>
+          <h1 id="peer-to-peer">
+            Peer-to-Peer<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#peer-to-peer"
+              >#</a
+            >
+          </h1>
+          <p>
+            为了显得专业一些，我们祭出比特币的创造者，中本聪的论文<a
+              href="https://bitcoin.org/bitcoin.pdf"
+              >《Bitcoin: A Peer-to-Peer Electronic Cash System》</a
+            >，从这篇论文的题目我们可以看到，区块链是基于<strong>Peer-to-Peer</strong>的，下面就来了解一下什么是
+            Peer-to-Peer。
+          </p>
+          <p>
+            Peer-to-Peer，简称 P2P（不是互联网借贷的那个
+            P2P），它是一种点对点网络，看图（我也不知道该怎么讲）。
+          </p>
+          <p>
+            <img alt="P2P网络" loading="lazy" src="/images/20180314_04.jpg" />
+          </p>
+          <p>
+            图中每一个方脑袋就是一个
+            Peer（节点），注意一下，这些方脑袋有一个共同点，他们都一毛一样（不仅长得一样，每一个脑袋都跟其它脑袋相连）。这也是
+            P2P 网络的最大特点——<strong>去中心化</strong>，P2P
+            网络中不存在中心节点，所有节点都是平等的，任何一个节点，想跟谁说话就跟谁说话，并且谁（节点）都不能说了算。
+          </p>
+          <h1 id="共识机制">
+            共识机制<a hidden class="anchor" aria-hidden="true" href="#共识机制"
+              >#</a
+            >
+          </h1>
+          <p>
+            你和好基友老王，还有你们共同喜欢的一个姑娘阿圆（对，就是圆滚滚的圆），组成了一个三节点的
+            P2P 网络，根据 P2P
+            网络定义你们三个人谁都不能说了算。这一天，阿圆生日，你和老王同时给阿圆送了一个大蛋糕，那么问题来了，阿圆先吃哪个呢？
+          </p>
+          <p>
+            既然没有人能说了算，也不能让你和老王决斗（计算机这么做恐怕人类会毁灭），那么就需要采用一个文明的办法决定——商量。既然商量，就要有规矩，这个规矩叫<strong>共识机制</strong>。
+          </p>
+          <p><img loading="lazy" src="/images/20180314_05.png" /></p>
+          <h1 id="proof-of-work">
+            Proof-of-work<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#proof-of-work"
+              >#</a
+            >
+          </h1>
+          <p>
+            区块链共识机制有很多种，Proof-of-work（POW，工作量证明）是其中一种，所谓工作量证明，有点像是比武招亲。你和老王对阿圆都很好，阿圆也很难抉择到底先吃谁的蛋糕，于是她请了两位武力相当的武林高手，让你和老王分别与高手过招，谁赢了高手，就先吃谁的蛋糕，如果你们都赢了高手，那么谁先赢算数。
+          </p>
+          <p><img loading="lazy" src="/images/20180314_06.jpg" /></p>
+          <h1 id="把这些捏在一起">
+            把这些捏在一起<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#把这些捏在一起"
+              >#</a
+            >
+          </h1>
+          <p>
+            了解了
+            POW、共识机制、P2P、区块、链的概念，我们就可以把他们拼在一起，看看会发生什么了。
+          </p>
+          <p>
+            <img
+              alt="区块链诞生了！"
+              loading="lazy"
+              src="/images/20180314_07.jpeg"
+            />
+          </p>
+          <p>
+            我们把 P2P
+            网络中的每一个节点，赋予一条链，这样网络中所有的链都是平等的了，接下来在其中一条链上增加一个带有信息的区块，P2P
+            网络会将这个区块同步到所有的链上，也就是这条信息会被存储在所有节点。
+          </p>
+          <p>把上面的一段话缩成一句（会显得比较厉害）：</p>
+          <p>
+            <strong
+              >区块链是用分布式数据库识别、传播和记载信息的智能化对等网络,
+              也称为价值互联网。</strong
+            >
+          </p>
+          <p>看到这里是不是对区块链略知一二了？</p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Golang | Zhiya&#39;s Blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+<meta name="author" content="Zhiya">
+<link rel="canonical" href="https://simpleapples.com/zh/categories/golang/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css" integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://simpleapples.com/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://simpleapples.com/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://simpleapples.com/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://simpleapples.com/apple-touch-icon.png">
+<link rel="mask-icon" href="https://simpleapples.com/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="https://simpleapples.com/zh/categories/golang/index.xml">
+<link rel="alternate" hreflang="zh" href="https://simpleapples.com/zh/categories/golang/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://simpleapples.com/zh/categories/golang/">
+  <meta property="og:site_name" content="Zhiya&#39;s Blog">
+  <meta property="og:title" content="Golang">
+  <meta property="og:locale" content="cn">
+  <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Golang">
+<meta name="twitter:description" content="">
+
+</head>
+
+<body class="list" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://simpleapples.com/zh/" accesskey="h" title="Zhiya&#39;s Blog (Alt + H)">Zhiya&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                    <li>
+                        <a href="https://simpleapples.com/en/" title="English"
+                            aria-label="English">English</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://simpleapples.com/zh/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><div class="breadcrumbs"><a href="https://simpleapples.com/zh/">主页</a>&nbsp;»&nbsp;<a href="https://simpleapples.com/zh/categories/">Categories</a></div>
+  <h1>
+    Golang
+    <a href="/zh/categories/golang/index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">基于Clean Architecture的Go项目架构实践
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>经过这些年的发展，Go 语言已经成为一门被广泛使用在各个领域的编程语言。从 k8s、docker 等基础组件，到业务领域的微服务，都可以用 Go 构建。在构建这些 Go 项目时，采用哪种架构模式和代码布局，是一个仁者见仁智者见智的事情。有 Java Spring 经验的可能会采用 MVC 模式，有 Python Flask 经验的可能会采用 MTV 模式。加上 Go 语言领域并没有出现主流的企业级开发框架，很多项目甚至没有明确的架构模式。
+Clean Architecture Clean Architecture 是 Uncle Bob 提出的适用于复杂业务系统的架构模式，其核心思想是将业务复杂度与技术复杂度解藕，相比于 MVC、MTV 等模式，Clean Architecture 除了进行分层，还通过约定依赖原则，明确了与外部依赖的交互方式，以及外部依赖与业务逻辑的边界。感兴趣的朋友可以直接阅读作者原文https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html。
+由于 Clean Architecture 具有脱离语言和框架的灵活性，作者在提出时也没有规定实现细节，给 Clean Architecture 的落地带来了困难，接下来以一个例子来说明如何在 Go 项目中应用 Clean Architecture 的思想。
+布局 作为一个 Go 项目，不管用哪种架构模式，建议都建立 app 和 scripts 这两个路径。app 存放启动 Go 项目的入口文件，通常是 main.go。而 scripts 可以放一些构建和部署时候用到的脚本。
+clean_architecture_demo ├── README.md ├── app │ └── main.go ├── scripts │ ├── build.sh │ └── run.sh ├── go.mod ├── go.sum └── usecases 接下来是代码部分，分为 entities、usecases、adapters 三个部分。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2021-12-12 16:45:00 +0000 GMT'>十二月 12, 2021</span>&nbsp;·&nbsp;1 分钟&nbsp;·&nbsp;Zhiya</footer>
+  <a class="entry-link" aria-label="post link to 基于Clean Architecture的Go项目架构实践" href="https://simpleapples.com/zh/posts/go-project-with-clean-architecture/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">规避 Go 中的常见并发 bug
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>在Understanding Real-World Concurrency Bugs in Go这篇论文中，几名研究人员分析了常见的Go并发bug，并在最流行的几个Go开源项目中进行了验证。本文梳理了论文中提到的常见的bug并给出解决方法的分析。
+论文中对bugs进行了分类，分为阻塞式和非阻塞式两种： 阻塞式：goroutine发生阻塞无法继续执行（例如死锁） 非阻塞式：不会阻塞执行，但存在潜在的数据冲突（例如并发写）
+阻塞式bug 阻塞式bug发生的根因有两种，一种是共享内存（例如卡在了意图保护共享内存的锁操作上），一种是消息传递（比如等待chan）。同时研究发现共享内存和消息传递导致的bug数量不想上下，但是共享这种方法的使用量比消息传递使用的更频繁，所以也得出了共享内存方式更不容易导致bug的结论。
+读写锁优先级导致的死锁 在Go中的写锁优先级高于读锁优先级，假设一个goroutine（goroutine A）连续获取两次读锁，而另一个goroutine（goroutine B）在gouroutine A两次获取读锁中间获取了写锁，就会导致死锁的发生。论文中没有针对这个bug给出示例代码，我写了一个简单的代码示意一下。
+func gouroutine1() { m.RLock() m.RLock() } func gouroutine2() { m.WLock() } f1和f2都在goroutine中执行，当f1执行完第一个l.RLock()语句后，假设这时f2的m.WLock执行，由于写锁是排它的，WLock本身被f1的第一个m.RLock()阻塞，写锁操作本身又会阻塞f1中的第二个m.RLock
+WaitGroup误用导致的死锁 这种情况就是比较典型的WaitGroup的误用了，提前执行group.Wait()会导致部分group.Done()无法执行到，进而导致程序被阻塞。
+var group sync.WaitGroup group.Add(len(pm.plugins)) for _, p := range pm.plugins { go func(p *plugin) { defer group.Done() } group.Wait() // blocked } // group.Wait() should be here for循环内的group.Wait()执行到的时候，循环内的部分goroutine还没有被创建出来，其中的group.Done()也就永远没法执行到，所以会导致永远阻塞在这一句，正确的写法是将group.Wait()移到for循环外。
+Channel的误用 Channel是go支持并发的一个非常重要的特性，Channel虽然在很多场景下非常解决问题，但是误用也是不容易发现的。
+func goroutine1() { m.Lock() ch &lt;- request // blocked m.Unlock() } func goroutine2() { for { m.Lock() // 阻塞 m.Unlock() request &lt;- ch } } 这段代码的业务语义是goroutine1会通过ch接收goroutine2发送的消息，但是当goroutine1执行到ch &lt;- request时候会阻塞并等待ch，此时由于goroutine1没有释放锁，goroutine2的m.Lock()也会阻塞，形成死锁。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2021-08-17 20:53:00 +0000 +0000'>八月 17, 2021</span>&nbsp;·&nbsp;2 分钟&nbsp;·&nbsp;Zhiya</footer>
+  <a class="entry-link" aria-label="post link to 规避 Go 中的常见并发 bug" href="https://simpleapples.com/zh/posts/avoid-concurrency-bugs-in-go/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">探究vscode debug流程，解决无法运行go程序的问题
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>问题描述 vscode 无法以 run 模式运行 go 项目（只能以 debug 模式调试），并且有如下报错。
+图中被遮盖的部分是项目内的 package，并非第三方 package，也就是说在以 run 模式运行 go 项目时无法找到其他的 go 文件，只能找到入口文件。
+初步排查 找不到其他文件，首先想到的是 GO_PATH 的问题，但是项目使用了 go mod，允许在 GO_PATH 之外的路径创建项目，所以这个怀疑点排除。接下来怀疑 vscode 的配置有问题，每个 vscode 项目中都有 .launch.json 文件，配置运行代码时的环境，下面是项目中的 .launch.json。
+{ // Use IntelliSense to learn about possible attributes. // Hover to view descriptions of existing attributes. // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387 &#34;version&#34;: &#34;0.2.0&#34;, &#34;configurations&#34;: [ { &#34;name&#34;: &#34;Launch&#34;, &#34;type&#34;: &#34;go&#34;, &#34;request&#34;: &#34;launch&#34;, &#34;mode&#34;: &#34;auto&#34;, &#34;program&#34;: &#34;${workspaceRoot}/src/main.go&#34;, &#34;env&#34;: {}, &#34;args&#34;: [] } ] } 可以看到 .launch.json 里没有指定程序的工作目录，debug 模式和 run 模式会不会默认的工作路径不同呢？于是在 main 函数里使用 os.Getwd() 打印一下当前的路径，结果如下：
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2020-04-20 15:35:00 +0000 +0000'>四月 20, 2020</span>&nbsp;·&nbsp;2 分钟&nbsp;·&nbsp;Zhiya</footer>
+  <a class="entry-link" aria-label="post link to 探究vscode debug流程，解决无法运行go程序的问题" href="https://simpleapples.com/zh/posts/vscode-cant-run-go-project/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">viper从etcd读取配置失败的问题
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>问题描述 Viper （本文环境是 Viper 1.1.0）是 Go 应用程序的完整配置解决方案，在很多项目中都有应用。etcd是一个分布式 KV 存储，最直接的应用是配置中心。
+Viper 除了支持从文件中读取配置，还支持从远程的配置中心读取配置，使用下面的代码进行配置。
+viper.AddRemoteProvider(&#34;etcd&#34;, &#34;http://127.0.0.1:2379&#34;, &#34;conf.toml&#34;) viper.SetConfigType(&#34;toml&#34;) err := viper.ReadRemoteConfig() if err != nil { panic(err) } 运行后报错panic: Remote Configurations Error: No Files Found，检查后发现 etcd 开启了 tls，所以需要用 https 协议访问 etcd 的 API，更新代码如下。
+viper.AddSecureRemoteProvider(&#34;etcd&#34;, &#34;https://127.0.0.1:2379&#34;, &#34;conf.toml&#34;, &#34;key_path&#34;) viper.SetConfigType(&#34;toml&#34;) err := viper.ReadRemoteConfig() if err != nil { panic(err) } 使用AddSecureRemoteProvider方法替换AddRemoteProvider方法，问题依旧。
+定位问题 跟踪源码发现，最终像 etcd 发送请求的是go-etcd包（目前 go-etcd 已经不维护），在 go-etcd 的 requests.go 文件中找到了相关的源码，go-etcd 调用了 net/http 包向 etcd 发送请求。
+这个时候忽然想到 etcd 的证书是自签名的，访问自签名证书的 https 接口应该会报错啊，怎么会请求到内容呢？如下图，在 Chrome 中访问 etcd 的自签名 https 接口，会提示证书无效。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2020-04-16 11:35:00 +0000 +0000'>四月 16, 2020</span>&nbsp;·&nbsp;1 分钟&nbsp;·&nbsp;Zhiya</footer>
+  <a class="entry-link" aria-label="post link to viper从etcd读取配置失败的问题" href="https://simpleapples.com/zh/posts/viper-read-from-etcd-failed/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">go json 实践中遇到的坑
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>
+在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。
+整数变浮点数问题 假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。
+type Person struct { Name string Age int64 Weight float64 } func main() { person := Person{ Name: &#34;Wang Wu&#34;, Age: 30, Weight: 150.07, } jsonBytes, _ := json.Marshal(person) fmt.Println(string(jsonBytes)) var personFromJSON interface{} json.Unmarshal(jsonBytes, &amp;personFromJSON) r := personFromJSON.(map[string]interface{}) } 代码执行到这里看上去一切正常，但是打印一下 map[string]interface{} 就会发现不太对了。
+fmt.Println(reflect.TypeOf(r[&#34;Age&#34;]).Name()) // float64 fmt.Println(reflect.TypeOf(r[&#34;Weight&#34;]).Name()) // float64 转换成 map[string]interface{} 之后，原先的 uint64 和 float64 类型都被转换成了 float64 类型，这显然是不符合我们的预期的。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2018-12-24 10:43:00 +0000 GMT'>十二月 24, 2018</span>&nbsp;·&nbsp;2 分钟&nbsp;·&nbsp;Zhiya</footer>
+  <a class="entry-link" aria-label="post link to go json 实践中遇到的坑" href="https://simpleapples.com/zh/posts/practice-in-json-with-go/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="https://simpleapples.com/zh/categories/golang/page/2/">下一页&nbsp;2/2&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://simpleapples.com/zh/">Zhiya&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

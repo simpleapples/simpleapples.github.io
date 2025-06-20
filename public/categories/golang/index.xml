@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Golang on Zhiya&#39;s Blog</title>
+    <link>http://localhost:1313/categories/golang/</link>
+    <description>Recent content in Golang on Zhiya&#39;s Blog</description>
+    <generator>Hugo -- 0.147.8</generator>
+    <language>cn</language>
+    <lastBuildDate>Sun, 12 Dec 2021 16:45:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>基于Clean Architecture的Go项目架构实践</title>
+      <link>http://localhost:1313/posts/go-project-with-clean-architecture/</link>
+      <pubDate>Sun, 12 Dec 2021 16:45:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/go-project-with-clean-architecture/</guid>
+      <description>&lt;p&gt;经过这些年的发展，Go 语言已经成为一门被广泛使用在各个领域的编程语言。从 k8s、docker 等基础组件，到业务领域的微服务，都可以用 Go 构建。在构建这些 Go 项目时，采用哪种架构模式和代码布局，是一个仁者见仁智者见智的事情。有 Java Spring 经验的可能会采用 MVC 模式，有 Python Flask 经验的可能会采用 MTV 模式。加上 Go 语言领域并没有出现主流的企业级开发框架，很多项目甚至没有明确的架构模式。&lt;/p&gt;
+&lt;h1 id=&#34;clean-architecture&#34;&gt;Clean Architecture&lt;/h1&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20211212_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Clean Architecture 是 Uncle Bob 提出的适用于复杂业务系统的架构模式，其核心思想是将业务复杂度与技术复杂度解藕，相比于 MVC、MTV 等模式，Clean Architecture 除了进行分层，还通过约定依赖原则，明确了与外部依赖的交互方式，以及外部依赖与业务逻辑的边界。感兴趣的朋友可以直接阅读作者原文&lt;a href=&#34;https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html&#34;&gt;https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;由于 Clean Architecture 具有脱离语言和框架的灵活性，作者在提出时也没有规定实现细节，给 Clean Architecture 的落地带来了困难，接下来以一个例子来说明如何在 Go 项目中应用 Clean Architecture 的思想。&lt;/p&gt;
+&lt;h1 id=&#34;布局&#34;&gt;布局&lt;/h1&gt;
+&lt;p&gt;作为一个 Go 项目，不管用哪种架构模式，建议都建立 app 和 scripts 这两个路径。app 存放启动 Go 项目的入口文件，通常是 main.go。而 scripts 可以放一些构建和部署时候用到的脚本。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;clean_architecture_demo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── README.md
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   └── main.go
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── scripts
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── build.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   └── run.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── go.mod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── go.sum
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;└── usecases
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;接下来是代码部分，分为 entities、usecases、adapters 三个部分。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>规避 Go 中的常见并发 bug</title>
+      <link>http://localhost:1313/posts/avoid-concurrency-bugs-in-go/</link>
+      <pubDate>Tue, 17 Aug 2021 20:53:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/avoid-concurrency-bugs-in-go/</guid>
+      <description>&lt;p&gt;在&lt;a href=&#34;https://cseweb.ucsd.edu/~yiying/GoStudy-ASPLOS19.pdf&#34;&gt;Understanding Real-World Concurrency Bugs in Go&lt;/a&gt;这篇论文中，几名研究人员分析了常见的Go并发bug，并在最流行的几个Go开源项目中进行了验证。本文梳理了论文中提到的常见的bug并给出解决方法的分析。&lt;/p&gt;
+&lt;p&gt;论文中对bugs进行了分类，分为阻塞式和非阻塞式两种：
+阻塞式：goroutine发生阻塞无法继续执行（例如死锁）
+非阻塞式：不会阻塞执行，但存在潜在的数据冲突（例如并发写）&lt;/p&gt;
+&lt;h1 id=&#34;阻塞式bug&#34;&gt;阻塞式bug&lt;/h1&gt;
+&lt;p&gt;阻塞式bug发生的根因有两种，一种是共享内存（例如卡在了意图保护共享内存的锁操作上），一种是消息传递（比如等待chan）。同时研究发现共享内存和消息传递导致的bug数量不想上下，但是共享这种方法的使用量比消息传递使用的更频繁，所以也得出了共享内存方式更不容易导致bug的结论。&lt;/p&gt;
+&lt;h2 id=&#34;读写锁优先级导致的死锁&#34;&gt;读写锁优先级导致的死锁&lt;/h2&gt;
+&lt;p&gt;在Go中的写锁优先级高于读锁优先级，假设一个goroutine（goroutine A）连续获取两次读锁，而另一个goroutine（goroutine B）在gouroutine A两次获取读锁中间获取了写锁，就会导致死锁的发生。论文中没有针对这个bug给出示例代码，我写了一个简单的代码示意一下。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;gouroutine1&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;m&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;RLock&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;m&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;RLock&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;gouroutine2&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;m&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;WLock&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;f1和f2都在goroutine中执行，当f1执行完第一个l.RLock()语句后，假设这时f2的m.WLock执行，由于写锁是排它的，WLock本身被f1的第一个m.RLock()阻塞，写锁操作本身又会阻塞f1中的第二个m.RLock&lt;/p&gt;
+&lt;h2 id=&#34;waitgroup误用导致的死锁&#34;&gt;WaitGroup误用导致的死锁&lt;/h2&gt;
+&lt;p&gt;这种情况就是比较典型的WaitGroup的误用了，提前执行group.Wait()会导致部分group.Done()无法执行到，进而导致程序被阻塞。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;group&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sync&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;WaitGroup&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;group&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Add&lt;/span&gt;(len(&lt;span style=&#34;color:#a6e22e&#34;&gt;pm&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;plugins&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;_&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;p&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;range&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;pm&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;plugins&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;p&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;plugin&lt;/span&gt;) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;defer&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;group&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Done&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;group&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Wait&lt;/span&gt;()  &lt;span style=&#34;color:#75715e&#34;&gt;// blocked&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;// group.Wait() should be here&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;for循环内的group.Wait()执行到的时候，循环内的部分goroutine还没有被创建出来，其中的group.Done()也就永远没法执行到，所以会导致永远阻塞在这一句，正确的写法是将group.Wait()移到for循环外。&lt;/p&gt;
+&lt;h2 id=&#34;channel的误用&#34;&gt;Channel的误用&lt;/h2&gt;
+&lt;p&gt;Channel是go支持并发的一个非常重要的特性，Channel虽然在很多场景下非常解决问题，但是误用也是不容易发现的。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;goroutine1&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;m&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Lock&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;ch&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;request&lt;/span&gt;  &lt;span style=&#34;color:#75715e&#34;&gt;// blocked&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;m&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Unlock&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;goroutine2&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;m&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Lock&lt;/span&gt;()  &lt;span style=&#34;color:#75715e&#34;&gt;// 阻塞&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;m&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Unlock&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;request&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这段代码的业务语义是goroutine1会通过ch接收goroutine2发送的消息，但是当goroutine1执行到ch &amp;lt;- request时候会阻塞并等待ch，此时由于goroutine1没有释放锁，goroutine2的m.Lock()也会阻塞，形成死锁。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>探究vscode debug流程，解决无法运行go程序的问题</title>
+      <link>http://localhost:1313/posts/vscode-cant-run-go-project/</link>
+      <pubDate>Mon, 20 Apr 2020 15:35:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/vscode-cant-run-go-project/</guid>
+      <description>&lt;h3 id=&#34;问题描述&#34;&gt;问题描述&lt;/h3&gt;
+&lt;p&gt;vscode 无法以 &lt;code&gt;run&lt;/code&gt; 模式运行 go 项目（只能以 &lt;code&gt;debug&lt;/code&gt; 模式调试），并且有如下报错。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20200420_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;图中被遮盖的部分是项目内的 package，并非第三方 package，也就是说在以 &lt;code&gt;run&lt;/code&gt; 模式运行 go 项目时无法找到其他的 go 文件，只能找到入口文件。&lt;/p&gt;
+&lt;h3 id=&#34;初步排查&#34;&gt;初步排查&lt;/h3&gt;
+&lt;p&gt;找不到其他文件，首先想到的是 GO_PATH 的问题，但是项目使用了 go mod，允许在 GO_PATH 之外的路径创建项目，所以这个怀疑点排除。接下来怀疑 vscode 的配置有问题，每个 vscode 项目中都有 .launch.json 文件，配置运行代码时的环境，下面是项目中的 .launch.json。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#75715e&#34;&gt;// Use IntelliSense to learn about possible attributes.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;  &lt;span style=&#34;color:#75715e&#34;&gt;// Hover to view descriptions of existing attributes.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;  &lt;span style=&#34;color:#75715e&#34;&gt;// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;version&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;0.2.0&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;configurations&amp;#34;&lt;/span&gt;: [
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Launch&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;go&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;request&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;launch&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;mode&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;auto&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;program&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;${workspaceRoot}/src/main.go&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;env&amp;#34;&lt;/span&gt;: {},
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;args&amp;#34;&lt;/span&gt;: []
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  ]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以看到 .launch.json 里没有指定程序的工作目录，&lt;code&gt;debug&lt;/code&gt; 模式和 &lt;code&gt;run&lt;/code&gt; 模式会不会默认的工作路径不同呢？于是在 main 函数里使用 &lt;code&gt;os.Getwd()&lt;/code&gt; 打印一下当前的路径，结果如下：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>viper从etcd读取配置失败的问题</title>
+      <link>http://localhost:1313/posts/viper-read-from-etcd-failed/</link>
+      <pubDate>Thu, 16 Apr 2020 11:35:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/viper-read-from-etcd-failed/</guid>
+      <description>&lt;h3 id=&#34;问题描述&#34;&gt;问题描述&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/spf13/viper&#34;&gt;Viper&lt;/a&gt; （本文环境是 Viper 1.1.0）是 Go 应用程序的完整配置解决方案，在很多项目中都有应用。&lt;a href=&#34;https://github.com/etcd-io/etcd&#34;&gt;etcd&lt;/a&gt;是一个分布式 KV 存储，最直接的应用是配置中心。&lt;/p&gt;
+&lt;p&gt;Viper 除了支持从文件中读取配置，还支持从远程的配置中心读取配置，使用下面的代码进行配置。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;viper&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;AddRemoteProvider&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;etcd&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:2379&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;conf.toml&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;viper&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;SetConfigType&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;toml&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;viper&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;ReadRemoteConfig&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    panic(&lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;运行后报错&lt;code&gt;panic: Remote Configurations Error: No Files Found&lt;/code&gt;，检查后发现 etcd 开启了 tls，所以需要用 https 协议访问 etcd 的 API，更新代码如下。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;viper&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;AddSecureRemoteProvider&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;etcd&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://127.0.0.1:2379&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;conf.toml&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key_path&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;viper&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;SetConfigType&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;toml&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;viper&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;ReadRemoteConfig&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    panic(&lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;使用&lt;code&gt;AddSecureRemoteProvider&lt;/code&gt;方法替换&lt;code&gt;AddRemoteProvider&lt;/code&gt;方法，问题依旧。&lt;/p&gt;
+&lt;h3 id=&#34;定位问题&#34;&gt;定位问题&lt;/h3&gt;
+&lt;p&gt;跟踪源码发现，最终像 etcd 发送请求的是&lt;a href=&#34;https://github.com/coreos/go-etcd/&#34;&gt;go-etcd&lt;/a&gt;包（目前 go-etcd 已经不维护），在 go-etcd 的 requests.go 文件中找到了相关的源码，go-etcd 调用了 net/http 包向 etcd 发送请求。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20200416_01.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;这个时候忽然想到 etcd 的证书是自签名的，访问自签名证书的 https 接口应该会报错啊，怎么会请求到内容呢？如下图，在 Chrome 中访问 etcd 的自签名 https 接口，会提示证书无效。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>go json 实践中遇到的坑</title>
+      <link>http://localhost:1313/posts/practice-in-json-with-go/</link>
+      <pubDate>Mon, 24 Dec 2018 10:43:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/practice-in-json-with-go/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20181224_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;整数变浮点数问题&#34;&gt;整数变浮点数问题&lt;/h3&gt;
+&lt;p&gt;假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Person&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;struct&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;Name&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;Age&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;Weight&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;float64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;person&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Person&lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;Name&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Wang Wu&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;Age&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;30&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;Weight&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;150.07&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;jsonBytes&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;_&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;json&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Marshal&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;person&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Println&lt;/span&gt;(string(&lt;span style=&#34;color:#a6e22e&#34;&gt;jsonBytes&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;personFromJSON&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;interface&lt;/span&gt;{}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;json&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Unmarshal&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;jsonBytes&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;personFromJSON&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;r&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;personFromJSON&lt;/span&gt;.(&lt;span style=&#34;color:#66d9ef&#34;&gt;map&lt;/span&gt;[&lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;]&lt;span style=&#34;color:#66d9ef&#34;&gt;interface&lt;/span&gt;{})
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;代码执行到这里看上去一切正常，但是打印一下 map[string]interface{} 就会发现不太对了。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Println&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;reflect&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;TypeOf&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;r&lt;/span&gt;[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Age&amp;#34;&lt;/span&gt;]).&lt;span style=&#34;color:#a6e22e&#34;&gt;Name&lt;/span&gt;())  &lt;span style=&#34;color:#75715e&#34;&gt;// float64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Println&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;reflect&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;TypeOf&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;r&lt;/span&gt;[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Weight&amp;#34;&lt;/span&gt;]).&lt;span style=&#34;color:#a6e22e&#34;&gt;Name&lt;/span&gt;())  &lt;span style=&#34;color:#75715e&#34;&gt;// float64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;转换成 map[string]interface{} 之后，原先的 uint64 和 float64 类型都被转换成了 float64 类型，这显然是不符合我们的预期的。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20181224_02.png&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>理解Golang的Time结构</title>
+      <link>http://localhost:1313/posts/understand-time-struct-in-go/</link>
+      <pubDate>Fri, 26 Oct 2018 17:58:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/understand-time-struct-in-go/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20181026_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;在 golang 中创建并打印一个时间对象，会看到如下输出&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;2018-10-26 14:15:50.306558969 +0800 CST m=+0.000401093
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;前面表示的意义好理解，分别是年月日和时间时区，最后的 m=+xxxx 这部分代表什么呢？&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;monotonic-clocks-和-wall-clocks&#34;&gt;Monotonic Clocks 和 Wall Clocks&lt;/h3&gt;
+&lt;p&gt;根据 golang 的 time 包的文档可以知道，golang 的 time 结构中存储了两种时钟，一种是 Wall Clocks，一种是 Monotonic Clocks。&lt;/p&gt;
+&lt;p&gt;Wall Clocks，顾名思义，表示墙上挂的钟，在这里表示我们平时理解的时间，存储的形式是自 1970 年 1 月 1 日 0 时 0 分 0 秒以来的时间戳，当系统和授时服务器进行校准时间时间操作时，有可能造成这一秒是 2018-1-1 00:00:00，而下一秒变成了 2017-12-31 23:59:59 的情况。Monotonic Clocks，意思是单调时间的，所谓单调，就是只会不停的往前增长，不受校时操作的影响，这个时间是自进程启动以来的秒数。&lt;/p&gt;
+&lt;p&gt;如果每隔一秒生成一个 Time 并打印出来，就会看到如下输出。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;2018-10-26 14:15:50.306558969 +0800 CST m=+0.000401093
+2018-10-26 14:15:51.310559881 +0800 CST m=+1.004425285
+2018-10-26 14:15:52.311822486 +0800 CST m=+2.005711106
+2018-10-26 14:15:53.314599457 +0800 CST m=+3.008511329
+2018-10-26 14:15:54.31882248 +0800 CST m=+4.012757636
+2018-10-26 14:15:55.320059921 +0800 CST m=+5.014018292
+2018-10-26 14:15:56.323814998 +0800 CST m=+6.017796644
+2018-10-26 14:15:57.324858749 +0800 CST m=+7.018863606
+2018-10-26 14:15:58.325164174 +0800 CST m=+8.019192224
+2018-10-26 14:15:59.329058535 +0800 CST m=+9.023109863
+2018-10-26 14:16:00.329591268 +0800 CST m=+10.023665796
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以看到 m=+后面所显示的数字，就是文档中所说的 Monotonic Clocks。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Go的栈空间管理</title>
+      <link>http://localhost:1313/posts/stacks-in-go/</link>
+      <pubDate>Thu, 11 Oct 2018 18:41:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/stacks-in-go/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20181011_01.jpg&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;栈空间管理的基本逻辑&#34;&gt;栈空间管理的基本逻辑&lt;/h3&gt;
+&lt;p&gt;go 语言通过 goroutine 提供了并发编程支持，goroutine 是 go 运行库的功能，而不是操作系统线程实现的，goroutine 可以被理解成一个用户态的线程。&lt;/p&gt;
+&lt;p&gt;既然 goroutine 是由 go 运行库管理的，那么 go 运行库也需要为每个 goroutine 创建并管理相应的栈空间，为每个 goroutine 分配的栈空间不能太大，goroutine 开多时会浪费大量空间，也不能太小，会导致栈溢出。go 语言选择栈的栈空间管理的方式是，一开始给一个比较小的空间，随着需要自动增长。当 goroutine 不需要那么大的空间时，栈空间也要自动缩小。&lt;/p&gt;
+&lt;h3 id=&#34;分段栈-segment-stacks&#34;&gt;分段栈 Segment Stacks&lt;/h3&gt;
+&lt;p&gt;在 go 1.3 之前，go 使用分段栈。&lt;/p&gt;
+&lt;p&gt;分段栈实现了一种不连续但是可以持续增长的栈，开始时，栈只有一个段，当需要更多的栈空间时，会分配一个新的段，和上一个栈双向链接。这样，一个栈就是由多个双向链接的段所组成的。当新分配的段使用完毕后，新段会被释放掉。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20181011_02.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;分段栈实现了栈的按需收缩，在增加新分段时也不需要对原有分段中的数据进行拷贝，使得 goroutine 的使用代价非常低廉。&lt;/p&gt;
+&lt;p&gt;分段栈的好处是可以按需增长，空间利用率比较高，然而分段栈在某些情况下也存在一定的瑕疵。当一个段即将用尽，这时使用 for 循环执行一个比较耗空间的函数，会导致函数执行时 goroutine 进行段的分配，而执行完成返回时，进行段的销毁，这样就会导致在循环中出现多次栈的扩容和收缩，造成很大的性能损失，这种情况被称作栈分裂（Stack Split）。&lt;/p&gt;
+&lt;h3 id=&#34;连续栈-contiguous-stacks&#34;&gt;连续栈 Contiguous Stacks&lt;/h3&gt;
+&lt;p&gt;go 1.3 推出了连续栈，连续栈使用了另外一种策略，不再把栈分成一段一段的，当栈空间不够时，直接 new 一个 2 倍大的栈空间，并将原先栈空间中的数据拷贝到新的栈空间中，而后销毁旧栈。这样当出现栈空间触及边界时，不会产生栈分裂的情况。&lt;/p&gt;
+&lt;p&gt;继续假设当前栈空间即将用尽，并且需要在 for 循环中执行一个比较消耗空间的函数。当该函数执行时，栈空间发生了扩容，变成原先 2 倍大小，函数执行完成一次后，栈空间的使用量缩小回执行前的大小，但是栈空间的使用量并没有小于栈大小的 1/4，不会触发栈收缩，所以在整个 for 循环执行过程中，不会反复触发栈空间的收缩扩容。&lt;/p&gt;
+&lt;h3 id=&#34;总结&#34;&gt;总结&lt;/h3&gt;
+&lt;p&gt;相比于分段栈，连续栈避免了某些场景下栈空间的的频繁伸缩。有一点需要注意的是，连续栈的收缩也是需要重新申请一段空间（原先的 1/2 大小），并进行栈拷贝操作的。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Go语言中defer的一些坑</title>
+      <link>http://localhost:1313/posts/how-to-use-defer-in-go/</link>
+      <pubDate>Fri, 14 Sep 2018 13:31:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/how-to-use-defer-in-go/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20180914_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;defer 语句是 Go 中一个非常有用的特性，可以将一个方法延迟到包裹该方法的方法返回时执行，在实际应用中，defer 语句可以充当其他语言中 try…catch…的角色，也可以用来处理关闭文件句柄等收尾操作。&lt;/p&gt;
+&lt;h3 id=&#34;defer-触发时机&#34;&gt;defer 触发时机&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A &amp;ldquo;defer&amp;rdquo; statement invokes a function whose execution is deferred to the moment the surrounding function returns, either because the surrounding function executed a return statement, reached the end of its function body, or because the corresponding goroutine is panicking.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;Go 官方文档中对 defer 的执行时机做了阐述，分别是。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;包裹 defer 的函数返回时&lt;/li&gt;
+&lt;li&gt;包裹 defer 的函数执行到末尾时&lt;/li&gt;
+&lt;li&gt;所在的 goroutine 发生 panic 时&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;defer-执行顺序&#34;&gt;defer 执行顺序&lt;/h3&gt;
+&lt;p&gt;当一个方法中有多个 defer 时， defer 会将要延迟执行的方法“压栈”，当 defer 被触发时，将所有“压栈”的方法“出栈”并执行。所以 defer 的执行顺序是 LIFO 的。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用gofmt格式化代码</title>
+      <link>http://localhost:1313/posts/gofmt-formating-your-code/</link>
+      <pubDate>Tue, 17 Jul 2018 14:13:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/gofmt-formating-your-code/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20180717_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;对于一门编程语言来说，代码格式化是最容易引起争议的一个问题，不同的开发者可能会有不同的编码风格和习惯，但是如果所有开发者都能使用同一种格式来编写代码，开发者就可以将宝贵的时间专注在语言要解决的问题上。&lt;/p&gt;
+&lt;h1 id=&#34;gofmt-介绍&#34;&gt;gofmt 介绍&lt;/h1&gt;
+&lt;p&gt;Golang 的开发团队制定了统一的官方代码风格，并且推出了 gofmt 工具（gofmt 或 go fmt）来帮助开发者格式化他们的代码到统一的风格。gofmt 是一个 cli 程序，会优先读取标准输入，如果传入了文件路径的话，会格式化这个文件，如果传入一个目录，会格式化目录中所有.go 文件，如果不传参数，会格式化当前目录下的所有.go 文件。&lt;/p&gt;
+&lt;p&gt;gofmt 默认不对代码进行简化，使用-s 参数可以开启简化代码功能，具体来说会进行如下的转换：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;去除数组、切片、Map 初始化时不必要的类型声明：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;如下形式的切片表达式&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    []&lt;span style=&#34;color:#a6e22e&#34;&gt;T&lt;/span&gt;{&lt;span style=&#34;color:#a6e22e&#34;&gt;T&lt;/span&gt;{}, &lt;span style=&#34;color:#a6e22e&#34;&gt;T&lt;/span&gt;{}}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;将被简化为&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    []&lt;span style=&#34;color:#a6e22e&#34;&gt;T&lt;/span&gt;{{}, {}}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;去除数组切片操作时不必要的索引指定&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;如下形式的切片表达式&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;s&lt;/span&gt;[&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;:len(&lt;span style=&#34;color:#a6e22e&#34;&gt;s&lt;/span&gt;)]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;将被简化为&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;s&lt;/span&gt;[&lt;span style=&#34;color:#a6e22e&#34;&gt;a&lt;/span&gt;:]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;去除迭代时非必要的变量赋值&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;如下形式的迭代&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;x&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;_&lt;/span&gt; = &lt;span style=&#34;color:#66d9ef&#34;&gt;range&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;v&lt;/span&gt; {&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;将被简化为&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;x&lt;/span&gt; = &lt;span style=&#34;color:#66d9ef&#34;&gt;range&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;v&lt;/span&gt; {&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;如下形式的迭代&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;_&lt;/span&gt; = &lt;span style=&#34;color:#66d9ef&#34;&gt;range&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;v&lt;/span&gt; {&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;将被简化为&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;range&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;v&lt;/span&gt; {&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;gofmt 命令参数列表如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;usage: gofmt &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;flags&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;path ...&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -cpuprofile string
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        write cpu profile to this file
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -d    display diffs instead of rewriting files
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -e    report all errors &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;not just the first &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt; on different lines&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -l    list files whose formatting differs from gofmt&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;s
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;  -r string
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;        rewrite rule (e.g., &amp;#39;&lt;/span&gt;a&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;b:len&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;a&lt;span style=&#34;color:#f92672&#34;&gt;)]&lt;/span&gt; -&amp;gt; a&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;b:&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -s    simplify code
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -w    write result to &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;source&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; file instead of stdout
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以看到，gofmt 命令还支持自定义的重写规则，使用-r 参数，按照 pattern -&amp;gt; replacement 的格式传入规则。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Golang环境安装和依赖管理</title>
+      <link>http://localhost:1313/posts/build-golang-environment/</link>
+      <pubDate>Tue, 10 Jul 2018 21:45:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/build-golang-environment/</guid>
+      <description>&lt;p&gt;2015 年，Go 1.5 加入了一个试验性的 vendor 机制（到 2016 年的 Go 1.6 版变为默认开启），vendor 机制就是在项目中加入了 vendor 文件夹，用于存放依赖，这样就可以将不同项目的依赖隔离开。
+&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20180710_02.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Golang 一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。Golang 提供了方便的安装包，支持 Windows、Linux、Mac 系统。&lt;/p&gt;
+&lt;h1 id=&#34;下载安装包&#34;&gt;下载安装包&lt;/h1&gt;
+&lt;p&gt;Golang 的官网是&lt;a href=&#34;https://golang.org/&#34;&gt;https://golang.org/&lt;/a&gt;，如果官网打不开，可以访问&lt;a href=&#34;https://golang.google.cn/&#34;&gt;https://golang.google.cn/&lt;/a&gt;这个域名。在官网点击 Download Go 会进入下载页，可以看到这里提供了针对各个系统的安装包，也提供了源码，可以下载源码编译安装。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20180710_03.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;下载运行安装包后，在 terminal 中执行 go env 命令，如果出现下面的输出说明已经安装成功。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/20180710_04.png&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;goroot-与-gopath&#34;&gt;GOROOT 与 GOPATH&lt;/h1&gt;
+&lt;p&gt;仔细看上面的输出，会发现其中有一个 GOPATH，又有一个 GOROOT，那么到底哪个才是 Golang 的运行环境呢。&lt;/p&gt;
+&lt;p&gt;首先访问一下 GOROOT 这个路径，会发现其中包含 bin、lib 等文件夹。GOROOT 就是 Golang 的安装路径，其中包含 Golang 编译、工具、标准库等，在安装后就会存在。&lt;/p&gt;
+&lt;p&gt;和 GOROOT 不同，GOPATH 是工作空间路径，从 go 1.8 开始，如果 GOPATH 没有被设置，会有一个默认值，在 Unix 上为$HOME/go，在 Windows 上为%USERPROFILE%/go，当调用 go build 时，它会在 GOPATH 中寻找源码。访问一下 GOPATH 这个路径，会发现其中只有 pkg、bin、src 三个文件夹，并且里面基本是空的，这是一个约定的目录结构，src 文件夹用来存放源码、pkg 存放编译后生成的文件，bin 存放编译后生成的可执行文件。项目代码需要在 GOPATH/src 路径下。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

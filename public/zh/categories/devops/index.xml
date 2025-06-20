@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>DevOps on Zhiya&#39;s Blog</title>
+    <link>https://simpleapples.com/zh/categories/devops/</link>
+    <description>Recent content in DevOps on Zhiya&#39;s Blog</description>
+    <generator>Hugo -- 0.147.8</generator>
+    <language>cn</language>
+    <lastBuildDate>Tue, 30 Jun 2020 15:34:00 +0000</lastBuildDate>
+    <atom:link href="https://simpleapples.com/zh/categories/devops/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>为 WSL2 一键设置代理</title>
+      <link>https://simpleapples.com/zh/posts/one-click-setting-proxy-for-wsl2/</link>
+      <pubDate>Tue, 30 Jun 2020 15:34:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/one-click-setting-proxy-for-wsl2/</guid>
+      <description>&lt;p&gt;在 WSL2 环境中 clone 一个很大的 git 项目，不走代理速度很慢，所以研究了一下怎么让 WSL2 走 Windows 的代理客户端。&lt;/p&gt;
+&lt;h3 id=&#34;wsl1-和-wsl2-网络的区别&#34;&gt;WSL1 和 WSL2 网络的区别&lt;/h3&gt;
+&lt;p&gt;在 WSL1 时代，由于 Linux 子系统和 Windows 共享了网络端口，所以访问 Windows 的代理非常简单。例如 Windows 的代理客户端监听了 8000 端口，那么只需要在 Linux 子系统中执行如下命令，就可以让当前 session 中的请求通过代理访问互联网。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;export ALL_PROXY&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:8000&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;但是 WSL2 基于 Hyper-V 运行，导致 Linux 子系统和 Windows 在网络上是两台各自独立的机器，从 Linux 子系统访问 Windows 首先需要找到 Windows 的 IP。&lt;/p&gt;
+&lt;h3 id=&#34;配置-wsl2-访问-windows-上的代理&#34;&gt;配置 WSL2 访问 Windows 上的代理&lt;/h3&gt;
+&lt;p&gt;有两个关键步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;WSL2 中配置的代理要指向 Windows 的 IP；&lt;/li&gt;
+&lt;li&gt;Windows 上的代理客户端需要允许来自本地局域网的请求；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;由于 Linux 子系统也是通过 Windows 访问网络，所以 Linux 子系统中的网关指向的是 Windows，DNS 服务器指向的也是 Windows，基于这两个特性，我们可以将 Windows 的 IP 读取出来。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>面向开发者的 WSL2 安装指南</title>
+      <link>https://simpleapples.com/zh/posts/wsl2-guideline-for-developers/</link>
+      <pubDate>Mon, 01 Jun 2020 19:02:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/wsl2-guideline-for-developers/</guid>
+      <description>&lt;h3 id=&#34;为什么要使用-windows-做开发&#34;&gt;为什么要使用 Windows 做开发&lt;/h3&gt;
+&lt;p&gt;一直以来 macOS 以类 unix 的特性，获得了程序员的青睐，但是近几年 Apple 在硬件领域少有让人耳目一新的产品，加上取消 Esc、使用蝶式键盘、基本为 0 的硬件可升级性、系统权限的收紧等骚操作，让 Mac 从软件到硬件都不如以前适合编程。另一方面，PC 阵营在软件层面保持开放的基础上，硬件体验也逐步赶上甚至超越 Mac，我也不想在用 Mac 做开发，用 PC 玩游戏，希望用一台电脑兼顾游戏和开发，所以选择回到了 PC 阵营。&lt;/p&gt;
+&lt;p&gt;随着微软拥抱开源领域，Windows 也开始变得程序员友好。Windows 10 2004 发布后，WSL2 也可以在正式版 Windows 10 中使用，相比于 macOS，WSL2 是一个原生 Linux 环境而非类 unix 环境，甚至可以在 App 商店中选择所需要的发行版。而相比于 WSL1，WSL2 采用了 HyperV 虚拟机的方式，解决了 WSL1 不能安装 Docker 等问题。&lt;/p&gt;
+&lt;h3 id=&#34;wsl1-和-wsl2&#34;&gt;WSL1 和 WSL2&lt;/h3&gt;
+&lt;p&gt;相比于 WSL1，WSL2 通过虚拟机的方式带来了更完整的 Linux 内核，但这种方式也引入了一些问题，微软给出了下面的图表来展示这些不同：&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20200601_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;WSL2 不能和 VMWarework Station、VirtualBox 同时运行这一条已经过时了，VirtualBox 和 VMWare Workstation 都发布了支持 WSL2 和 Hyper-V 的新版。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Docker COPY 复制文件夹的诡异行为</title>
+      <link>https://simpleapples.com/zh/posts/dockers-creepy-behaviour-in-copying-folders/</link>
+      <pubDate>Mon, 28 Oct 2019 10:55:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/dockers-creepy-behaviour-in-copying-folders/</guid>
+      <description>&lt;h3 id=&#34;问题现象&#34;&gt;问题现象&lt;/h3&gt;
+&lt;p&gt;在制作 docker 镜像时，有复制某一个路径下所有文件和文件夹到镜像的需求，写下了如下 dockerfile：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-dockerfile&#34; data-lang=&#34;dockerfile&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; alpine&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /root/test_docker_proj&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;COPY&lt;/span&gt; * ./&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;原始目录结构是这样的：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/projects/test_docker_proj
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── Dockerfile
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── dir1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── dir11
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   │   └── file11
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   └── file1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;└── file2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然而复制到 docker 镜像里的目录结构变成了这样：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/root/test_docker_proj
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── Dockerfile
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── dir11
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   └── file11
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── file1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;└── file2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;!-- more --&gt;
+&lt;p&gt;可以看到 dir1 这个文件夹并没有被复制到镜像里，但是 dir1 中的子文件夹和文件都被复制进来了，和 dir1 同级的文件也被复制了。也就是说，在 COPY 执行的过程中，第一层文件夹被「解包」了。&lt;/p&gt;
+&lt;h3 id=&#34;copyadd-行为逻辑&#34;&gt;COPY/ADD 行为逻辑&lt;/h3&gt;
+&lt;p&gt;为了确定 COPY 和相似的 ADD 命令的行为，做了以下测试：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-dockerfile&#34; data-lang=&#34;dockerfile&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; alpine&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /root/test_docker_proj_1&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;COPY&lt;/span&gt; * ./&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /root/test_docker_proj_2&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ADD&lt;/span&gt; * ./&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /root/test_docker_proj_3&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;COPY&lt;/span&gt; ./ ./&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /root/test_docker_proj_4&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ADD&lt;/span&gt; ./ ./&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /root/test_docker_proj_5&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;COPY&lt;/span&gt; ./dir* ./&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /root/test_docker_proj_6&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ADD&lt;/span&gt; ./dir* ./&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;通过测试可以发现 &lt;code&gt;COPY/ADD&lt;/code&gt; 命令有这么几个规则：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用代理进行 docker build 问题的解决思路</title>
+      <link>https://simpleapples.com/zh/posts/building-docker-image-behind-proxy/</link>
+      <pubDate>Thu, 18 Apr 2019 10:55:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/building-docker-image-behind-proxy/</guid>
+      <description>&lt;h3 id=&#34;问题描述&#34;&gt;问题描述&lt;/h3&gt;
+&lt;p&gt;在使用 docker build 打包镜像时，遇到了需要使用代理访问网络的需求。使用如下的 Dockerfile 来模拟这个场景：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-dockerfile&#34; data-lang=&#34;dockerfile&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; golang:1.12&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;RUN&lt;/span&gt; curl www.google.com --max-time &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;国内一般网络环境下，curl &lt;a href=&#34;https://www.google.com&#34;&gt;www.google.com&lt;/a&gt; 是无法正常返回的，加入 &amp;ndash;max-time 让 curl 的耗时不要太长。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;配置-http_proxy-变量&#34;&gt;配置 http_proxy 变量&lt;/h3&gt;
+&lt;p&gt;首先需要在环境变量中设置 http_proxy 和 https_proxy，使得访问网络的命令（这里使用 curl 来代表）能够通过环境变量中配置的代理服务器访问 &lt;a href=&#34;https://www.google.com&#34;&gt;www.google.com&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;docker build 命令虽然是在 docker 所在的宿主机上执行的，看上去像是直接使用了宿主机的网络环境，但实际上 docker build 也是启动了一个 container 进行构建，所以在构建过程中的所有命令都是在 container 中执行的，http_proxy 和 https_proxy 的配置也应该是在 container 中进行的。可以使用 ENV 来配置 container 中的环境变量。&lt;/p&gt;
+&lt;p&gt;代理服务器启动在宿主机的 1087 端口上，修改 dockerfile 文件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-dockerfile&#34; data-lang=&#34;dockerfile&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; golang:1.12&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ENV&lt;/span&gt; http_proxy &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:1087&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ENV&lt;/span&gt; HTTP_PROXY &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:1087&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ENV&lt;/span&gt; https_proxy &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:1087&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ENV&lt;/span&gt; HTTPS_PROXY &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:1087&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;RUN&lt;/span&gt; curl www.google.com --max-time &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;重新执行 docker build 会发现 curl 依旧无法访问 &lt;a href=&#34;https://www.google.com&#34;&gt;www.google.com&lt;/a&gt;，从报错信息上可以看到 127.0.0.1 上的 1087 端口上并没有服务。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>理解 PostgreSQL 的 count 函数的行为</title>
+      <link>https://simpleapples.com/zh/posts/understanding-postgres-count-function/</link>
+      <pubDate>Tue, 16 Apr 2019 11:25:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/understanding-postgres-count-function/</guid>
+      <description>&lt;p&gt;关于 count 函数的使用一直存在争议，尤其是在 MySQL 中，作为流行度越来越高的 PostgreSQL 是否也有类似的问题呢，我们通过实践来理解一下 PostgreSQL 中 count 函数的行为。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;构建测试数据库&#34;&gt;构建测试数据库&lt;/h3&gt;
+&lt;p&gt;创建测试数据库，并创建测试表。测试表中有自增 ID、创建时间、内容三个字段，自增 ID 字段是主键。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;create&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;database&lt;/span&gt; performance_test;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;create&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;table&lt;/span&gt; test_tbl (id serial &lt;span style=&#34;color:#66d9ef&#34;&gt;primary&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;key&lt;/span&gt;, created_at &lt;span style=&#34;color:#66d9ef&#34;&gt;timestamp&lt;/span&gt;, content varchar(&lt;span style=&#34;color:#ae81ff&#34;&gt;512&lt;/span&gt;));
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;生成测试数据&#34;&gt;生成测试数据&lt;/h3&gt;
+&lt;p&gt;使用 generate_series 函数生成自增 ID，使用 now() 函数生成 created_at 列，对于 content 列，使用了 repeat(md5(random()::text), 10) 生成 10 个 32 位长度的 md5 字符串。使用下列语句，插入 1000w 条记录用于测试。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;performance_test&lt;span style=&#34;color:#f92672&#34;&gt;=#&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;insert&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;into&lt;/span&gt; test_tbl &lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt; generate_series(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;10000000&lt;/span&gt;),now(),repeat(md5(random()::text),&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;INSERT&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10000000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Time: &lt;span style=&#34;color:#ae81ff&#34;&gt;212184&lt;/span&gt;.&lt;span style=&#34;color:#ae81ff&#34;&gt;223&lt;/span&gt; ms (&lt;span style=&#34;color:#ae81ff&#34;&gt;03&lt;/span&gt;:&lt;span style=&#34;color:#ae81ff&#34;&gt;32&lt;/span&gt;.&lt;span style=&#34;color:#ae81ff&#34;&gt;184&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;由-count-语句引发的思考&#34;&gt;由 count 语句引发的思考&lt;/h3&gt;
+&lt;p&gt;默认情况下 PostgreSQL 不开启 SQL 执行时间的显示，所以需要手动开启一下，方便后面的测试对比。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;\&lt;/span&gt;timing &lt;span style=&#34;color:#66d9ef&#34;&gt;on&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;count(*) 和 count(1) 的性能区别是经常被讨论的问题，分别使用 count(*) 和 count(1) 执行一次查询。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>nginx &#43; ingress &#43; gunicorn 环境上传大文件报错问题的解决思路</title>
+      <link>https://simpleapples.com/zh/posts/update-error-on-nginx-ingress-gunicorn-environment/</link>
+      <pubDate>Thu, 28 Feb 2019 14:32:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/update-error-on-nginx-ingress-gunicorn-environment/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20190228_01.jpeg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;文件上传过程&#34;&gt;文件上传过程&lt;/h3&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20190228_02.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;上传文件流程&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;上传的文件首先到达 Kubernetes 所在的宿主机。&lt;/li&gt;
+&lt;li&gt;宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress Controller，Ingress controller 也是使用 Nginx 实现的。&lt;/li&gt;
+&lt;li&gt;Ingress Controller 中的 Nginx 通过 Proxy 转发给 Gunicorn。&lt;/li&gt;
+&lt;li&gt;Gunicorn 会启动若干个 Worker 处理请求，所以 Gunicorn 会再转发给 Worker。&lt;/li&gt;
+&lt;li&gt;Worker 就是最终的 Python Web App&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;错误-413-的解决&#34;&gt;错误 413 的解决&lt;/h3&gt;
+&lt;p&gt;首先碰到的是 413 Request Entity Too Large 错误，在上传过程中连接被中断（基本上每次都是相同的上传百分比被中断），请求返回 413，首先考虑到 Nginx 对于请求体的大小有限制，查看 Nginx 文档，发现 client_max_body_size 参数控制请求体的大小，默认的设置是 1mb。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;client_max_body_size:&lt;/strong&gt; Sets the maximum allowed size of the client request body, specified in the “Content-Length” request header field. If the size in a request exceeds the configured value, the 413 (Request Entity Too Large) error is returned to the client. Please be aware that browsers cannot correctly display this error. Setting size to 0 disables checking of client request body size.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>搭建Kubernetes集群时DNS无法解析问题的处理过程</title>
+      <link>https://simpleapples.com/zh/posts/solving-kubernetes-dns-problem/</link>
+      <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/solving-kubernetes-dns-problem/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20180715_01.jpg&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;问题描述&#34;&gt;问题描述&lt;/h1&gt;
+&lt;p&gt;在搭建 Kubernetes 集群过程中，安装了 kube-dns 插件后，运行一个 ubuntu 容器，发现容器内无法解析集群外域名，一开始可以解析集群内域名，一段时间后也无法解析集群内域名。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ nslookup kubernetes.default
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Server:    10.99.0.2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Address 1: 10.99.0.2 kube-dns.kube-system.svc.cluster.local
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;nslookup: can&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;t resolve &amp;#39;&lt;/span&gt;kubernetes.default&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;排查过程&#34;&gt;排查过程&lt;/h1&gt;
+&lt;p&gt;在排查问题前，先思考一下 Kubernetes 集群中的 DNS 解析过程，在安装好 kube-dns 的集群中，普通 Pod 的 dnsPolicy 属性是默认值 ClusterFirst，也就是会指向集群内部的 DNS 服务器，kube-dns 负责解析集群内部的域名，kube-dns Pod 的 dnsPolicy 值是 Default，意思是从所在 Node 继承 DNS 服务器，对于无法解析的外部域名，kube-dns 会继续向集群外部的 dns 进行查询，过程如图。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20180715_02.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Ubuntu 容器是一个普通的 Pod，在 Linux 系统中，/etc/resolv.conf 是存储 DNS 服务器的文件，普通 Pod 的/etc/resolv.conf 文件应该存储的是 kube-dns 的 Service IP。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;nameserver 10.99.0.2  &lt;span style=&#34;color:#75715e&#34;&gt;# 这里存储的是kube-dns的Service IP&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;search default.svc.cluster.local. svc.cluster.local. cluster.local.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;options ndots:5
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;查看后发现/etc/resolv.conf 文件中存储的是 kube-dns 的 Service IP，证明这一步没有问题，接下来查看一下 kube-dns 的 Pod，先进入 kube-dns 的 Pod 中检查一下/etc/resolv.conf 文件，这里存储的应该是集群外部的 DNS 服务器地址，查看后发现，这里存储的地址是 127.0.0.53，进一步查看 kube-dns Pod 的 log，发现出现了非常多的 i/o timeout 错误。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Ubuntu 18.04 LTS安装KVM虚拟机</title>
+      <link>https://simpleapples.com/zh/posts/install-kvm-on-ubuntu-18.04-lts/</link>
+      <pubDate>Thu, 28 Jun 2018 17:54:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/install-kvm-on-ubuntu-18.04-lts/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20180628_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;前一阵使用在最新的 Ubuntu 18.04 上安装了 KVM 来虚拟一个小的 VM 集群，将主要过程和其中遇到的一些问题记录下来。&lt;/p&gt;
+&lt;h1 id=&#34;准备工作&#34;&gt;准备工作&lt;/h1&gt;
+&lt;p&gt;首先需要检查一下 CPU 是否支持虚拟化，执行一下命令来检查/proc/cpuinfo 文件中是否又虚拟化相关的字眼，如果有的话表明 CPU 支持虚拟化技术。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;egrep -c &amp;#39;(svm|vmx)&amp;#39; /proc/cpuinfo
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上面命令执行结果如果返回 0，表示 CPU 不支持虚拟化技术。当然主板 BIOS 中的虚拟化技术也可能不是默认开启的，如果没有开启需要手动开启一下。&lt;/p&gt;
+&lt;h1 id=&#34;安装-kvm&#34;&gt;安装 KVM&lt;/h1&gt;
+&lt;p&gt;执行以下命令安装 KVM&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;sudo apt update
+sudo apt install qemu qemu-kvm libvirt-bin  bridge-utils  virt-manager
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将 libvirtd 添加自启动&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;sudo systemctl start libvirtd.service
+sudo systemctl enable libvirtd.service
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&#34;网络模式&#34;&gt;网络模式&lt;/h1&gt;
+&lt;p&gt;KVM 安装完成后，首先需要进行网络设定，KVM 支持四种网络模式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;桥接模式&lt;/li&gt;
+&lt;li&gt;NAT 模式&lt;/li&gt;
+&lt;li&gt;用户网络模式&lt;/li&gt;
+&lt;li&gt;直接分配设备模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;主要讲一下前两种&lt;/p&gt;
+&lt;h1 id=&#34;桥接bridge模式&#34;&gt;桥接（Bridge）模式&lt;/h1&gt;
+&lt;p&gt;在桥接模式下，宿主机和虚拟机共享同一个物理网络设备，虚拟机中的网卡和物理机中的网卡是平行关系，所以虚拟机可以直接接入外部网络，虚拟机和宿主机有平级的 IP。&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;桥接模式&#34; loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20180628_02.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;原本宿主机是通过网卡 eth0 连接外部网络的，网桥模式会新创建一个网桥 br0，接管 eth0 来连接外部网络，然后将宿主机和虚拟机的网卡 eth0 都绑定到网桥上。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>理解 PostgreSQL 的 count 函数的行为 | simpleapples</title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="关于 count 函数的使用一直存在争议，尤其是在 MySQL 中，作为流行度越来越高的 PostgreSQL 是否也有类似的问题呢，我们通过实践来理解一下 PostgreSQL 中 count 函数的行为。
+构建测试数据库
+创建测试数据库，并创建测试表。测试表中有自增 ID、创建时间、内容三个字段，自增 ID 字段是主键。
+create database performance_test;
+
+create table test_tbl (id serial primary key, created_at timestamp, content varchar(512));
+生成测试数据
+使用 generate_series 函数生成自增 ID，使用 now() 函数生成 created_at 列，对于 content 列，使用了 repeat(md5(random()::text), 10) 生成 10 个 32 位长度的 md5 字符串。使用下列语句，插入 1000w 条记录用于测试。
+performance_test=# insert into test_tbl select generate_series(1,10000000),now(),repeat(md5(random()::text),10);
+INSERT 0 10000000
+Time: 212184.223 ms (03:32.184)
+由 count 语句引发的思考
+默认情况下 PostgreSQL 不开启 SQL 执行时间的显示，所以需要手动开启一下，方便后面的测试对比。
+\timing on
+count(*) 和 count(1) 的性能区别是经常被讨论的问题，分别使用 count(*) 和 count(1) 执行一次查询。"
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/understanding-postgres-count-function/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/understanding-postgres-count-function/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">
+            理解 PostgreSQL 的 count 函数的行为
+          </h1>
+          <div class="post-meta">
+            <span title="2019-04-16 11:25:00 +0000 +0000">四月 16, 2019</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <p>
+            关于 count 函数的使用一直存在争议，尤其是在 MySQL
+            中，作为流行度越来越高的 PostgreSQL
+            是否也有类似的问题呢，我们通过实践来理解一下 PostgreSQL 中 count
+            函数的行为。
+          </p>
+          <h3 id="构建测试数据库">
+            构建测试数据库<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#构建测试数据库"
+              >#</a
+            >
+          </h3>
+          <p>
+            创建测试数据库，并创建测试表。测试表中有自增
+            ID、创建时间、内容三个字段，自增 ID 字段是主键。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">database</span> performance_test;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> test_tbl (id serial <span style="color:#66d9ef">primary</span> <span style="color:#66d9ef">key</span>, created_at <span style="color:#66d9ef">timestamp</span>, content varchar(<span style="color:#ae81ff">512</span>));
+</span></span></code></pre>
+          </div>
+          <h3 id="生成测试数据">
+            生成测试数据<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#生成测试数据"
+              >#</a
+            >
+          </h3>
+          <p>
+            使用 generate_series 函数生成自增 ID，使用 now() 函数生成 created_at
+            列，对于 content 列，使用了 repeat(md5(random()::text), 10) 生成 10
+            个 32 位长度的 md5 字符串。使用下列语句，插入 1000w 条记录用于测试。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>performance_test<span style="color:#f92672">=#</span> <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> test_tbl <span style="color:#66d9ef">select</span> generate_series(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">10000000</span>),now(),repeat(md5(random()::text),<span style="color:#ae81ff">10</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">10000000</span>
+</span></span><span style="display:flex;"><span>Time: <span style="color:#ae81ff">212184</span>.<span style="color:#ae81ff">223</span> ms (<span style="color:#ae81ff">03</span>:<span style="color:#ae81ff">32</span>.<span style="color:#ae81ff">184</span>)
+</span></span></code></pre>
+          </div>
+          <h3 id="由-count-语句引发的思考">
+            由 count 语句引发的思考<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#由-count-语句引发的思考"
+              >#</a
+            >
+          </h3>
+          <p>
+            默认情况下 PostgreSQL 不开启 SQL
+            执行时间的显示，所以需要手动开启一下，方便后面的测试对比。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">\</span>timing <span style="color:#66d9ef">on</span>
+</span></span></code></pre>
+          </div>
+          <p>
+            count(*) 和 count(1) 的性能区别是经常被讨论的问题，分别使用 count(*)
+            和 count(1) 执行一次查询。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>performance_test<span style="color:#f92672">=#</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> test_tbl;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">count</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">----------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#ae81ff">10000000</span>
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">1</span> <span style="color:#66d9ef">row</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Time: <span style="color:#ae81ff">115090</span>.<span style="color:#ae81ff">380</span> ms (<span style="color:#ae81ff">01</span>:<span style="color:#ae81ff">55</span>.<span style="color:#ae81ff">090</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>performance_test<span style="color:#f92672">=#</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#ae81ff">1</span>) <span style="color:#66d9ef">from</span> test_tbl;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">count</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">----------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#ae81ff">10000000</span>
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">1</span> <span style="color:#66d9ef">row</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Time: <span style="color:#ae81ff">738</span>.<span style="color:#ae81ff">502</span> ms
+</span></span></code></pre>
+          </div>
+          <p>
+            可以看到两次查询的速度差别非常大，count(1)
+            真的有这么大的性能提升？接下来再次运行查询语句。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>performance_test<span style="color:#f92672">=#</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> test_tbl;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">count</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">----------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#ae81ff">10000000</span>
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">1</span> <span style="color:#66d9ef">row</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Time: <span style="color:#ae81ff">657</span>.<span style="color:#ae81ff">831</span> ms
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>performance_test<span style="color:#f92672">=#</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#ae81ff">1</span>) <span style="color:#66d9ef">from</span> test_tbl;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">count</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">----------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#ae81ff">10000000</span>
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">1</span> <span style="color:#66d9ef">row</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Time: <span style="color:#ae81ff">682</span>.<span style="color:#ae81ff">157</span> ms
+</span></span></code></pre>
+          </div>
+          <p>
+            可以看到第一次查询时候会非常的慢，后面三次速度非常快并且时间相近，这里就有两个问题出现了：
+          </p>
+          <ul>
+            <li>为什么第一次查询速度这么慢？</li>
+            <li>count(*) 和 count(1) 到底存不存在性能差别？</li>
+          </ul>
+          <h3 id="查询缓存">
+            查询缓存<a hidden class="anchor" aria-hidden="true" href="#查询缓存"
+              >#</a
+            >
+          </h3>
+          <p>使用 explain 语句重新执行查询语句</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">explain</span> (<span style="color:#66d9ef">analyze</span>,buffers,<span style="color:#66d9ef">verbose</span>) <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> test_tbl;
+</span></span></code></pre>
+          </div>
+          <p>可以看到如下输出：</p>
+          <pre
+            tabindex="0"
+          ><code> Finalize Aggregate  (cost=529273.69..529273.70 rows=1 width=8) (actual time=882.569..882.570 rows=1 loops=1)
+   Output: count(*)
+   Buffers: shared hit=96 read=476095
+   -&gt;  Gather  (cost=529273.48..529273.69 rows=2 width=8) (actual time=882.492..884.170 rows=3 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=96 read=476095
+         -&gt;  Partial Aggregate  (cost=528273.48..528273.49 rows=1 width=8) (actual time=881.014..881.014 rows=1 loops=3)
+               Output: PARTIAL count(*)
+               Buffers: shared hit=96 read=476095
+               Worker 0: actual time=880.319..880.319 rows=1 loops=1
+                 Buffers: shared hit=34 read=158206
+               Worker 1: actual time=880.369..880.369 rows=1 loops=1
+                 Buffers: shared hit=29 read=156424
+               -&gt;  Parallel Seq Scan on public.test_tbl  (cost=0.00..517856.98 rows=4166598 width=0) (actual time=0.029..662.165 rows=3333333 loops=3)
+                     Buffers: shared hit=96 read=476095
+                     Worker 0: actual time=0.026..661.807 rows=3323029 loops=1
+                       Buffers: shared hit=34 read=158206
+                     Worker 1: actual time=0.030..660.197 rows=3285513 loops=1
+                       Buffers: shared hit=29 read=156424
+ Planning time: 0.043 ms
+ Execution time: 884.207 ms
+</code></pre>
+          <p>
+            注意里面的 shared
+            hit，表示命中了内存中缓存的数据，这就可以解释为什么后面的查询会比第一次快很多。接下来去掉缓存，并重启
+            PostgreSQL。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>service postgresql stop
+</span></span><span style="display:flex;"><span>echo <span style="color:#ae81ff">1</span> &gt; /proc/sys/vm/drop_caches
+</span></span><span style="display:flex;"><span>service postgresql start
+</span></span></code></pre>
+          </div>
+          <p>重新执行 SQL 语句，速度慢了很多。</p>
+          <pre
+            tabindex="0"
+          ><code> Finalize Aggregate  (cost=529273.69..529273.70 rows=1 width=8) (actual time=50604.564..50604.564 rows=1 loops=1)
+   Output: count(*)
+   Buffers: shared read=476191
+   -&gt;  Gather  (cost=529273.48..529273.69 rows=2 width=8) (actual time=50604.508..50606.141 rows=3 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared read=476191
+         -&gt;  Partial Aggregate  (cost=528273.48..528273.49 rows=1 width=8) (actual time=50591.550..50591.551 rows=1 loops=3)
+               Output: PARTIAL count(*)
+               Buffers: shared read=476191
+               Worker 0: actual time=50585.182..50585.182 rows=1 loops=1
+                 Buffers: shared read=158122
+               Worker 1: actual time=50585.181..50585.181 rows=1 loops=1
+                 Buffers: shared read=161123
+               -&gt;  Parallel Seq Scan on public.test_tbl  (cost=0.00..517856.98 rows=4166598 width=0) (actual time=92.491..50369.691 rows=3333333 loops=3)
+                     Buffers: shared read=476191
+                     Worker 0: actual time=122.170..50362.271 rows=3320562 loops=1
+                       Buffers: shared read=158122
+                     Worker 1: actual time=14.020..50359.733 rows=3383583 loops=1
+                       Buffers: shared read=161123
+ Planning time: 11.537 ms
+ Execution time: 50606.215 ms
+</code></pre>
+          <p>
+            shared read
+            表示没有命中缓存，通过这个现象可以推断出，上一小节的四次查询中，第一次查询没有命中缓存，剩下三次查询都命中了缓存。
+          </p>
+          <h4 id="count1-和-count-的区别">
+            count(1) 和 count(*) 的区别<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#count1-和-count-的区别"
+              >#</a
+            >
+          </h4>
+          <p>
+            接下来探究 count(1) 和 count(*)
+            的区别是什么，继续思考最开始的四次查询，第一次查询使用了
+            count(*)，第二次查询使用了 count(1) ，却依然命中了缓存，不正是说明
+            count(1) 和 count(*) 是一样的吗？
+          </p>
+          <p>
+            事实上，PostgreSQL 官方对于 is there a difference performance-wise
+            between select count(1) and select count(*)?
+            问题的回复也证实了这一点：
+          </p>
+          <blockquote>
+            <p>
+              Nope. In fact, the latter is converted to the former during
+              parsing.[2]
+            </p>
+          </blockquote>
+          <p>
+            既然 count(1) 在性能上没有比 count(*) 更好，那么使用 count(*)
+            就是更好的选择。
+          </p>
+          <h3 id="sequence-scan-和-index-scan">
+            sequence scan 和 index scan<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#sequence-scan-和-index-scan"
+              >#</a
+            >
+          </h3>
+          <p>
+            接下来测试一下，在不同数据量大小的情况下 count(*)
+            的速度，将查询语句写在 count.sql 文件中，使用 pgbench 进行测试。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pgbench -c <span style="color:#ae81ff">5</span> -t <span style="color:#ae81ff">20</span> performance_test -r -f count.sql
+</span></span></code></pre>
+          </div>
+          <p>分别测试 200w - 1000w 数据量下的 count 语句耗时</p>
+          <table>
+            <thead>
+              <tr>
+                <th>数据大小</th>
+                <th>count耗时(ms)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>200w</td>
+                <td>738.758</td>
+              </tr>
+              <tr>
+                <td>300w</td>
+                <td>1035.846</td>
+              </tr>
+              <tr>
+                <td>400w</td>
+                <td>1426.183</td>
+              </tr>
+              <tr>
+                <td>500w</td>
+                <td>1799.866</td>
+              </tr>
+              <tr>
+                <td>600w</td>
+                <td>2117.247</td>
+              </tr>
+              <tr>
+                <td>700w</td>
+                <td>2514.691</td>
+              </tr>
+              <tr>
+                <td>800w</td>
+                <td>2526.441</td>
+              </tr>
+              <tr>
+                <td>900w</td>
+                <td>2568.240</td>
+              </tr>
+              <tr>
+                <td>1000w</td>
+                <td>2650.434</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>绘制成耗时曲线</p>
+          <p><img loading="lazy" src="/images/20190416_01.png" /></p>
+          <p>
+            曲线的趋势在 600w - 700w 数据量之间出现了转折，200w - 600w
+            是线性增长，600w 之后 count 的耗时就基本相同了。使用 explain
+            语句分别查看 600w 和 700w 数据时的 count 语句执行。
+          </p>
+          <p>700w：</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span> Finalize <span style="color:#66d9ef">Aggregate</span>  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">502185</span>.<span style="color:#ae81ff">93</span>..<span style="color:#ae81ff">502185</span>.<span style="color:#ae81ff">94</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">894</span>.<span style="color:#ae81ff">361</span>..<span style="color:#ae81ff">894</span>.<span style="color:#ae81ff">361</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">Output</span>: <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>)
+</span></span><span style="display:flex;"><span>   Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">16344</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">352463</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">-&gt;</span>  Gather  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">502185</span>.<span style="color:#ae81ff">72</span>..<span style="color:#ae81ff">502185</span>.<span style="color:#ae81ff">93</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">894</span>.<span style="color:#ae81ff">232</span>..<span style="color:#ae81ff">899</span>.<span style="color:#ae81ff">763</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">Output</span>: (<span style="color:#66d9ef">PARTIAL</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>))
+</span></span><span style="display:flex;"><span>         Workers Planned: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>         Workers Launched: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>         Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">16344</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">352463</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">-&gt;</span>  <span style="color:#66d9ef">Partial</span> <span style="color:#66d9ef">Aggregate</span>  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">501185</span>.<span style="color:#ae81ff">72</span>..<span style="color:#ae81ff">501185</span>.<span style="color:#ae81ff">73</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">889</span>.<span style="color:#ae81ff">371</span>..<span style="color:#ae81ff">889</span>.<span style="color:#ae81ff">371</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>               <span style="color:#66d9ef">Output</span>: <span style="color:#66d9ef">PARTIAL</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>)
+</span></span><span style="display:flex;"><span>               Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">16344</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">352463</span>
+</span></span><span style="display:flex;"><span>               Worker <span style="color:#ae81ff">0</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">887</span>.<span style="color:#ae81ff">112</span>..<span style="color:#ae81ff">887</span>.<span style="color:#ae81ff">112</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                 Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">5459</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">118070</span>
+</span></span><span style="display:flex;"><span>               Worker <span style="color:#ae81ff">1</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">887</span>.<span style="color:#ae81ff">120</span>..<span style="color:#ae81ff">887</span>.<span style="color:#ae81ff">120</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                 Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">5601</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">117051</span>
+</span></span><span style="display:flex;"><span>               <span style="color:#f92672">-&gt;</span>  Parallel <span style="color:#66d9ef">Index</span> <span style="color:#66d9ef">Only</span> Scan <span style="color:#66d9ef">using</span> test_tbl_pkey <span style="color:#66d9ef">on</span> <span style="color:#66d9ef">public</span>.test_tbl  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">43</span>..<span style="color:#ae81ff">493863</span>.<span style="color:#ae81ff">32</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2928960</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">112</span>..<span style="color:#ae81ff">736</span>.<span style="color:#ae81ff">376</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2333333</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>                     <span style="color:#66d9ef">Index</span> Cond: (test_tbl.id <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">7000000</span>)
+</span></span><span style="display:flex;"><span>                     Heap Fetches: <span style="color:#ae81ff">2328492</span>
+</span></span><span style="display:flex;"><span>                     Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">16344</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">352463</span>
+</span></span><span style="display:flex;"><span>                     Worker <span style="color:#ae81ff">0</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">107</span>..<span style="color:#ae81ff">737</span>.<span style="color:#ae81ff">180</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2344479</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                       Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">5459</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">118070</span>
+</span></span><span style="display:flex;"><span>                     Worker <span style="color:#ae81ff">1</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">133</span>..<span style="color:#ae81ff">737</span>.<span style="color:#ae81ff">960</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2327028</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                       Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">5601</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">117051</span>
+</span></span><span style="display:flex;"><span> Planning time: <span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">165</span> ms
+</span></span><span style="display:flex;"><span> Execution time: <span style="color:#ae81ff">899</span>.<span style="color:#ae81ff">857</span> ms
+</span></span></code></pre>
+          </div>
+          <p>600w：</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-sql" data-lang="sql"><span style="display:flex;"><span> Finalize <span style="color:#66d9ef">Aggregate</span>  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">429990</span>.<span style="color:#ae81ff">94</span>..<span style="color:#ae81ff">429990</span>.<span style="color:#ae81ff">95</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">765</span>.<span style="color:#ae81ff">575</span>..<span style="color:#ae81ff">765</span>.<span style="color:#ae81ff">575</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">Output</span>: <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>)
+</span></span><span style="display:flex;"><span>   Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">13999</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">302112</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">-&gt;</span>  Gather  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">429990</span>.<span style="color:#ae81ff">72</span>..<span style="color:#ae81ff">429990</span>.<span style="color:#ae81ff">93</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">765</span>.<span style="color:#ae81ff">557</span>..<span style="color:#ae81ff">770</span>.<span style="color:#ae81ff">889</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">Output</span>: (<span style="color:#66d9ef">PARTIAL</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>))
+</span></span><span style="display:flex;"><span>         Workers Planned: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>         Workers Launched: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>         Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">13999</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">302112</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">-&gt;</span>  <span style="color:#66d9ef">Partial</span> <span style="color:#66d9ef">Aggregate</span>  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">428990</span>.<span style="color:#ae81ff">72</span>..<span style="color:#ae81ff">428990</span>.<span style="color:#ae81ff">73</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">763</span>.<span style="color:#ae81ff">821</span>..<span style="color:#ae81ff">763</span>.<span style="color:#ae81ff">821</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>               <span style="color:#66d9ef">Output</span>: <span style="color:#66d9ef">PARTIAL</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>)
+</span></span><span style="display:flex;"><span>               Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">13999</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">302112</span>
+</span></span><span style="display:flex;"><span>               Worker <span style="color:#ae81ff">0</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">762</span>.<span style="color:#ae81ff">742</span>..<span style="color:#ae81ff">762</span>.<span style="color:#ae81ff">742</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                 Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">4638</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">98875</span>
+</span></span><span style="display:flex;"><span>               Worker <span style="color:#ae81ff">1</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">763</span>.<span style="color:#ae81ff">308</span>..<span style="color:#ae81ff">763</span>.<span style="color:#ae81ff">308</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                 Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">4696</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">101570</span>
+</span></span><span style="display:flex;"><span>               <span style="color:#f92672">-&gt;</span>  Parallel <span style="color:#66d9ef">Index</span> <span style="color:#66d9ef">Only</span> Scan <span style="color:#66d9ef">using</span> test_tbl_pkey <span style="color:#66d9ef">on</span> <span style="color:#66d9ef">public</span>.test_tbl  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">43</span>..<span style="color:#ae81ff">422723</span>.<span style="color:#ae81ff">16</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2507026</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">053</span>..<span style="color:#ae81ff">632</span>.<span style="color:#ae81ff">199</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2000000</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>                     <span style="color:#66d9ef">Index</span> Cond: (test_tbl.id <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">6000000</span>)
+</span></span><span style="display:flex;"><span>                     Heap Fetches: <span style="color:#ae81ff">2018490</span>
+</span></span><span style="display:flex;"><span>                     Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">13999</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">302112</span>
+</span></span><span style="display:flex;"><span>                     Worker <span style="color:#ae81ff">0</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">059</span>..<span style="color:#ae81ff">633</span>.<span style="color:#ae81ff">156</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1964483</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                       Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">4638</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">98875</span>
+</span></span><span style="display:flex;"><span>                     Worker <span style="color:#ae81ff">1</span>: actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">038</span>..<span style="color:#ae81ff">634</span>.<span style="color:#ae81ff">271</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2017026</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                       Buffers: shared hit<span style="color:#f92672">=</span><span style="color:#ae81ff">4696</span> <span style="color:#66d9ef">read</span><span style="color:#f92672">=</span><span style="color:#ae81ff">101570</span>
+</span></span><span style="display:flex;"><span> Planning time: <span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">055</span> ms
+</span></span><span style="display:flex;"><span> Execution time: <span style="color:#ae81ff">770</span>.<span style="color:#ae81ff">921</span> ms
+</span></span></code></pre>
+          </div>
+          <p>
+            根据以上现象推断，PostgreSQL 似乎在 count
+            的数据量小于数据表长度的某一比例时，才使用 index scan，通过查看官方
+            wiki 也可以看到相关描述：
+          </p>
+          <blockquote>
+            <p>
+              It is important to realise that the planner is concerned with
+              minimising the total cost of the query. With databases, the cost
+              of I/O typically dominates. For that reason, &ldquo;count(*)
+              without any predicate&rdquo; queries will only use an index-only
+              scan if the index is significantly smaller than its table. This
+              typically only happens when the table&rsquo;s row width is much
+              wider than some indexes&rsquo;.[3]
+            </p>
+          </blockquote>
+          <p>
+            根据 Stackoverflow 上的回答，count 语句查询的数量大于表大小的 3/4
+            时候就会用使用全表扫描代替索引扫描[4]。
+          </p>
+          <h3 id="结论">
+            结论<a hidden class="anchor" aria-hidden="true" href="#结论">#</a>
+          </h3>
+          <ol>
+            <li>不要用 count(1) 或 count(列名) 代替 count(*)</li>
+            <li>count 本身是非常耗时的</li>
+            <li>
+              count 可能是 index scan 也可能是 sequence scan，取决于 count
+              数量占表大小的比例
+            </li>
+          </ol>
+          <h3 id="参考资料">
+            参考资料<a hidden class="anchor" aria-hidden="true" href="#参考资料"
+              >#</a
+            >
+          </h3>
+          <p>
+            [1]
+            <a href="https://www.cnblogs.com/flying-tiger/p/7885478.html"
+              >深入理解Postgres中的cache</a
+            >
+          </p>
+          <p>
+            [2]
+            <a
+              href="https://www.postgresql.org/message-id/11471.1027875769%40sss.pgh.pa.us"
+              >Re: performance difference in count(1) vs. count(*)?</a
+            >
+          </p>
+          <p>
+            [3]
+            <a
+              href="https://wiki.postgresql.org/wiki/Index-only_scans#Is_.22count.28.2A.29.22_much_faster_now.3F"
+              >Is &ldquo;count(*)&rdquo; much faster now?</a
+            >
+          </p>
+          <p>
+            [4]
+            <a
+              href="https://dba.stackexchange.com/questions/126997/postgresql-not-using-index-during-count"
+              >PostgreSQL not using index during count(*)</a
+            >
+          </p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

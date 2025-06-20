@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>利用AWS Lambda和iOS捷径实现手机一键开小区门禁 | simpleapples</title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="我住的小区使用了一个叫守望领域的智能门禁系统，可以通过手机App开小区门禁和单元门，但是用App开门需要经过四五步：打开App→进入开门界面→找到需要开的门→点击开门。
+
+加上戴口罩时候解锁手机需要输入密码，导致整个流程非常耗时，经常需要站在小区门口和单元门口操作半天，有一段时间我甚至养成了携带实体门禁卡的习惯，实体门禁卡开门要快很多。
+最近又开始忘带门禁卡，苦恼之余发现iOS在锁屏界面右划可以免解锁直接进入spotlight界面，这个界面可以添加捷径，如果能写一个捷径去调用守望领域App的API开门，就可以实现手机免解锁一键开门。
+
+查找 API
+首先需要通过Charles之类的软件查找App调用的API，配置Charles查看App请求的方式不再赘述，Google一下可以看到很多教程。直接看结果Charles的结果，可以看到api.lookdoor.cn是这个软件所请求的API域名。
+
+打开软件发的请求非常多，经过操作和请求的对比可以看到，发送开门指令调用的API是：/func/hjapp/house/v1/pushOpenDoorBySn.json?equipmentId=xxxxxx 这个路径。
+详细查看这个请求可以发现，equipmentId指的就是小区门的Id，接口使用cookie做认证，只要将cookie带上就可以模拟开门指令。
+第一次尝试
+打开iOS捷径App，创建一个新捷径，App调用API使用了POST请求，搜索Get contents of这个动作来实现发送POST请求。
+通过Charles找到要开的门的URL填入，Method选择POST，Headers里填入Cookie进行认证，内容直接从Charles复制就可以，尝试运行，it works!
+
+接下来把这个捷径添加到Spotlight界面，锁屏界面右划点一下，就可以实现一键开小区门禁，和打开App的四五步操作相比，确实省时省力。拿着新配好的捷径去上班，下班回到小区想试一把一键开门，结果又被困到门口了，上午还正常的捷径竟然失效了，打开一看API报登录超时，有可能是Cookie里的SESSION_ID过期了。
+
+分析登录过程
+再次用Charles抓包，分析登录相关的API，会发现主要是这两个：
+
+/func/hjapp/user/v2/getPasswordAndKey.json：获取AES Key的API
+/func/hjapp/user/v2/login.json?password=xxxxxx：登录API
+
+通过分析，用时序图来表示这部分的交互逻辑：
+
+登录过程清楚了，但是其中使用AES_KEY对密码进行加密的配置还是不清楚的，使用一个工具来尝试通过密文和AES_KEY来解密：http://tool.chacuo.net/cryptaes
+
+输入密钥和密文，使用各种配置进行解密，当能够解出内容的时候，证明我们找到了加密的配置，可以看到BlockSize=128，padder使用的是pkcs7padding，加密模式是ECB。解密出来的字符并不是我们的密码，看着像是md5过的，用 echo -n xxxxxx | md5sum 把密码md5一下，对上了。看来服务端校验的是单次md5后的密码。
+
+到这里登录逻辑已经搞清了，但是iOS捷径无法实现AES加密，单纯依托捷径来实现开门已经不可行了，需要搭建一个后端服务来计算密文。既然躲不过麻烦要搭建服务，不如把登录、开门整个流程都放在服务上，这样iOS捷径只需要一个请求就可以完成开门动作了。
+考虑到登录开门的逻辑很简单，也就是3个HTTP请求&#43;AES加密，直接在裸服务器上从0搭建步骤多成本高，要自己申请虚机、部署HTTP Server、Web App，还需要申请SSL证书，不仅初次搭建要搞个一两天，后续对机器和证书的维护也需要大量时间，成本极高。
+最好是有服务能直接托管一段Python代码，第一时间想到的是Leancloud，一个Serverless服务提供商，但是实操过程中发现，由于政策要求Leancloud已经不提供域名了，绑定自己的域名也需要进行备案。这意味着只能选择一家海外Serverless服务商，看来看去AWS Lambda应该可以满足要求，试一下。
+使用 AWS Lambda 搭建服务
+AWS Lambda是一个Serverless服务，可以直接托管一段函数，省去配置服务和基础设施的麻烦。搭建一个Python的Serverless服务需要准备这么几件事：
+
+新建函数，编写代码
+添加API Gateway Trigger，确保函数可以通过HTTP请求调用
+配置函数的运行环境，增加一个层（Layer），这个层里打包进AES加密需要的cryptography和HTTP请求需要的requests
+
+1. 函数代码
+首先上代码，需要填写自己的手机号、md5后的密码、设备ID（可以用Charles获取）等字段，粘贴到Lambda的在线编辑器中。"
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/one-click-open-door-based-on-aws-lambda-and-ios-shortcut/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/one-click-open-door-based-on-aws-lambda-and-ios-shortcut/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">
+            利用AWS Lambda和iOS捷径实现手机一键开小区门禁
+          </h1>
+          <div class="post-meta">
+            <span title="2021-10-19 22:30:00 +0000 +0000">十月 19, 2021</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <p>
+            我住的小区使用了一个叫守望领域的智能门禁系统，可以通过手机App开小区门禁和单元门，但是用App开门需要经过四五步：打开App→进入开门界面→找到需要开的门→点击开门。
+          </p>
+          <!-- raw HTML omitted -->
+          <p>
+            加上戴口罩时候解锁手机需要输入密码，导致整个流程非常耗时，经常需要站在小区门口和单元门口操作半天，有一段时间我甚至养成了携带实体门禁卡的习惯，实体门禁卡开门要快很多。
+          </p>
+          <p>
+            最近又开始忘带门禁卡，苦恼之余发现iOS在锁屏界面右划可以免解锁直接进入spotlight界面，这个界面可以添加捷径，如果能写一个捷径去调用守望领域App的API开门，就可以实现手机免解锁一键开门。
+          </p>
+          <!-- raw HTML omitted -->
+          <h1 id="查找-api">
+            查找 API<a hidden class="anchor" aria-hidden="true" href="#查找-api"
+              >#</a
+            >
+          </h1>
+          <p>
+            首先需要通过Charles之类的软件查找App调用的API，配置Charles查看App请求的方式不再赘述，Google一下可以看到很多教程。直接看结果Charles的结果，可以看到api.lookdoor.cn是这个软件所请求的API域名。
+          </p>
+          <p><img loading="lazy" src="/images/20211019_05.png" /></p>
+          <p>
+            打开软件发的请求非常多，经过操作和请求的对比可以看到，发送开门指令调用的API是：/func/hjapp/house/v1/pushOpenDoorBySn.json?equipmentId=xxxxxx
+            这个路径。
+          </p>
+          <p>
+            详细查看这个请求可以发现，equipmentId指的就是小区门的Id，接口使用cookie做认证，只要将cookie带上就可以模拟开门指令。
+          </p>
+          <h1 id="第一次尝试">
+            第一次尝试<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#第一次尝试"
+              >#</a
+            >
+          </h1>
+          <p>
+            打开iOS捷径App，创建一个新捷径，App调用API使用了POST请求，搜索Get
+            contents of这个动作来实现发送POST请求。
+          </p>
+          <p>
+            通过Charles找到要开的门的URL填入，Method选择POST，Headers里填入Cookie进行认证，内容直接从Charles复制就可以，尝试运行，it
+            works!
+          </p>
+          <!-- raw HTML omitted -->
+          <p>
+            接下来把这个捷径添加到Spotlight界面，锁屏界面右划点一下，就可以实现一键开小区门禁，和打开App的四五步操作相比，确实省时省力。拿着新配好的捷径去上班，下班回到小区想试一把一键开门，结果又被困到门口了，上午还正常的捷径竟然失效了，打开一看API报登录超时，有可能是Cookie里的SESSION_ID过期了。
+          </p>
+          <!-- raw HTML omitted -->
+          <h1 id="分析登录过程">
+            分析登录过程<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#分析登录过程"
+              >#</a
+            >
+          </h1>
+          <p>再次用Charles抓包，分析登录相关的API，会发现主要是这两个：</p>
+          <ul>
+            <li>
+              /func/hjapp/user/v2/getPasswordAndKey.json：获取AES Key的API
+            </li>
+            <li>/func/hjapp/user/v2/login.json?password=xxxxxx：登录API</li>
+          </ul>
+          <p>通过分析，用时序图来表示这部分的交互逻辑：</p>
+          <p><img loading="lazy" src="/images/20211019_08.png" /></p>
+          <p>
+            登录过程清楚了，但是其中使用AES_KEY对密码进行加密的配置还是不清楚的，使用一个工具来尝试通过密文和AES_KEY来解密：<a
+              href="http://tool.chacuo.net/cryptaes"
+              >http://tool.chacuo.net/cryptaes</a
+            >
+          </p>
+          <p><img loading="lazy" src="/images/20211019_09.png" /></p>
+          <p>
+            输入密钥和密文，使用各种配置进行解密，当能够解出内容的时候，证明我们找到了加密的配置，可以看到BlockSize=128，padder使用的是pkcs7padding，加密模式是ECB。解密出来的字符并不是我们的密码，看着像是md5过的，用
+            echo -n xxxxxx | md5sum
+            把密码md5一下，对上了。看来服务端校验的是单次md5后的密码。
+          </p>
+          <p><img loading="lazy" src="/images/20211019_10.png" /></p>
+          <p>
+            到这里登录逻辑已经搞清了，但是iOS捷径无法实现AES加密，单纯依托捷径来实现开门已经不可行了，需要搭建一个后端服务来计算密文。既然躲不过麻烦要搭建服务，不如把登录、开门整个流程都放在服务上，这样iOS捷径只需要一个请求就可以完成开门动作了。
+          </p>
+          <p>
+            考虑到登录开门的逻辑很简单，也就是3个HTTP请求+AES加密，直接在裸服务器上从0搭建步骤多成本高，要自己申请虚机、部署HTTP
+            Server、Web
+            App，还需要申请SSL证书，不仅初次搭建要搞个一两天，后续对机器和证书的维护也需要大量时间，成本极高。
+          </p>
+          <p>
+            最好是有服务能直接托管一段Python代码，第一时间想到的是Leancloud，一个Serverless服务提供商，但是实操过程中发现，由于政策要求Leancloud已经不提供域名了，绑定自己的域名也需要进行备案。这意味着只能选择一家海外Serverless服务商，看来看去AWS
+            Lambda应该可以满足要求，试一下。
+          </p>
+          <h1 id="使用-aws-lambda-搭建服务">
+            使用 AWS Lambda 搭建服务<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#使用-aws-lambda-搭建服务"
+              >#</a
+            >
+          </h1>
+          <p>
+            AWS
+            Lambda是一个Serverless服务，可以直接托管一段函数，省去配置服务和基础设施的麻烦。搭建一个Python的Serverless服务需要准备这么几件事：
+          </p>
+          <ul>
+            <li>新建函数，编写代码</li>
+            <li>添加API Gateway Trigger，确保函数可以通过HTTP请求调用</li>
+            <li>
+              配置函数的运行环境，增加一个层（Layer），这个层里打包进AES加密需要的cryptography和HTTP请求需要的requests
+            </li>
+          </ul>
+          <h2 id="1-函数代码">
+            1. 函数代码<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#1-函数代码"
+              >#</a
+            >
+          </h2>
+          <p>
+            首先上代码，需要填写自己的手机号、md5后的密码、设备ID（可以用Charles获取）等字段，粘贴到Lambda的在线编辑器中。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> urllib.parse
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> cryptography.hazmat.primitives.ciphers <span style="color:#f92672">import</span> Cipher, algorithms, modes
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> cryptography.hazmat.primitives <span style="color:#f92672">import</span> padding
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PHONE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>PASSWORD_MD5 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>DEVICE_ID <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encrypt</span>(key, msg):
+</span></span><span style="display:flex;"><span>    cipher <span style="color:#f92672">=</span> Cipher(algorithms<span style="color:#f92672">.</span>AES(str<span style="color:#f92672">.</span>encode(key)), modes<span style="color:#f92672">.</span>ECB())
+</span></span><span style="display:flex;"><span>    encryptor <span style="color:#f92672">=</span> cipher<span style="color:#f92672">.</span>encryptor()
+</span></span><span style="display:flex;"><span>    padder <span style="color:#f92672">=</span> padding<span style="color:#f92672">.</span>PKCS7(<span style="color:#ae81ff">128</span>)<span style="color:#f92672">.</span>padder()
+</span></span><span style="display:flex;"><span>    msg <span style="color:#f92672">=</span> padder<span style="color:#f92672">.</span>update(str<span style="color:#f92672">.</span>encode(msg)) <span style="color:#f92672">+</span> padder<span style="color:#f92672">.</span>finalize()
+</span></span><span style="display:flex;"><span>    ct <span style="color:#f92672">=</span> encryptor<span style="color:#f92672">.</span>update(msg) <span style="color:#f92672">+</span> encryptor<span style="color:#f92672">.</span>finalize()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> base64<span style="color:#f92672">.</span>b64encode(ct)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">lambda_handler</span>(event, context):
+</span></span><span style="display:flex;"><span>    resp <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(<span style="color:#e6db74">&#39;https://api.lookdoor.cn:443/func/hjapp/user/v2/getPasswordAesKey.json?&#39;</span>)
+</span></span><span style="display:flex;"><span>    cookie <span style="color:#f92672">=</span> resp<span style="color:#f92672">.</span>headers[<span style="color:#e6db74">&#39;set-cookie&#39;</span>]
+</span></span><span style="display:flex;"><span>    aes_key <span style="color:#f92672">=</span> resp<span style="color:#f92672">.</span>json()[<span style="color:#e6db74">&#39;data&#39;</span>][<span style="color:#e6db74">&#39;aesKey&#39;</span>]
+</span></span><span style="display:flex;"><span>    password_encypted <span style="color:#f92672">=</span> urllib<span style="color:#f92672">.</span>parse<span style="color:#f92672">.</span>quote_plus(encrypt(aes_key, PASSWORD_MD5))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;https://api.lookdoor.cn:443/func/hjapp/user/v2/login.json?password=</span><span style="color:#e6db74">{</span>password_encypted<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;deviceId=</span><span style="color:#e6db74">{</span>DEVICE_ID<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;loginNumber=</span><span style="color:#e6db74">{</span>PHONE<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;equipmentFlag=1&#39;</span>
+</span></span><span style="display:flex;"><span>    requests<span style="color:#f92672">.</span>post(url, headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;cookie&#39;</span>: cookie})
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    equipment_id <span style="color:#f92672">=</span> event[<span style="color:#e6db74">&#39;queryStringParameters&#39;</span>][<span style="color:#e6db74">&#39;equipment_id&#39;</span>]
+</span></span><span style="display:flex;"><span>    url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;https://api.lookdoor.cn:443/func/hjapp/house/v1/pushOpenDoorBySn.json?equipmentId=</span><span style="color:#e6db74">{</span>equipment_id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>    resp <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url, headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;cookie&#39;</span>: cookie})
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> resp<span style="color:#f92672">.</span>json()
+</span></span></code></pre>
+          </div>
+          <p>
+            代码首先通过API获取AES_KEY和SESSION_ID，然后使用AES_KEY对密码进行加密，接下来调用登录接口将获取的SESSION_ID绑定到当前账户，接下来根据请求传入的设备ID（门的ID）来发送开门指令。
+          </p>
+          <p>
+            点击Deploy部署，然后运行测试，会出现超时的报错，这是因为Lambda函数默认的执行器内存大小是128MB，超时时间是3s，在配置页面把内存改大一些，超时时间设置为10s就可以了。
+          </p>
+          <p><img loading="lazy" src="/images/20211019_11.png" /></p>
+          <h2 id="2-添加-api-gateway-trigger">
+            2. 添加 API Gateway Trigger<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#2-添加-api-gateway-trigger"
+              >#</a
+            >
+          </h2>
+          <p>
+            一个Lambda函数可以被多种形式触发执行，因为要使用捷径通过HTTP请求调用，所以加一个API
+            Gateway
+            Trigger，添加后会自动为函数生成一个URL，通过这个URL就可以直接调用函数。
+          </p>
+          <p><img loading="lazy" src="/images/20211019_12.png" /></p>
+          <h2 id="3-添加包含依赖的-layer">
+            3. 添加包含依赖的 Layer<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#3-添加包含依赖的-layer"
+              >#</a
+            >
+          </h2>
+          <p>
+            代码中使用了 requests 和 cryptography
+            这两个第三方库，Lambda不支持使用pip直接安装这些依赖，而是需要我们在把依赖打成zip包上传成为容器的一层Layer，添加到函数镜像中。需要注意的是，Lambda函数执行的环境是Linux，对于cryptography这个库需要打包Linux版的才可以正常使用。
+          </p>
+          <p>
+            由于日常使用的是Mac，所以在AWS上申请一台Ubuntu
+            20的EC2实例，登录实例后使用如下命令安装依赖，并打包成zip文件：
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>mkdir python
+</span></span><span style="display:flex;"><span>pip install <span style="color:#f92672">-</span>t python cryptography
+</span></span><span style="display:flex;"><span>pip install <span style="color:#f92672">-</span>t python requests
+</span></span><span style="display:flex;"><span>zip <span style="color:#f92672">-</span>r python<span style="color:#f92672">/*</span>
+</span></span></code></pre>
+          </div>
+          <p>
+            在AWS上创建一个新的Layer，并将生成的python.zip上传到Layer上。尝试通过URL访问写好的Lambda函数，可以看到开门指令已经成功下发。
+          </p>
+          <p><img loading="lazy" src="/images/20211019_13.png" /></p>
+          <h1 id="配置ios捷径">
+            配置iOS捷径<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#配置ios捷径"
+              >#</a
+            >
+          </h1>
+          <p>
+            打开iOS捷径App，创建一个新捷径，搜索Get contents
+            of这个动作，填入Lambda函数的URL和门的ID。由于API
+            Gateway并没有配置认证，所以其他参数默认即可。如果有安全方面的顾虑，可以自己实现一个简单的Token认证或添加Lambda提供的JWT认证。点击执行，接口返回成功，证明整个流程已经跑通，以后就可以用这个捷径给自己和外卖小哥开门了。
+          </p>
+          <!-- raw HTML omitted -->
+          <h1 id="总结">
+            总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a>
+          </h1>
+          <p>
+            一开始本想用自定义一个iOS捷径的方式来实现一键开门禁，但为了实现SESSION_ID自动更新，不得不基于AWS
+            Lambda搭了一个后端服务来模拟App的行为，所幸AWS
+            Lambda提供了低成本的构建方案，包括搭建服务和配置SSL证书都可以几乎0成本的完成，免费套餐政策也能让这个服务长期跑着而不产生任何实际花费。
+          </p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

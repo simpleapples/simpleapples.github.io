@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>MySQL on Zhiya&#39;s Blog</title>
+    <link>https://simpleapples.com/zh/categories/mysql/</link>
+    <description>Recent content in MySQL on Zhiya&#39;s Blog</description>
+    <generator>Hugo -- 0.147.8</generator>
+    <language>cn</language>
+    <lastBuildDate>Thu, 29 Jul 2021 21:19:00 +0000</lastBuildDate>
+    <atom:link href="https://simpleapples.com/zh/categories/mysql/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MySQL 子查询中order by不生效问题</title>
+      <link>https://simpleapples.com/zh/posts/orderby-invalid-in-subquery/</link>
+      <pubDate>Thu, 29 Jul 2021 21:19:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/orderby-invalid-in-subquery/</guid>
+      <description>&lt;p&gt;一个偶然的机会，发现一条 SQL 语句在不同的 MySQL 实例上执行得到了不同的结果。&lt;/p&gt;
+&lt;h1 id=&#34;问题描述&#34;&gt;问题描述&lt;/h1&gt;
+&lt;p&gt;创建商品表 product_tbl 和商品操作记录表 product_operation_tbl 两个表，来模拟下业务场景，结构和数据如下：&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20210729_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20210729_02.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;接下来需要查询所有商品最新的修改时间，使用如下语句：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt; t1.id, t1.name, t2.product_id, t2.created_at  &lt;span style=&#34;color:#66d9ef&#34;&gt;from&lt;/span&gt; product_tbl t1 &lt;span style=&#34;color:#66d9ef&#34;&gt;left&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;join&lt;/span&gt; (&lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;from&lt;/span&gt; product_operation_log_tbl &lt;span style=&#34;color:#66d9ef&#34;&gt;order&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;by&lt;/span&gt; created_at &lt;span style=&#34;color:#66d9ef&#34;&gt;desc&lt;/span&gt;) t2 &lt;span style=&#34;color:#66d9ef&#34;&gt;on&lt;/span&gt; t1.id &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; t2.product_id &lt;span style=&#34;color:#66d9ef&#34;&gt;group&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;by&lt;/span&gt; t1.id;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;通过结果可以看到，子查询先将 product_operation_log_tbl 里的所有记录按创建时间(created_at)逆序，然后和 product_tbl 进行 join 操作，进而查询出的商品的最新修改时间。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20210729_03.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;在区域 A 的 MySQL 实例上，查询商品最新修改时间可以得到正确结果，但是在区域 B 的 MySQL 实例上，得到的修改时间并不是最新的，而是最老的。通过对语句进行简化，发现是子查询中的 order by created_at desc 语句在区域 B 的实例上没有生效。&lt;/p&gt;
+&lt;h1 id=&#34;排查过程&#34;&gt;排查过程&lt;/h1&gt;
+&lt;p&gt;难道区域会影响 MySQL 的行为？经过 DBA 排查，区域 A 的 MySQL 是 5.6 版，区域 B 的 MySQL 是 5.7 版，并且找到了这篇文章：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

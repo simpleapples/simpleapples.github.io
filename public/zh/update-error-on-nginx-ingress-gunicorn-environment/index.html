@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>
+      nginx &#43; ingress &#43; gunicorn 环境上传大文件报错问题的解决思路 |
+      simpleapples
+    </title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="
+在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。
+文件上传过程
+
+上传文件流程
+
+上传的文件首先到达 Kubernetes 所在的宿主机。
+宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress Controller，Ingress controller 也是使用 Nginx 实现的。
+Ingress Controller 中的 Nginx 通过 Proxy 转发给 Gunicorn。
+Gunicorn 会启动若干个 Worker 处理请求，所以 Gunicorn 会再转发给 Worker。
+Worker 就是最终的 Python Web App
+
+错误 413 的解决
+首先碰到的是 413 Request Entity Too Large 错误，在上传过程中连接被中断（基本上每次都是相同的上传百分比被中断），请求返回 413，首先考虑到 Nginx 对于请求体的大小有限制，查看 Nginx 文档，发现 client_max_body_size 参数控制请求体的大小，默认的设置是 1mb。
+
+client_max_body_size: Sets the maximum allowed size of the client request body, specified in the “Content-Length” request header field. If the size in a request exceeds the configured value, the 413 (Request Entity Too Large) error is returned to the client. Please be aware that browsers cannot correctly display this error. Setting size to 0 disables checking of client request body size."
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/update-error-on-nginx-ingress-gunicorn-environment/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/update-error-on-nginx-ingress-gunicorn-environment/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">
+            nginx &#43; ingress &#43; gunicorn 环境上传大文件报错问题的解决思路
+          </h1>
+          <div class="post-meta">
+            <span title="2019-02-28 14:32:00 +0000 GMT">二月 28, 2019</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <p><img loading="lazy" src="/images/20190228_01.jpeg" /></p>
+          <p>
+            在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web
+            应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。
+          </p>
+          <h3 id="文件上传过程">
+            文件上传过程<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#文件上传过程"
+              >#</a
+            >
+          </h3>
+          <p><img loading="lazy" src="/images/20190228_02.jpg" /></p>
+          <p>上传文件流程</p>
+          <ol>
+            <li>上传的文件首先到达 Kubernetes 所在的宿主机。</li>
+            <li>
+              宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress
+              Controller，Ingress controller 也是使用 Nginx 实现的。
+            </li>
+            <li>Ingress Controller 中的 Nginx 通过 Proxy 转发给 Gunicorn。</li>
+            <li>
+              Gunicorn 会启动若干个 Worker 处理请求，所以 Gunicorn 会再转发给
+              Worker。
+            </li>
+            <li>Worker 就是最终的 Python Web App</li>
+          </ol>
+          <h3 id="错误-413-的解决">
+            错误 413 的解决<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#错误-413-的解决"
+              >#</a
+            >
+          </h3>
+          <p>
+            首先碰到的是 413 Request Entity Too Large
+            错误，在上传过程中连接被中断（基本上每次都是相同的上传百分比被中断），请求返回
+            413，首先考虑到 Nginx 对于请求体的大小有限制，查看 Nginx 文档，发现
+            client_max_body_size 参数控制请求体的大小，默认的设置是 1mb。
+          </p>
+          <blockquote>
+            <p>
+              <strong>client_max_body_size:</strong> Sets the maximum allowed
+              size of the client request body, specified in the “Content-Length”
+              request header field. If the size in a request exceeds the
+              configured value, the 413 (Request Entity Too Large) error is
+              returned to the client. Please be aware that browsers cannot
+              correctly display this error. Setting size to 0 disables checking
+              of client request body size.
+            </p>
+          </blockquote>
+          <p>首先在 Kubernetes 宿主机上 Nginx 的 http 域中加入如下配置。</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">client_max_body_size</span> <span style="color:#ae81ff">1024m</span>;
+</span></span></code></pre>
+          </div>
+          <p>
+            需要注意，除了 Kubernetes 宿主机上跑的 Nginx，还要修改 Ingress
+            Controller 中的 Nginx。Ingress Nginx 的修改方法在 Annotation
+            字段中加入如下配置。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">&#34;nginx.ingress.kubernetes.io/proxy-body-size&#34;: </span><span style="color:#e6db74">&#34;1024m&#34;</span>
+</span></span></code></pre>
+          </div>
+          <h3 id="错误-504-的解决">
+            错误 504 的解决<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#错误-504-的解决"
+              >#</a
+            >
+          </h3>
+          <p>
+            再次尝试上传，发现接口依然会返回错误，这次是 504 Gateway Timeout，从
+            Chrome 的开发者工具中查看请求，发现上传至少要持续5分钟，接下来从
+            Nginx 的超时机制入手。
+          </p>
+          <p>
+            在 Nginx 和 Ingress 中分别提高了读写的超时限制，将发送的超时设置为
+            600s，返回的超时设置为 30s。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">proxy_send_timeout</span> <span style="color:#e6db74">600s</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">proxy_read_timeout</span> <span style="color:#e6db74">30s</span>;
+</span></span></code></pre>
+          </div>
+          <p>
+            再次尝试，发现依然报同样的错误
+            504，难道说还有别的超时字段需要设置？再次查看文档发现了端倪。
+          </p>
+          <blockquote>
+            <p>
+              <strong>proxy_send_timeout:</strong> Sets a timeout for
+              transmitting a request to the proxied server. The timeout is set
+              only between two successive write operations, not for the
+              transmission of the whole request. If the proxied server does not
+              receive anything within this time, the connection is closed.
+            </p>
+          </blockquote>
+          <blockquote>
+            <p>
+              <strong>proxy_read_timeout:</strong> Defines a timeout for reading
+              a response from the proxied server. The timeout is set only
+              between two successive read operations, not for the transmission
+              of the whole response. If the proxied server does not transmit
+              anything within this time, the connection is closed.
+            </p>
+          </blockquote>
+          <p>
+            这里的 send 和 read，主语不是客户端，而是 Nginx 自己，超时的时候，是
+            Nginx 向 Upstream 发送了文件，而等到 Upstream 处理完返回时候，超过了
+            proxy_read_timeout 的限制，所以需要增加的是 read_timeout。
+          </p>
+          <p>将宿主机上的 Nginx 和 Ingress 分别做如下配置。</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-nginx" data-lang="nginx"><span style="display:flex;"><span><span style="color:#66d9ef">proxy_send_timeout</span> <span style="color:#e6db74">30s</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">proxy_read_timeout</span> <span style="color:#e6db74">600s</span>;
+</span></span></code></pre>
+          </div>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">nginx.ingress.kubernetes.io/proxy-send-timeout</span>: <span style="color:#ae81ff">30s</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">nginx.ingress.kubernetes.io/proxy-read-timeout</span>: <span style="color:#ae81ff">600s</span>
+</span></span></code></pre>
+          </div>
+          <h3 id="错误-502-的解决">
+            错误 502 的解决<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#错误-502-的解决"
+              >#</a
+            >
+          </h3>
+          <p>
+            修改好了超时和上传文件大小的限制后，又出现了新的错误 502 Bad
+            Gateway，这次就没有头绪了，由于是新的报错，上面的修改应该是生效了的，并且也不是上面两个限制导致的，通过查询
+            Nginx 和 Ingress 的日志，发现 Ingress 中有这样的报错。
+          </p>
+          <pre
+            tabindex="0"
+          ><code class="language-log" data-lang="log">2019/02/27 07:18:36 [error] 4265#4265: *19932411 upstream prematurely closed connection while reading response header from upstream, client: 172.20.0.1, server: example.com, request: &#34;POST /upload HTTP/1.0&#34;, upstream: &#34;http://172.0.0.1/upload&#34;, host: &#34;example.com&#34;, referrer: &#34;http://example.com/&#34;
+</code></pre>
+          <p>
+            这就比较奇怪了，刚才已经修改了超时，为什么 Ingress
+            还会有超时的报错呢？从日志上看，可能是 Ingress 的 Upstream
+            超时了，也就是 Gunicorn，Stackoverflow
+            上有人遇到了类似的问题，答案是给 Gunicorn 设置 -t 参数。查看
+            Gunicorn 的文档，timeout 参数是这么定义的。
+          </p>
+          <blockquote>
+            <p>
+              <strong>timeout:</strong> Workers silent for more than this many
+              seconds are killed and restarted. Generally set to thirty seconds.
+              Only set this noticeably higher if you’re sure of the
+              repercussions for sync workers. For the non sync workers it just
+              means that the worker process is still communicating and is not
+              tied to the length of time required to handle a single request.
+            </p>
+          </blockquote>
+          <p>
+            也就是说，当某一个 Worker
+            处理文件上传请求时候，如果在默认的超时时间内没有响应
+            Master，就会被杀掉，这也不难理解为什么 Ingress 从 Upstream
+            获取返回值时候连接会被关闭了。修改 Gunicorn 的配置，将超时时间设置为
+            600s，重新上传，问题解决。
+          </p>
+          <h3 id="参考文档">
+            参考文档<a hidden class="anchor" aria-hidden="true" href="#参考文档"
+              >#</a
+            >
+          </h3>
+          <p>
+            <a
+              href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_read_timeout"
+              >Module ngx_http_proxy_module</a
+            >
+          </p>
+          <p>
+            <a
+              href="https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md"
+              >Ingress-Nginx Annotations</a
+            >
+          </p>
+          <p>
+            <a href="http://docs.gunicorn.org/en/0.17.2/configure.html"
+              >Gunicorn Configuration</a
+            >
+          </p>
+          <p>
+            <a href="http://docs.gunicorn.org/en/stable/signals.html"
+              >Gunicorn Signals</a
+            >
+          </p>
+          <p>
+            <a
+              href="https://stackoverflow.com/questions/48046379/nginx-gunicorn-502-bad-gateway-upstream-prematurely-closed-connection-while-rea?rq=1"
+              >nginx gunicorn 502 bad gateway: upstream prematurely closed
+              connection while reading response header from upstream</a
+            >
+          </p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

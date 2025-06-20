@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Python跨服务传递作用域的坑 | simpleapples</title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="背景
+在一个古老的系统中，有这样一段代码：
+scope = dict(globals(), **locals())
+exec(
+&#34;&#34;&#34;
+global_a = 123
+def func_a():
+    print(global_a)
+&#34;&#34;&#34;
+, scope)
+exec(&#34;func_a()&#34;, scope)
+第一段用户代码定义了函数，第二段用户代码执行函数（不要问为什么这么做，因为用户永远是正确的）。第一个代码段执行后，func_a和global_a都会被加入作用域scope，由于第二个代码段也使用同一个scope，所以第二个代码段调用func_a是可以正确输出123的。
+但是使用exec执行用户代码毕竟不优雅，也很危险，于是把exec函数封装在了一个Python沙箱环境中（简单理解就是另一个Python服务，将code和scope传给这个服务后，服务会在沙箱环境调用exec(code,scope)执行代码），相当于每一次对exec调用都替换成了对沙箱服务的RPC请求。
+于是代码变成了这个样子：
+scope = dict(globals(), **locals())
+scope = call_sandbox(
+&#34;&#34;&#34;
+global_a = 123
+def func_a():
+    print(global_a)
+&#34;&#34;&#34;
+, scope)
+call_sandbox(&#34;func_a()&#34;, scope)
+作用域跨服务传递问题
+由于多次RPC调用需要使用同一个作用域，所以沙箱服务返回了新的scope，以保证下次调用时作用域不会丢失。但是执行代码会发现第二次call_sandbox调用时候，会返回错误：
+global name &lsquo;global_a&rsquo; is not defined
+首先怀疑第一次调用后scope没有更新，但是如果scope没有更新，应该会报找不到func_a才对，这个报错说明，第二次调用时候，作用域里的func_a是存在的，但是func_a找不到变量global_a。通过输出第二次call_sandbox前的scope，会发现global_a和func_a都是存在的：
+print(scope.keys())
+# [&#39;__name__&#39;, &#39;__doc__&#39;, &#39;__package__&#39;, &#39;__loader__&#39;, &#39;__spec__&#39;, &#39;__file__&#39;, &#39;__cached__&#39;, 
+# &#39;__builtins__&#39;, &#39;global_a&#39;, &#39;func_a&#39;]
+call_sandbox(&#34;func_a()&#34;, scope)
+证明在第二次call_sandbox时，scope被正确的传入了，没有报找不到func_a也印证了这个结论。在func_a里获取并输出一下globals()和locals()：
+def func_a():
+    inner_scope = dict(globals(), **locals()
+    print(inner_scope.keys())
+    # [&#39;__builtins__&#39;]
+可以看到在func_a外作用域是正常的，但是func_a内的作用域就只有__builtins__了，相当于作用域被清空了。猜测是函数的caller指向的是沙箱环境内的作用域，当scope回传回来后，caller没有更新，所以在函数内找不到函数外的作用域，查看一下Python函数的魔术方法："
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/python-cross-scope-issue/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/python-cross-scope-issue/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">
+            Python跨服务传递作用域的坑
+          </h1>
+          <div class="post-meta">
+            <span title="2021-11-06 08:25:00 +0000 GMT">十一月 6, 2021</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <h1 id="背景">
+            背景<a hidden class="anchor" aria-hidden="true" href="#背景">#</a>
+          </h1>
+          <p>在一个古老的系统中，有这样一段代码：</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>scope <span style="color:#f92672">=</span> dict(globals(), <span style="color:#f92672">**</span>locals())
+</span></span><span style="display:flex;"><span>exec(
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">global_a = 123
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">def func_a():
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    print(global_a)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>, scope)
+</span></span><span style="display:flex;"><span>exec(<span style="color:#e6db74">&#34;func_a()&#34;</span>, scope)
+</span></span></code></pre>
+          </div>
+          <p>
+            第一段用户代码定义了函数，第二段用户代码执行函数（不要问为什么这么做，因为用户永远是正确的）。第一个代码段执行后，func_a和global_a都会被加入作用域scope，由于第二个代码段也使用同一个scope，所以第二个代码段调用func_a是可以正确输出123的。
+          </p>
+          <p>
+            但是使用exec执行用户代码毕竟不优雅，也很危险，于是把exec函数封装在了一个Python沙箱环境中（简单理解就是另一个Python服务，将code和scope传给这个服务后，服务会在沙箱环境调用exec(code,scope)执行代码），相当于每一次对exec调用都替换成了对沙箱服务的RPC请求。
+          </p>
+          <p>于是代码变成了这个样子：</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>scope <span style="color:#f92672">=</span> dict(globals(), <span style="color:#f92672">**</span>locals())
+</span></span><span style="display:flex;"><span>scope <span style="color:#f92672">=</span> call_sandbox(
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">global_a = 123
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">def func_a():
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    print(global_a)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>, scope)
+</span></span><span style="display:flex;"><span>call_sandbox(<span style="color:#e6db74">&#34;func_a()&#34;</span>, scope)
+</span></span></code></pre>
+          </div>
+          <h1 id="作用域跨服务传递问题">
+            作用域跨服务传递问题<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#作用域跨服务传递问题"
+              >#</a
+            >
+          </h1>
+          <p>
+            由于多次RPC调用需要使用同一个作用域，所以沙箱服务返回了新的scope，以保证下次调用时作用域不会丢失。但是执行代码会发现第二次call_sandbox调用时候，会返回错误：
+          </p>
+          <p>global name &lsquo;global_a&rsquo; is not defined</p>
+          <p>
+            首先怀疑第一次调用后scope没有更新，但是如果scope没有更新，应该会报找不到func_a才对，这个报错说明，第二次调用时候，作用域里的func_a是存在的，但是func_a找不到变量global_a。通过输出第二次call_sandbox前的scope，会发现global_a和func_a都是存在的：
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>print(scope<span style="color:#f92672">.</span>keys())
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [&#39;__name__&#39;, &#39;__doc__&#39;, &#39;__package__&#39;, &#39;__loader__&#39;, &#39;__spec__&#39;, &#39;__file__&#39;, &#39;__cached__&#39;, </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># &#39;__builtins__&#39;, &#39;global_a&#39;, &#39;func_a&#39;]</span>
+</span></span><span style="display:flex;"><span>call_sandbox(<span style="color:#e6db74">&#34;func_a()&#34;</span>, scope)
+</span></span></code></pre>
+          </div>
+          <p>
+            证明在第二次call_sandbox时，scope被正确的传入了，没有报找不到func_a也印证了这个结论。在func_a里获取并输出一下globals()和locals()：
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func_a</span>():
+</span></span><span style="display:flex;"><span>    inner_scope <span style="color:#f92672">=</span> dict(globals(), <span style="color:#f92672">**</span>locals()
+</span></span><span style="display:flex;"><span>    print(inner_scope<span style="color:#f92672">.</span>keys())
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># [&#39;__builtins__&#39;]</span>
+</span></span></code></pre>
+          </div>
+          <p>
+            可以看到在func_a外作用域是正常的，但是func_a内的作用域就只有__builtins__了，相当于作用域被清空了。猜测是函数的caller指向的是沙箱环境内的作用域，当scope回传回来后，caller没有更新，所以在函数内找不到函数外的作用域，查看一下Python函数的魔术方法：
+          </p>
+          <p><img loading="lazy" src="/images/20211106_01.png" />   </p>
+          <p>
+            发现有一个__globals__变量，指向的就是所在作用域，相当于函数的caller，通过如下代码验证调用沙箱服务后的scope里的func_a的__globals__是否和当前作用域的一样：
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>scope[<span style="color:#e6db74">&#34;func_a&#34;</span>]<span style="color:#f92672">.</span>__globals__ <span style="color:#f92672">==</span> globals()  <span style="color:#75715e"># False</span>
+</span></span></code></pre>
+          </div>
+          <p>
+            确实不一样，接下来试试把scope[&ldquo;func_a&rdquo;].__globals__置为globals()，应该就可以跑通了。
+          </p>
+          <h1 id="优化作用域更新逻辑">
+            优化作用域更新逻辑<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#优化作用域更新逻辑"
+              >#</a
+            >
+          </h1>
+          <p>到这里问题的根源已经搞清了：</p>
+          <ul>
+            <li>
+              第一个exec语句和第二个exec语句分别在Python服务A和B中执行，第一个exec语句中定义的func_a所在的作用域是服务A（func_a.<strong
+                >globals</strong
+              >
+              == A）
+            </li>
+            <li>
+              在scope回传到服务B后，global_a和func_a被拷贝到了服务B所在作用域，但是func_a.__globals__还是指向服务A的作用域，所以出现可以调用到func_a但在func_a里找不到global_a
+            </li>
+            <li>将func_a.__globals__置为B，就可以使代码在服务B正确执行</li>
+          </ul>
+          <p>
+            如文档所述，函数__globals__是一个只读变量，所以不能直接赋值，需要通过拷贝函数的方式实现，定义一个拷贝函数的方法：
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> copy
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> types
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> functools
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">copy_func</span>(f, globals<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>, module<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> globals <span style="color:#f92672">is</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>        globals <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>__globals__
+</span></span><span style="display:flex;"><span>    g <span style="color:#f92672">=</span> types<span style="color:#f92672">.</span>FunctionType(f<span style="color:#f92672">.</span>__code__, globals, name<span style="color:#f92672">=</span>f<span style="color:#f92672">.</span>__name__,
+</span></span><span style="display:flex;"><span>                           argdefs<span style="color:#f92672">=</span>f<span style="color:#f92672">.</span>__defaults__, closure<span style="color:#f92672">=</span>f<span style="color:#f92672">.</span>__closure__)
+</span></span><span style="display:flex;"><span>    g <span style="color:#f92672">=</span> functools<span style="color:#f92672">.</span>update_wrapper(g, f)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> module <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>        g<span style="color:#f92672">.</span>__module__ <span style="color:#f92672">=</span> module
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> g
+</span></span></code></pre>
+          </div>
+          <p>
+            更新调用沙箱后回传的scope，如果scope中的value是一个function，就通过复制的方式更新它的__globals__为scope：
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>scope <span style="color:#f92672">=</span> dict(globals(), <span style="color:#f92672">**</span>locals())
+</span></span><span style="display:flex;"><span>scope <span style="color:#f92672">=</span> call_sandbox(
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">global_a = 123
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">def func_a():
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    print(global_a)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>, scope)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> scope:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> isinstance(v, types<span style="color:#f92672">.</span>FunctionType):
+</span></span><span style="display:flex;"><span>        scope[k] <span style="color:#f92672">=</span> copy_func(v, scope, __name__)
+</span></span><span style="display:flex;"><span>call_sandbox(<span style="color:#e6db74">&#34;func_a()&#34;</span>, scope)
+</span></span></code></pre>
+          </div>
+          <p>重新运行，两个call_sandbox都可以正常执行，问题解决。</p>
+          <h1 id="参考文档">
+            参考文档<a hidden class="anchor" aria-hidden="true" href="#参考文档"
+              >#</a
+            >
+          </h1>
+          <p>
+            <a href="https://docs.python.org/3/reference/datamodel.html"
+              >https://docs.python.org/3/reference/datamodel.html</a
+            >
+          </p>
+          <p>
+            <a
+              href="https://stackoverflow.com/questions/49076566/override-globals-in-function-imported-from-another-module"
+              >https://stackoverflow.com/questions/49076566/override-globals-in-function-imported-from-another-module</a
+            >
+          </p>
+          <p>
+            <a
+              href="https://stackoverflow.com/questions/2904274/globals-and-locals-in-python-exec/2906198"
+              >https://stackoverflow.com/questions/2904274/globals-and-locals-in-python-exec/2906198</a
+            >
+          </p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://simpleapples.com/sitemap.xml

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>实战 | 用aiohttp和uvloop实现一个高性能爬虫 | simpleapples</title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="asyncio 于 Python3.4 引入标准库，增加了对异步 I/O 的支持，asyncio 基于事件循环，可以轻松实现异步 I/O 操作。接下来，我们用基于 asyncio 的库实现一个高性能爬虫。
+准备工作
+Earth View from Google Earth是一款 Chrome 插件，会在打开新标签页时自动加载一张来自 Google Earth 的背景图片。
+
+使用 Chrome 开发者工具观察插件的网络请求，我们发现插件会请求一个地址如https://www.gstatic.com/prettyearth/assets/data/v2/1234.json的 JSON 文件，文件中包含了经过 Base64 的图片内容，观察发现，图片的 ID 范围大致在 1000-8000 之间，我们的爬虫就要来爬取这些精美的背景图片。
+实现主要逻辑
+由于爬取目标是 JSON 文件，爬虫的主要逻辑就变成了爬取 JSON&ndash;&gt;提取图片&ndash;&gt;保存图片。
+requests 是一个常用的 http 请求库，但是由于 requests 的请求都是同步的，我们使用aiohttp这个异步 http 请求库来代替。
+async def fetch_image_by_id(item_id):
+	url = f&#39;https://www.gstatic.com/prettyearth/assets/data/v2/{item_id}.json&#39;
+        # 由于URL是https的，所以选择不验证SSL
+	async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+		async with session.get(url) as response:
+            # 获取后需要将JSON字符串转为对象
+			try:
+				json_obj = json.loads(await response.text())
+			except json.decoder.JSONDecodeError as e:
+				print(f&#39;Download failed - {item_id}.jpg&#39;)
+				return
+            # 获取JSON中的图片内容字段，经过Base64解码成二进制内容
+			image_str = json_obj[&#39;dataUri&#39;].replace(&#39;data:image/jpeg;base64,&#39;, &#39;&#39;)
+			image_data = base64.b64decode(image_str)
+			save_folder = dir_path = os.path.dirname(
+				os.path.realpath(__file__)) &#43; &#39;/google_earth/&#39;
+			with open(f&#39;{save_folder}{item_id}.jpg&#39;, &#39;wb&#39;) as f:
+				f.write(image_data)
+			print(f&#39;Download complete - {item_id}.jpg&#39;)
+aiohttp 基于 asyncio，所以在调用时需要使用 async/await 语法糖，可以看到，由于 aiohttp 中提供了一个 ClientSession 上下文，代码中使用了 async with 的语法糖。"
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/a-crawler-based-on-aiohttp-and-uvloop/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/a-crawler-based-on-aiohttp-and-uvloop/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">
+            实战 | 用aiohttp和uvloop实现一个高性能爬虫
+          </h1>
+          <div class="post-meta">
+            <span title="2018-04-10 19:26:00 +0000 +0000">四月 10, 2018</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <p>
+            asyncio 于 Python3.4 引入标准库，增加了对异步 I/O 的支持，asyncio
+            基于事件循环，可以轻松实现异步 I/O 操作。接下来，我们用基于 asyncio
+            的库实现一个高性能爬虫。
+          </p>
+          <h1 id="准备工作">
+            准备工作<a hidden class="anchor" aria-hidden="true" href="#准备工作"
+              >#</a
+            >
+          </h1>
+          <p>
+            <a
+              href="https://chrome.google.com/webstore/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh"
+              >Earth View from Google Earth</a
+            >是一款 Chrome 插件，会在打开新标签页时自动加载一张来自 Google Earth
+            的背景图片。
+          </p>
+          <p>
+            <img
+              alt="Earth View from Google Earth"
+              loading="lazy"
+              src="/images/20180410_01.png"
+            />
+          </p>
+          <p>
+            使用 Chrome
+            开发者工具观察插件的网络请求，我们发现插件会请求一个地址如<a
+              href="https://www.gstatic.com/prettyearth/assets/data/v2/1234.json"
+              >https://www.gstatic.com/prettyearth/assets/data/v2/1234.json</a
+            >的 JSON 文件，文件中包含了经过 Base64 的图片内容，观察发现，图片的
+            ID 范围大致在 1000-8000
+            之间，我们的爬虫就要来爬取这些精美的背景图片。
+          </p>
+          <h1 id="实现主要逻辑">
+            实现主要逻辑<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#实现主要逻辑"
+              >#</a
+            >
+          </h1>
+          <p>
+            由于爬取目标是 JSON 文件，爬虫的主要逻辑就变成了<strong
+              >爬取 JSON&ndash;&gt;提取图片&ndash;&gt;保存图片</strong
+            >。
+          </p>
+          <p>
+            requests 是一个常用的 http 请求库，但是由于 requests
+            的请求都是同步的，我们使用<a
+              href="https://aiohttp.readthedocs.io/en/stable/"
+              >aiohttp</a
+            >这个异步 http 请求库来代替。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch_image_by_id</span>(item_id):
+</span></span><span style="display:flex;"><span>	url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;https://www.gstatic.com/prettyearth/assets/data/v2/</span><span style="color:#e6db74">{</span>item_id<span style="color:#e6db74">}</span><span style="color:#e6db74">.json&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 由于URL是https的，所以选择不验证SSL</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> aiohttp<span style="color:#f92672">.</span>ClientSession(connector<span style="color:#f92672">=</span>aiohttp<span style="color:#f92672">.</span>TCPConnector(verify_ssl<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)) <span style="color:#66d9ef">as</span> session:
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> session<span style="color:#f92672">.</span>get(url) <span style="color:#66d9ef">as</span> response:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 获取后需要将JSON字符串转为对象</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>				json_obj <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(<span style="color:#66d9ef">await</span> response<span style="color:#f92672">.</span>text())
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">except</span> json<span style="color:#f92672">.</span>decoder<span style="color:#f92672">.</span>JSONDecodeError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>				print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Download failed - </span><span style="color:#e6db74">{</span>item_id<span style="color:#e6db74">}</span><span style="color:#e6db74">.jpg&#39;</span>)
+</span></span><span style="display:flex;"><span>				<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 获取JSON中的图片内容字段，经过Base64解码成二进制内容</span>
+</span></span><span style="display:flex;"><span>			image_str <span style="color:#f92672">=</span> json_obj[<span style="color:#e6db74">&#39;dataUri&#39;</span>]<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;data:image/jpeg;base64,&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>			image_data <span style="color:#f92672">=</span> base64<span style="color:#f92672">.</span>b64decode(image_str)
+</span></span><span style="display:flex;"><span>			save_folder <span style="color:#f92672">=</span> dir_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>dirname(
+</span></span><span style="display:flex;"><span>				os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>realpath(__file__)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/google_earth/&#39;</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>save_folder<span style="color:#e6db74">}{</span>item_id<span style="color:#e6db74">}</span><span style="color:#e6db74">.jpg&#39;</span>, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>				f<span style="color:#f92672">.</span>write(image_data)
+</span></span><span style="display:flex;"><span>			print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Download complete - </span><span style="color:#e6db74">{</span>item_id<span style="color:#e6db74">}</span><span style="color:#e6db74">.jpg&#39;</span>)
+</span></span></code></pre>
+          </div>
+          <p>
+            aiohttp 基于 asyncio，所以在调用时需要使用 async/await
+            语法糖，可以看到，由于 aiohttp 中提供了一个 ClientSession
+            上下文，代码中使用了 async with 的语法糖。
+          </p>
+          <h1 id="加入并行逻辑">
+            加入并行逻辑<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#加入并行逻辑"
+              >#</a
+            >
+          </h1>
+          <p>
+            上面的代码是抓取单张图片的逻辑，批量抓取图片，需要再嵌套一层方法：
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch_all_images</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 使用Semaphore限制最大并发数</span>
+</span></span><span style="display:flex;"><span>	sem <span style="color:#f92672">=</span> asyncio<span style="color:#f92672">.</span>Semaphore(<span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>	ids <span style="color:#f92672">=</span> [id <span style="color:#66d9ef">for</span> id <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1000</span>, <span style="color:#ae81ff">8000</span>)]
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> current_id <span style="color:#f92672">in</span> ids:
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> sem:
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">await</span> fetch_image_by_id(current_id)
+</span></span></code></pre>
+          </div>
+          <p>接下来，将这个方法加入到 asyncio 的事件循环中。</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>event_loop <span style="color:#f92672">=</span> asyncio<span style="color:#f92672">.</span>get_event_loop()
+</span></span><span style="display:flex;"><span>future <span style="color:#f92672">=</span> asyncio<span style="color:#f92672">.</span>ensure_future(fetch_all_images())
+</span></span><span style="display:flex;"><span>results <span style="color:#f92672">=</span> event_loop<span style="color:#f92672">.</span>run_until_complete(future)
+</span></span></code></pre>
+          </div>
+          <h1 id="使用-uvloop-加速">
+            使用 uvloop 加速<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#使用-uvloop-加速"
+              >#</a
+            >
+          </h1>
+          <p>
+            uvloop 基于 libuv，libuv 是一个使用 C 语言实现的高性能异步 I/O
+            库，uvloop 用来代替 asyncio 默认事件循环，可以进一步加快异步 I/O
+            操作的速度。
+          </p>
+          <p>
+            uvloop 的使用非常简单，只要在获取事件循环前，调用如下方法，将
+            asyncio 的事件循环策略设置为 uvloop 的事件循环策略。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-python" data-lang="python"><span style="display:flex;"><span>asyncio<span style="color:#f92672">.</span>set_event_loop_policy(uvloop<span style="color:#f92672">.</span>EventLoopPolicy())
+</span></span></code></pre>
+          </div>
+          <p>使用上面的代码，我们可以快速将大约 1500 张的图片爬取下来。</p>
+          <p>
+            <img
+              alt="爬取下来的Google Earth图片"
+              loading="lazy"
+              src="/images/20180410_02.png"
+            />
+          </p>
+          <h1 id="性能对比">
+            性能对比<a hidden class="anchor" aria-hidden="true" href="#性能对比"
+              >#</a
+            >
+          </h1>
+          <p>
+            为了验证 aiohttp 和 uvloop 的性能，笔者使用 requests+concurrent
+            库实现了一个多进程版的爬虫，分别爬取 20 个 id，消耗的时间如图。
+          </p>
+          <p><img loading="lazy" src="/images/20180410_03.png" /></p>
+          <p>
+            可以看到，耗时相差了大概 7 倍，aiohttp+uvloop 的组合在爬虫这种 I/O
+            密集型的场景下，可以说具有压倒性优势。相信在不远的将来，基于 asyncio
+            的库会将无数爬虫工程师从加班中拯救出来。
+          </p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

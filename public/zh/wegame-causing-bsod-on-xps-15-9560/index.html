@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>大毒瘤！卸载WeGame解决XPS 15蓝屏问题 | simpleapples</title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="潜伏期
+去年4月底买了一台美版XPS 15 9560，用了几个月之后就会偶尔出现蓝屏问题，由于之前就在论坛上看到很多吐槽XPS品控的帖子，以为自己也中了枪，好在蓝屏也不频繁，不影响使用也就没管。
+上升期
+进入今年5月，升级了Win10 1803后（基本上软件有更新我都会第一时间升级，体验最新的改进），蓝屏的次数开始多了起来，开始变得影响使用，于是开始着手查找问题。
+由于心急，并没有看转储文件，而是直接Google了XPS 15的蓝屏问题，希望能尽快找到方案。很快发现具有类似问题的人不在少数，也有很大一部分人以此说XPS 15品控不好，看了很多内容后，把怀疑的方向放在了驱动层面（Dell有一个Dell Update软件，一有更新提示我就会更新驱动），于是从更新频率最高的显卡驱动入手，降级显卡驱动到上一个版本，然而并没有什么用。于是又降级了Wifi驱动，因为Wifi驱动也是最近更新的，并且XPS 15的Killer显卡兼容性似乎没有那么好。
+
+降级完驱动之后，电脑进入了短暂的回光返照阶段，用了几个小时都没有蓝屏，然而紧接着更加不幸的问题就要发生了。
+爆发期
+用QQ接收一个大文件，大概1G，进行到一半的时候忽然蓝屏，重启后重新接收，准备传完之后再解决蓝屏问题，然而不幸的是传了一半又蓝屏了&hellip; 这时我把怀疑的方向转向了硬盘，于是降级了Intel RST驱动，心想降级要是没用的话，有可能是SSD跪了&hellip; 降级后怀着忐忑的心情再次重试，竟然&hellip;又蓝屏了&hellip;
+这次把怀疑的方向转到了QQ或者Wifi上，毕竟是一用QQ接收大文件就出问题，那么不是QQ就是Wifi了，于是卸载QQ，用迅雷下载一个大文件，果不其然，又跪了&hellip;
+
+然而已经降级了Wifi驱动，之前也一直没有什么问题，难道真的是硬件出了问题？这个时候，我内心已经有点放弃PC，转而在京东上看MBP的价格了&hellip;
+然而MBP高企的售价让我冷静了下来，回来死马当活马医，继续找问题吧。
+既然自己怀疑的方向都不对，只能信仰科学了，安装了WinDbg和BlueScreenView这两款软件来查看和分析转储文件（具体过程不再赘述，可以参考文末的相关资源）。
+
+从BlueScreenView里并没有看到太多信息，现在只剩下WinDbg这一根救命稻草了。
+
+不过好在WinDbg非常给力，分析了几个不同时间的转储文件，都提示问题可能是由tdx.sys文件造成的。
+
+tdx是TDI Translation Driver的意思，TDI是传输层驱动接口的意思，那么可以肯定问题来自于网络，这也印证了每次使用网络传输大文件就会蓝屏的现象。紧接着，看到了另外一段话：
+
+WARNING: Unable to verify timestamp for QMTgpNetFlow764.sys
+这个QMTgpNetFlow764.sys又是什么，看前缀似乎像第三方的文件，先Google一下。
+真相大白
+Google了一下这个QMTgpNetFlow764.sys，终于拨云见日。
+
+根据网友们的分析（具体可以查看文末的相关资源），这5个文件来自于腾讯的游戏平台WeGame，于是卸载了腾讯系的游戏，并且重启删除了C:\Windows\system32\drivers目录下以QMT开头的5个文件，没关机使用至今（大约半个月）再也没有出现过蓝屏的情况，至此可以证明，腾讯WeGame平台是引起蓝屏的主要原因。
+
+相关资源
+BlueScreenView下载地址：https://www.nirsoft.net/utils/blue_screen_view.html
+WinDbg下载地址：https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools
+WinDbg使用说明：https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html
+知乎用户Weasley Frank的专栏文章TGP/WeGame驱动导致WSL网络服务异常
+对这个问题进行了简单分析"
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/wegame-causing-bsod-on-xps-15-9560/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/wegame-causing-bsod-on-xps-15-9560/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">
+            大毒瘤！卸载WeGame解决XPS 15蓝屏问题
+          </h1>
+          <div class="post-meta">
+            <span title="2018-06-20 14:00:00 +0000 +0000">六月 20, 2018</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <h1 id="潜伏期">
+            潜伏期<a hidden class="anchor" aria-hidden="true" href="#潜伏期"
+              >#</a
+            >
+          </h1>
+          <p>
+            去年4月底买了一台美版XPS 15
+            9560，用了几个月之后就会偶尔出现蓝屏问题，由于之前就在论坛上看到很多吐槽XPS品控的帖子，以为自己也中了枪，好在蓝屏也不频繁，不影响使用也就没管。
+          </p>
+          <h1 id="上升期">
+            上升期<a hidden class="anchor" aria-hidden="true" href="#上升期"
+              >#</a
+            >
+          </h1>
+          <p>
+            进入今年5月，升级了Win10
+            1803后（基本上软件有更新我都会第一时间升级，体验最新的改进），蓝屏的次数开始多了起来，开始变得影响使用，于是开始着手查找问题。
+          </p>
+          <p>
+            由于心急，并没有看转储文件，而是直接Google了XPS
+            15的蓝屏问题，希望能尽快找到方案。很快发现具有类似问题的人不在少数，也有很大一部分人以此说XPS
+            15品控不好，看了很多内容后，把怀疑的方向放在了驱动层面（Dell有一个Dell
+            Update软件，一有更新提示我就会更新驱动），于是从更新频率最高的显卡驱动入手，降级显卡驱动到上一个版本，然而并没有什么用。于是又降级了Wifi驱动，因为Wifi驱动也是最近更新的，并且XPS
+            15的Killer显卡兼容性似乎没有那么好。
+          </p>
+          <p>
+            <img
+              alt="XPS 15的驱动列表，可以看到Wifi和显卡驱动都是最近发布的"
+              loading="lazy"
+              src="/images/20180620_01.png"
+            />
+          </p>
+          <p>
+            降级完驱动之后，电脑进入了短暂的回光返照阶段，用了几个小时都没有蓝屏，然而紧接着更加不幸的问题就要发生了。
+          </p>
+          <h1 id="爆发期">
+            爆发期<a hidden class="anchor" aria-hidden="true" href="#爆发期"
+              >#</a
+            >
+          </h1>
+          <p>
+            用QQ接收一个大文件，大概1G，进行到一半的时候忽然蓝屏，重启后重新接收，准备传完之后再解决蓝屏问题，然而不幸的是传了一半又蓝屏了&hellip;
+            这时我把怀疑的方向转向了硬盘，于是降级了Intel
+            RST驱动，心想降级要是没用的话，有可能是SSD跪了&hellip;
+            降级后怀着忐忑的心情再次重试，竟然&hellip;又蓝屏了&hellip;
+          </p>
+          <p>
+            这次把怀疑的方向转到了QQ或者Wifi上，毕竟是一用QQ接收大文件就出问题，那么不是QQ就是Wifi了，于是卸载QQ，用迅雷下载一个大文件，果不其然，又跪了&hellip;
+          </p>
+          <p><img loading="lazy" src="/images/20180620_02.png" /></p>
+          <p>
+            然而已经降级了Wifi驱动，之前也一直没有什么问题，难道真的是硬件出了问题？这个时候，我内心已经有点放弃PC，转而在京东上看MBP的价格了&hellip;
+          </p>
+          <p>
+            然而MBP高企的售价让我冷静了下来，回来死马当活马医，继续找问题吧。
+          </p>
+          <p>
+            既然自己怀疑的方向都不对，只能信仰科学了，安装了WinDbg和BlueScreenView这两款软件来查看和分析转储文件（具体过程不再赘述，可以参考文末的相关资源）。
+          </p>
+          <p>
+            <img
+              alt="从BlueScreenView里可以看到，机器以近乎疯狂的频率蓝屏"
+              loading="lazy"
+              src="/images/20180620_03.jpeg"
+            />
+          </p>
+          <p>
+            从BlueScreenView里并没有看到太多信息，现在只剩下WinDbg这一根救命稻草了。
+          </p>
+          <p><img loading="lazy" src="/images/20180620_04.jpeg" /></p>
+          <p>
+            不过好在WinDbg非常给力，分析了几个不同时间的转储文件，都提示问题可能是由tdx.sys文件造成的。
+          </p>
+          <p><img loading="lazy" src="/images/20180620_05.png" /></p>
+          <p>
+            tdx是TDI Translation
+            Driver的意思，TDI是传输层驱动接口的意思，那么可以肯定问题来自于网络，这也印证了每次使用网络传输大文件就会蓝屏的现象。紧接着，看到了另外一段话：
+          </p>
+          <blockquote>
+            <p>WARNING: Unable to verify timestamp for QMTgpNetFlow764.sys</p>
+          </blockquote>
+          <p>
+            这个QMTgpNetFlow764.sys又是什么，看前缀似乎像第三方的文件，先Google一下。
+          </p>
+          <h1 id="真相大白">
+            真相大白<a hidden class="anchor" aria-hidden="true" href="#真相大白"
+              >#</a
+            >
+          </h1>
+          <p>Google了一下这个QMTgpNetFlow764.sys，终于拨云见日。</p>
+          <p>
+            <img
+              alt="原来早有人发现了QMTgpNetFlow764.sys引发蓝屏问题的秘密"
+              loading="lazy"
+              src="/images/20180620_06.png"
+            />
+          </p>
+          <p>
+            根据网友们的分析（具体可以查看文末的相关资源），这5个文件来自于腾讯的游戏平台WeGame，于是卸载了腾讯系的游戏，并且重启删除了C:\Windows\system32\drivers目录下以QMT开头的5个文件，没关机使用至今（大约半个月）再也没有出现过蓝屏的情况，至此可以证明，腾讯WeGame平台是引起蓝屏的主要原因。
+          </p>
+          <p>
+            <img alt="毒瘤们" loading="lazy" src="/images/20180620_07.png" />
+          </p>
+          <h1 id="相关资源">
+            相关资源<a hidden class="anchor" aria-hidden="true" href="#相关资源"
+              >#</a
+            >
+          </h1>
+          <p>
+            BlueScreenView下载地址：<a
+              href="https://www.nirsoft.net/utils/blue_screen_view.html"
+              >https://www.nirsoft.net/utils/blue_screen_view.html</a
+            >
+          </p>
+          <p>
+            WinDbg下载地址：<a
+              href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools"
+              >https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools</a
+            >
+          </p>
+          <p>
+            WinDbg使用说明：<a
+              href="https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html"
+              >https://jingyan.baidu.com/article/9f7e7ec0b0aea36f281554df.html</a
+            >
+          </p>
+          <p>
+            知乎用户<a href="https://www.zhihu.com/people/weasley-frank"
+              >Weasley Frank</a
+            >的专栏文章<a href="https://zhuanlan.zhihu.com/p/33723838"
+              >TGP/WeGame驱动导致WSL网络服务异常 </a
+            >对这个问题进行了简单分析
+          </p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

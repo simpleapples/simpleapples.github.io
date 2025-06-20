@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+  <head>
+    <script
+      src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload"
+      data-no-instant
+      defer
+    ></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>go json 实践中遇到的坑 | simpleapples</title>
+    <meta name="keywords" content="" />
+    <meta
+      name="description"
+      content="
+在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和 struct 的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。
+整数变浮点数问题
+假设有一个 Person 结构，其中包含 Age int64 和 Weight float64 两个字段，现在通过 json 包将 Person 结构转为 map[string]interface{}，代码如下。
+type Person struct {
+	Name string
+	Age int64
+	Weight float64
+}
+
+func main() {
+    person := Person{
+        Name: &#34;Wang Wu&#34;,
+        Age: 30,
+        Weight: 150.07,
+    }
+
+    jsonBytes, _ := json.Marshal(person)
+    fmt.Println(string(jsonBytes))
+
+    var personFromJSON interface{}
+    json.Unmarshal(jsonBytes, &amp;personFromJSON)
+
+    r := personFromJSON.(map[string]interface{})
+}
+代码执行到这里看上去一切正常，但是打印一下 map[string]interface{} 就会发现不太对了。
+fmt.Println(reflect.TypeOf(r[&#34;Age&#34;]).Name())  // float64
+fmt.Println(reflect.TypeOf(r[&#34;Weight&#34;]).Name())  // float64
+转换成 map[string]interface{} 之后，原先的 uint64 和 float64 类型都被转换成了 float64 类型，这显然是不符合我们的预期的。
+
+查看 json 的规范可以看到，在 json 中是没有整型和浮点型之分的，所以现在可以理解 json 包中的 Unmarshal 方法转出的数字类型为什么都是 float64 了，因为根据 json 规范，数字都是同一种类型，那么对应到 go 的类型中最接近的就是 float64 了。"
+    />
+    <meta name="author" content="" />
+    <link
+      rel="canonical"
+      href="http://localhost:1313/zh/practice-in-json-with-go/"
+    />
+    <link
+      crossorigin="anonymous"
+      href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css"
+      integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A="
+      rel="preload stylesheet"
+      as="style"
+    />
+    <link rel="icon" href="http://localhost:1313/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="http://localhost:1313/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="http://localhost:1313/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="http://localhost:1313/apple-touch-icon.png"
+    />
+    <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg" />
+    <meta name="theme-color" content="#2e2e33" />
+    <meta name="msapplication-TileColor" content="#2e2e33" />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href="http://localhost:1313/zh/practice-in-json-with-go/"
+    />
+    <noscript>
+      <style>
+        #theme-toggle,
+        .top-link {
+          display: none;
+        }
+      </style>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --theme: rgb(29, 30, 32);
+            --entry: rgb(46, 46, 51);
+            --primary: rgb(218, 218, 219);
+            --secondary: rgb(155, 156, 157);
+            --tertiary: rgb(65, 66, 68);
+            --content: rgb(196, 196, 197);
+            --code-block-bg: rgb(46, 46, 51);
+            --code-bg: rgb(55, 56, 62);
+            --border: rgb(51, 51, 51);
+          }
+
+          .list {
+            background: var(--theme);
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-track {
+            background: 0 0;
+          }
+
+          .list:not(.dark)::-webkit-scrollbar-thumb {
+            border-color: var(--theme);
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="" id="top">
+    <script>
+      if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add("dark");
+      } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove("dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.classList.add("dark");
+      }
+    </script>
+
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a
+            href="http://localhost:1313/zh/"
+            accesskey="h"
+            title="simpleapples (Alt + H)"
+            >simpleapples</a
+          >
+          <div class="logo-switches">
+            <button
+              id="theme-toggle"
+              accesskey="t"
+              title="(Alt + T)"
+              aria-label="Toggle theme"
+            >
+              <svg
+                id="moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+              <svg
+                id="sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+            <ul class="lang-switch">
+              <li>|</li>
+              <li>
+                <a
+                  href="http://localhost:1313/"
+                  title="English"
+                  aria-label="English"
+                  >En</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <ul id="menu">
+          <li>
+            <a href="http://localhost:1313/zh/about/" title="about">
+              <span>about</span>
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:1313/zh/categories/" title="categories">
+              <span>categories</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="post-single">
+        <header class="post-header">
+          <h1 class="post-title entry-hint-parent">go json 实践中遇到的坑</h1>
+          <div class="post-meta">
+            <span title="2018-12-24 10:43:00 +0000 GMT">十二月 24, 2018</span>
+          </div>
+        </header>
+        <div class="post-content">
+          <p><img loading="lazy" src="/images/20181224_01.png" /></p>
+          <p>
+            在使用 go 语言开发过程中，经常需要使用到 json 包来进行 json 和
+            struct
+            的互相转换，在使用过程中，遇到了一些需要额外注意的地方，记录如下。
+          </p>
+          <h3 id="整数变浮点数问题">
+            整数变浮点数问题<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#整数变浮点数问题"
+              >#</a
+            >
+          </h3>
+          <p>
+            假设有一个 Person 结构，其中包含 Age int64 和 Weight float64
+            两个字段，现在通过 json 包将 Person 结构转为
+            map[string]interface{}，代码如下。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Person</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Name</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Age</span> <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Weight</span> <span style="color:#66d9ef">float64</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">person</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Person</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Name</span>: <span style="color:#e6db74">&#34;Wang Wu&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Age</span>: <span style="color:#ae81ff">30</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Weight</span>: <span style="color:#ae81ff">150.07</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">jsonBytes</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">person</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(string(<span style="color:#a6e22e">jsonBytes</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">personFromJSON</span> <span style="color:#66d9ef">interface</span>{}
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Unmarshal</span>(<span style="color:#a6e22e">jsonBytes</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">personFromJSON</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">personFromJSON</span>.(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">interface</span>{})
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre>
+          </div>
+          <p>
+            代码执行到这里看上去一切正常，但是打印一下 map[string]interface{}
+            就会发现不太对了。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">TypeOf</span>(<span style="color:#a6e22e">r</span>[<span style="color:#e6db74">&#34;Age&#34;</span>]).<span style="color:#a6e22e">Name</span>())  <span style="color:#75715e">// float64</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">TypeOf</span>(<span style="color:#a6e22e">r</span>[<span style="color:#e6db74">&#34;Weight&#34;</span>]).<span style="color:#a6e22e">Name</span>())  <span style="color:#75715e">// float64</span>
+</span></span></code></pre>
+          </div>
+          <p>
+            转换成 map[string]interface{} 之后，原先的 uint64 和 float64
+            类型都被转换成了 float64 类型，这显然是不符合我们的预期的。
+          </p>
+          <p><img loading="lazy" src="/images/20181224_02.png" /></p>
+          <p>
+            查看 json 的规范可以看到，在 json
+            中是没有整型和浮点型之分的，所以现在可以理解 json 包中的 Unmarshal
+            方法转出的数字类型为什么都是 float64 了，因为根据 json
+            规范，数字都是同一种类型，那么对应到 go 的类型中最接近的就是 float64
+            了。
+          </p>
+          <p>
+            json 包还针对这个问题提供了更好的解决方案，不过需要使用 json.Decoder
+            来代替 json.Unmarshal 方法，将 json.Unmarhsal 替换如下。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">personFromJSON</span> <span style="color:#66d9ef">interface</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">decoder</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">NewDecoder</span>(<span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#a6e22e">jsonBytes</span>))
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">decoder</span>.<span style="color:#a6e22e">UseNumber</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">decoder</span>.<span style="color:#a6e22e">Decode</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">personFromJSON</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">personFromJSON</span>.(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">interface</span>{})
+</span></span></code></pre>
+          </div>
+          <p>
+            这种方法首先创建了一个 jsonDecoder，然后调用了 UseNumber
+            方法，从文档中可以知道，使用 UseNumber 方法后，json
+            包会将数字转换成一个内置的 Number 类型（而不是 float64），这个
+            Number 类型提供了转换为 int64、float64 等多个方法。
+          </p>
+          <p><img loading="lazy" src="/images/20181224_03.png" /></p>
+          <h3 id="时间格式">
+            时间格式<a hidden class="anchor" aria-hidden="true" href="#时间格式"
+              >#</a
+            >
+          </h3>
+          <p>
+            对于 json 格式，是没有时间类型的，日期和时间以 json
+            格式存储时，需要转换为字符串类型。这就带来了一个问题，日期时间的字符串表示有多种多样，go
+            的 json 包支持的是哪一种呢？
+          </p>
+          <p>
+            使用下面的代码来输出 json.Marshal 方法将 Time
+            类型转换为字符串后的格式。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Person</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Name</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Birth</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">person</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Person</span>{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Name</span>: <span style="color:#e6db74">&#34;Wang Wu&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Birth</span>: <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>(),
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">jsonBytes</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">person</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(string(<span style="color:#a6e22e">jsonBytes</span>))  <span style="color:#75715e">// {&#34;Name&#34;:&#34;Wang Wu&#34;,&#34;Birth&#34;:&#34;2018-12-20T16:22:02.00287617+08:00&#34;}</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre>
+          </div>
+          <p>
+            根据输出可以判断，go 的 json 包使用的是 RFC3339
+            标准中定义的格式。接下来测试一下 json.Unmarshal
+            方法所支持的日期时间格式。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">dateStr</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;2018-10-12&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">person</span> <span style="color:#a6e22e">Person</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">jsonStr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;{\&#34;name\&#34;:\&#34;Wang Wu\&#34;, \&#34;Birth\&#34;: \&#34;%s\&#34;}&#34;</span>, <span style="color:#a6e22e">dateStr</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Unmarshal</span>([]byte(<span style="color:#a6e22e">jsonStr</span>), <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">person</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">person</span>.<span style="color:#a6e22e">Birth</span>)  <span style="color:#75715e">// 0001-01-01 00:00:00 +0000 UTC</span>
+</span></span></code></pre>
+          </div>
+          <p>
+            对于形如 2018-10-12 的字符串，json
+            包并没有成功将其解析，接下来我们把 time 包中支持的所有格式都试一下。
+          </p>
+          <p><img loading="lazy" src="/images/20181224_04.png" /></p>
+          <p>
+            经过试验，发现 json.Unmarshal 方法只支持 RFC3339 和 RFC3339Nano
+            两种格式的转换。还有一个需要注意的地方，使用 time.Now()
+            生成的时间是带有一个 Monotonic Time 的，经过 json.Marshal
+            转换时候，由于 RFC3339 规范里没有存放 Monotonic Time
+            的位置，会丢掉这一部分。
+          </p>
+          <h3 id="对于字段为空的处理">
+            对于字段为空的处理<a
+              hidden
+              class="anchor"
+              aria-hidden="true"
+              href="#对于字段为空的处理"
+              >#</a
+            >
+          </h3>
+          <p>json 包对于空值的处理是一个非常容易出错的地方，看下面代码。</p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Person</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Name</span>     <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Age</span>      <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Birth</span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Children</span> []<span style="color:#a6e22e">Person</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">person</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Person</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">jsonBytes</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">person</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(string(<span style="color:#a6e22e">jsonBytes</span>))  <span style="color:#75715e">// {&#34;Name&#34;:&#34;&#34;,&#34;Age&#34;:0,&#34;Birth&#34;:&#34;0001-01-01T00:00:00Z&#34;,&#34;Children&#34;:null}</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre>
+          </div>
+          <p>
+            当 struct 中的字段没有值时，使用 json.Marshal
+            方法并不会自动忽略这些字段，而是根据字段的类型输出了他们的默认空值，这往往和我们的预期不一致，json
+            包提供了对字段的控制手段，我们可以为字段增加 omitempty tag，这个 tag
+            会在字段值为零值（int 和 float 类型零值是 0，string 类型零值是
+            &ldquo;&quot;，对象类型零值是 nil）时，忽略该字段。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">PersonAllowEmpty</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Name</span>     <span style="color:#66d9ef">string</span>             <span style="color:#e6db74">`json:&#34;,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Age</span>      <span style="color:#66d9ef">int64</span>              <span style="color:#e6db74">`json:&#34;,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Birth</span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>          <span style="color:#e6db74">`json:&#34;,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Children</span> []<span style="color:#a6e22e">PersonAllowEmpty</span> <span style="color:#e6db74">`json:&#34;,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">person</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">PersonAllowEmpty</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">jsonBytes</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">person</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(string(<span style="color:#a6e22e">jsonBytes</span>))  <span style="color:#75715e">// {&#34;Birth&#34;:&#34;0001-01-01T00:00:00Z&#34;}</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre>
+          </div>
+          <p>
+            可以看到，这次输出的 json 中只有 Birth
+            字段了，string、int、对象类型的字段，都因为没有赋值，默认是零值，所以被忽略，对于日期时间类型，由于不可以设置为零值，也就是
+            0000-00-00 00:00:00，不会被忽略。
+          </p>
+          <p>
+            需要注意这样的情况：如果一个人的年龄是 0
+            （对于刚出生的婴儿，这个值是合理的），刚好是 int 字段的零值，在添加
+            omitempty tag 的情况下，年龄字段会被忽略。
+          </p>
+          <p>
+            如果想要某一个字段在任何情况下都被 json 包忽略，需要使用如下的写法。
+          </p>
+          <div class="highlight">
+            <pre
+              tabindex="0"
+              style="
+                color: #f8f8f2;
+                background-color: #272822;
+                -moz-tab-size: 4;
+                -o-tab-size: 4;
+                tab-size: 4;
+              "
+            ><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Person</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Name</span>     <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;-&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Age</span>      <span style="color:#66d9ef">int64</span> <span style="color:#e6db74">`json:&#34;-&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Birth</span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span> <span style="color:#e6db74">`json:&#34;-&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Children</span> []<span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;-&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">birth</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">RFC3339</span>, <span style="color:#e6db74">&#34;1988-12-02T15:04:27+08:00&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">person</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Person</span>{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Name</span>: <span style="color:#e6db74">&#34;Wang Wu&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Age</span>: <span style="color:#ae81ff">30</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Birth</span>: <span style="color:#a6e22e">birth</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Children</span>: []<span style="color:#66d9ef">string</span>{},
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">jsonBytes</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">person</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(string(<span style="color:#a6e22e">jsonBytes</span>))  <span style="color:#75715e">// {}</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre>
+          </div>
+          <p>可以看到，使用 json:&rdquo;-&quot; 标签的字段都被忽略了。</p>
+        </div>
+
+        <footer class="post-footer">
+          <ul class="post-tags"></ul>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span
+        >&copy; 2025 <a href="http://localhost:1313/zh/">simpleapples</a></span
+      >
+      ·
+
+      <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank"
+          >Hugo</a
+        >
+        &
+        <a
+          href="https://github.com/adityatelange/hugo-PaperMod/"
+          rel="noopener"
+          target="_blank"
+          >PaperMod</a
+        >
+      </span>
+    </footer>
+    <a
+      href="#top"
+      aria-label="go to top"
+      title="Go to Top (Alt + G)"
+      class="top-link"
+      id="top-link"
+      accesskey="g"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 6"
+        fill="currentColor"
+      >
+        <path d="M12 6H0l6-6z" />
+      </svg>
+    </a>
+
+    <script>
+      let menu = document.getElementById("menu");
+      if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+          localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        };
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          var id = this.getAttribute("href").substr(1);
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView({
+                behavior: "smooth",
+              });
+          } else {
+            document
+              .querySelector(`[id='${decodeURIComponent(id)}']`)
+              .scrollIntoView();
+          }
+          if (id === "top") {
+            history.replaceState(null, null, " ");
+          } else {
+            history.pushState(null, null, `#${id}`);
+          }
+        });
+      });
+    </script>
+    <script>
+      var mybutton = document.getElementById("top-link");
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 800 ||
+          document.documentElement.scrollTop > 800
+        ) {
+          mybutton.style.visibility = "visible";
+          mybutton.style.opacity = "1";
+        } else {
+          mybutton.style.visibility = "hidden";
+          mybutton.style.opacity = "0";
+        }
+      };
+    </script>
+    <script>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+          document.body.classList.remove("dark");
+          localStorage.setItem("pref-theme", "light");
+        } else {
+          document.body.classList.add("dark");
+          localStorage.setItem("pref-theme", "dark");
+        }
+      });
+    </script>
+  </body>
+</html>

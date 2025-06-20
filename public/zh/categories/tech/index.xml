@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Tech on Zhiya&#39;s Blog</title>
+    <link>https://simpleapples.com/zh/categories/tech/</link>
+    <description>Recent content in Tech on Zhiya&#39;s Blog</description>
+    <generator>Hugo -- 0.147.8</generator>
+    <language>cn</language>
+    <lastBuildDate>Fri, 16 May 2025 21:52:00 +0000</lastBuildDate>
+    <atom:link href="https://simpleapples.com/zh/categories/tech/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>唯一索引这玩意儿，真得好好掂量掂量</title>
+      <link>https://simpleapples.com/zh/posts/think-twice-on-unique-key/</link>
+      <pubDate>Fri, 16 May 2025 21:52:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/think-twice-on-unique-key/</guid>
+      <description>&lt;p&gt;在大厂（就是那种用户多、数据量大、需求快速迭代的地方），如果不是对账那种一分钱不能错的业务，想着靠数据库的 &lt;code&gt;UNIQUE INDEX&lt;/code&gt;（唯一索引）来拦重复数据，说实话，效果不一定好，伺候它的成本还很高。更好的办法是把去重的主要活儿放应用层，数据库那个唯一索引，能不用就先别用，或者想清楚了再用。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;一-为啥我开始琢磨唯一索引这事儿因为坑踩了&#34;&gt;一、 为啥我开始琢磨唯一索引这事儿？因为坑踩了&lt;/h2&gt;
+&lt;p&gt;数据库唯一索引，听着挺靠谱，对吧？保证数据不重复的最后一道防线。以前我也是这么想的，表里哪个字段不让重，随手就给它来个唯一索引。&lt;/p&gt;
+&lt;p&gt;直到被现实狠狠摩擦了。&lt;/p&gt;
+&lt;p&gt;很久之前，当我头发还很茂密的时候，给一个千万级的表加个组合唯一索引（比如 &lt;code&gt;tenant_id&lt;/code&gt; 和 &lt;code&gt;is_deleted&lt;/code&gt; 这俩字段不能重复）。听着简单吧？结果呢，整个变更从头到尾折腾了几天！这期间，主从延迟跟过山车似的，时不时还得担心线上服务会不会抖一下。事儿完了我在想，就为了数据库层面这个“唯一”，搭进去这么多工夫、担这么大风险，值吗？&lt;/p&gt;
+&lt;p&gt;还有个事儿也挺别扭。 业务上，我们都知道 &lt;code&gt;user@example.com&lt;/code&gt; 和 &lt;code&gt;USER@EXAMPLE.COM&lt;/code&gt; 其实是一个邮箱，你注册的时候，应用代码肯定也会把它们统一处理成小写再判断有没有重复。结果呢，数据库里的唯一索引（区分大小写）不认这个账。有时候因为一些历史数据或者旁路数据同步没做好规范化，数据库里就存了两种大小写格式的“同一个”邮箱。这时候，唯一索引它要么“眼瞎”发现不了这种业务上的重复，要么在你修数据的时候，因为它那死板的规矩，反而碍手碍脚。&lt;/p&gt;
+&lt;p&gt;更别提业务迭代了。 比如，以前光是“邮箱唯一”就行，现在要改成“租户 ID+邮箱唯一”。好家伙，应用代码得改吧？数据库的唯一索引也得跟着 &lt;code&gt;DROP&lt;/code&gt; 旧的 &lt;code&gt;CREATE&lt;/code&gt; 新的吧？这两拨操作怎么配合？谁先谁后？万一中间出岔子怎么办？在大表上搞这种操作，每次都跟拆炸弹似的，提心吊胆。&lt;/p&gt;
+&lt;p&gt;就这些事儿搞得我不得不琢磨：数据量大、并发高、需求又变得快，唯一索引这一套，是不是该重新掂量掂量了？它带来的麻烦，是不是已经比它的好处多了？&lt;/p&gt;
+&lt;p&gt;这篇文章，就是想跟大家伙儿聊聊我的反思。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;二-unique-index我们为啥那么信它&#34;&gt;二、 &lt;code&gt;UNIQUE INDEX&lt;/code&gt;：我们为啥那么信它？&lt;/h2&gt;
+&lt;p&gt;在吐槽之前，咱也得公平点，说说唯一索引为啥那么招人待见，它确实有几个看上去不错的点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;数据不跑偏的最后保险：&lt;/strong&gt; 防止数据重复的最后一道关卡。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;上手简单：&lt;/strong&gt; 建表的时候或者后来加个 DDL，几行 SQL 就搞定了。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;表结构一看就懂：&lt;/strong&gt; Schema 里标着呢，这字段不能重。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;顺便还能快点查：&lt;/strong&gt; 反正也是个索引，按这个键查数据能快点。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这些好处，在小项目或者数据量不大、业务不复杂的时候，确实挺香。但一到大数据量+快速迭代“修罗场”，情况就变了。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;三-大厂滤镜下的unique-index那些好处还好使吗&#34;&gt;三、 大厂滤镜下的&lt;code&gt;UNIQUE INDEX&lt;/code&gt;：那些“好处”还好使吗？&lt;/h2&gt;
+&lt;p&gt;接下来咱们挨个盘盘上面说的那些“好处”，看看在大厂这环境下，它们是不是还那么“美”。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;“最后保险”？这保险靠谱吗？保的是啥险？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;业务上的“重复”它认不全啊！就像前面说的邮箱大小写，还有手机号带不带&lt;code&gt;+86&lt;/code&gt;，用户名清不清除特殊字符……这些业务上才认的“一样”，数据库那简单粗暴的“字节必须一样”的唯一索引根本管不过来。它防不住业务层面的“逻辑重复”。&lt;/p&gt;
+&lt;p&gt;应用层反正要干活。 既然这些复杂的“一样不一样”都得在应用代码里判断（总不能直接把数据库报错丢给用户吧？），那应用层才是真正保证“业务数据不重复”的主力军。数据库那个唯一索引，充其量是个标准可能还跟业务不一致的“辅警”。&lt;/p&gt;
+&lt;p&gt;分布式系统里它就是个“本地保镖”。在分布式场景下一旦分表，表内的唯一索引，管不了全局唯一性。全局唯一还得靠 ID 生成服务或者应用层的全局校验。这时候，数据库本地那点“保险”作用就更小了。&lt;/p&gt;
+&lt;p&gt;这个“最后保险”既可能保不到点子上，覆盖面也有限，全指望它优点悬。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;“上手简单”？一次上线，一周折腾&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;新表新加个唯一索引，确实就一条 SQL。但更多的时候是给已经跑了好久、数据堆成山的旧表改规则。你想给千万行的表改个唯一索引（比如从一个字段唯一改成俩字段组合唯一），可能就是几分钟的锁表！在线 DDL 工具，也只是让你不用停服务，但整个过程照样漫长、耗资源、有风险。&lt;/p&gt;
+&lt;p&gt;敏捷？快不起来啊！在快速迭代+多区域同步+合规要求的场景下。数据库这儿一个唯一索引的变更就要卡你好几天，啥敏捷都白搭。&lt;/p&gt;
+&lt;p&gt;所以开始那一下“简单”，跟后来改起来的“要老命”比，简直是钓鱼。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;“表结构一看就懂”？懂的可能跟实际要的不一样啊！&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;唯一索引在表结构里写着，是，算是一种“技术文档”。可是“文档”可能误导人，如果这个唯一索引定义的“唯一”跟业务上实际的、更复杂的唯一规则对不上（比如大小写问题），那这份“文档”不光没用，还可能误导后来的开发。 如果改这份“文档”（就是改唯一索引）就要经历九九八十一难，那我们为啥不把业务规则好好写在真正的设计文档、Wiki 或者代码注释里呢？那些地方改起来可方便多了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;“顺便还能快点查”？为了这点醋，才包的这顿饺子？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这是个很常见的误解，或者说是一个被过分强调的“附加值”。如果你只是想让某个字段或某几个字段的查询快一点，你完全可以给它们建一个普普通通的、非唯一的索引（Non-Unique Index）啊！非唯一索引照样能嗖嗖地提高查询速度，而且它还没有唯一性约束带来的那些写入开销、DDL 痛苦和业务逻辑的死板限制。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>JWT 避坑指南：nbf 验签失效问题的解决</title>
+      <link>https://simpleapples.com/zh/posts/solution-to-problem-of-jwt-token-invalidation/</link>
+      <pubDate>Tue, 26 Mar 2019 18:52:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/solution-to-problem-of-jwt-token-invalidation/</guid>
+      <description>&lt;h3 id=&#34;现象&#34;&gt;现象&lt;/h3&gt;
+&lt;p&gt;刚签发的 JWT，在下一个请求使用时候会失效，请求会报 422 错误。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#34;msg&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;The token is not yet valid (nbf)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果隔几秒再请求（例如使用 Chrome 开发者工具中的 Replay XHR），就会成功。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20190326_01.png&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;nbf-字段的原理&#34;&gt;nbf 字段的原理&lt;/h3&gt;
+&lt;p&gt;查看上面的报错信息，会发现有一个 nbf，nbf 是 JWT 协议中的一个字段，是 Not Before 的缩写，表示 JWT Token 在这个时间之前是无效的，一般来讲会设置成签发的时间。这里产生了一个猜想，多服务器环境时候，服务器之间时间如果不一致，一台服务器签发的 token 如果立刻被发往另一台服务器验证，就很容易产生 nbf 字段验证不通过的问题。其实 JWT 协议已经考虑到了这类问题，所以协议中在 nbf 这一节专门提到了可以使用一个 small leeway 来解决这个问题。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;4.1.5. &amp;ldquo;nbf&amp;rdquo; (Not Before) Claim&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;The &amp;ldquo;nbf&amp;rdquo; (not before) claim identifies the time before which the JWT
+MUST NOT be accepted for processing. The processing of the &amp;ldquo;nbf&amp;rdquo;
+claim requires that the current date/time MUST be after or equal to
+the not-before date/time listed in the &amp;ldquo;nbf&amp;rdquo; claim. Implementers MAY
+provide for some small leeway, usually no more than a few minutes, to
+account for clock skew. Its value MUST be a number containing a
+NumericDate value. Use of this claim is OPTIONAL.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>基于 JWT &#43; Refresh Token 的用户认证实践</title>
+      <link>https://simpleapples.com/zh/posts/combining-jwt-with-refresh-token/</link>
+      <pubDate>Thu, 13 Dec 2018 13:07:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/combining-jwt-with-refresh-token/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20181213_01.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;HTTP 是一个无状态的协议，一次请求结束后，下次在发送服务器就不知道这个请求是谁发来的了（同一个 IP 不代表同一个用户），在 Web 应用中，用户的认证和鉴权是非常重要的一环，实践中有多种可用方案，并且各有千秋。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;基于-session-的会话管理&#34;&gt;基于 Session 的会话管理&lt;/h3&gt;
+&lt;p&gt;在 Web 应用发展的初期，大部分采用基于 Session 的会话管理方式，逻辑如下。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端使用用户名密码进行认证&lt;/li&gt;
+&lt;li&gt;服务端生成并存储 Session，将 SessionID 通过 Cookie 返回给客户端&lt;/li&gt;
+&lt;li&gt;客户端访问需要认证的接口时在 Cookie 中携带 SessionID&lt;/li&gt;
+&lt;li&gt;服务端通过 SessionID 查找 Session 并进行鉴权，返回给客户端需要的数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20181213_02.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;基于 Session 的方式存在多种问题。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;服务端需要存储 Session，并且由于 Session 需要经常快速查找，通常存储在内存或内存数据库中，同时在线用户较多时需要占用大量的服务器资源。&lt;/li&gt;
+&lt;li&gt;当需要扩展时，创建 Session 的服务器可能不是验证 Session 的服务器，所以还需要将所有 Session 单独存储并共享。&lt;/li&gt;
+&lt;li&gt;由于客户端使用 Cookie 存储 SessionID，在跨域场景下需要进行兼容性处理，同时这种方式也难以防范 CSRF 攻击。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;基于-token-的会话管理&#34;&gt;基于 Token 的会话管理&lt;/h3&gt;
+&lt;p&gt;鉴于基于 Session 的会话管理方式存在上述多个缺点，无状态的基于 Token 的会话管理方式诞生了，所谓无状态，就是服务端不再存储信息，甚至是不再存储 Session，逻辑如下。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端使用用户名密码进行认证&lt;/li&gt;
+&lt;li&gt;服务端验证用户名密码，通过后生成 Token 返回给客户端&lt;/li&gt;
+&lt;li&gt;客户端保存 Token，访问需要认证的接口时在 URL 参数或 HTTP Header 中加入 Token&lt;/li&gt;
+&lt;li&gt;服务端通过解码 Token 进行鉴权，返回给客户端需要的数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20181213_03.jpg&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>通过 ngrok 实现 ssh 内网穿透</title>
+      <link>https://simpleapples.com/zh/posts/ssh-via-ngrok/</link>
+      <pubDate>Mon, 10 Dec 2018 14:42:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/ssh-via-ngrok/</guid>
+      <description>&lt;h3 id=&#34;ngrok&#34;&gt;ngrok&lt;/h3&gt;
+&lt;p&gt;用 ssh 访问一台主机，如果和主机在一个局域网中或者主机拥有公网 IP，就可以使用 ssh 命令直接连接主机的 IP 地址，但是大部分公司和家庭内部都是局域网，并不能给局域网内的每一台主机都分配一个公网 IP，这时候就需要进行内网穿透，才能从外部连接到局域网内的主机。&lt;/p&gt;
+&lt;p&gt;ngrok 是一个反向代理工具，可以实现将内网的端口暴露到公网，通过 ngrok，也能将 ssh 使用的端口暴露出去，以此实现 ssh 的内网穿透。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;注册并下载-ngrok&#34;&gt;注册并下载 ngrok&lt;/h3&gt;
+&lt;p&gt;访问 &lt;a href=&#34;https://ngrok.com/&#34;&gt;https://ngrok.com/&lt;/a&gt; 注册 ngrok 账号并下载 ngrok 客户端。&lt;/p&gt;
+&lt;h3 id=&#34;查看-ngrok-的-token&#34;&gt;查看 ngrok 的 token&lt;/h3&gt;
+&lt;p&gt;访问 &lt;a href=&#34;https://dashboard.ngrok.com/auth&#34;&gt;https://dashboard.ngrok.com/auth&lt;/a&gt; 查看 token 并复制。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20181210_01.png&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;在内网机器上启动-ngrok&#34;&gt;在内网机器上启动 ngrok&lt;/h3&gt;
+&lt;p&gt;连接 ngrok 账号&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ngrok authtoken 5TqUhMnum6ntDE8Z5HkNb_49F9ffzzcV9V7pKLVdDYc
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;启动 ngrok 并打开 22 端口转发&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ngrok tcp &lt;span style=&#34;color:#ae81ff&#34;&gt;22&lt;/span&gt; --log&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;stdout &amp;gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$HOME&lt;span style=&#34;color:#e6db74&#34;&gt;/ngrok.log&amp;#34;&lt;/span&gt; --region ap &amp;amp;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其中 region 的 ap 代表 ngrok 新加坡节点，访问速度相比美国节点会快一些。访问 &lt;a href=&#34;https://ngrok.com/docs#config-options&#34;&gt;https://ngrok.com/docs#config-options&lt;/a&gt; 可以查看支持的所有区域。&lt;/p&gt;
+&lt;p&gt;访问 &lt;code&gt;http://127.0.0.1:4040&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;可以看到一个 tcp 开头的地址，通过访问这个地址，就可以转发到本机的 22 端口上。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Unicode 和 UTF-8</title>
+      <link>https://simpleapples.com/zh/posts/unicode-and-utf-8/</link>
+      <pubDate>Fri, 07 Dec 2018 15:22:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/unicode-and-utf-8/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20181207_01.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Unicode 和 UTF-8 的概念是一个非常基础和重要，但是却容易被忽略的问题。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h3 id=&#34;字符集&#34;&gt;字符集&lt;/h3&gt;
+&lt;p&gt;在计算机系统中，所有的数据都以二进制存储，所有的运算也以二进制表示，人类语言和符号也需要转化成二进制的形式，才能存储在计算机中，于是需要有一个从人类语言到二进制编码的映射表。这个映射表就叫做字符集。&lt;/p&gt;
+&lt;h3 id=&#34;ascii&#34;&gt;ASCII&lt;/h3&gt;
+&lt;p&gt;最早的字符集叫 American Standard Code for Information Interchange（美国信息交换标准代码），简称 ASCII，由 American National Standard Institute（美国国家标准协会）制定。在 ASCII 字符集中，字母 &lt;code&gt;A&lt;/code&gt; 对应的字符编码是 &lt;code&gt;65&lt;/code&gt;，转换成二进制是 &lt;code&gt;0100 0001&lt;/code&gt;，由于二进制表示比较长，通常使用十六进制 &lt;code&gt;41&lt;/code&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;gb2312gbk&#34;&gt;GB2312、GBK&lt;/h3&gt;
+&lt;p&gt;ASCII 字符集总共规定了 128 种字符规范，但是并没有涵盖西文字母之外的字符，当需要计算机显示存储中文的时候，就需要一种对中文进行编码的字符集，GB 2312 就是解决中文编码的字符集，由国家标准委员会发布。同时考虑到中文语境中往往也需要使用西文字母，GB 2312 也实现了对 ASCII 的向下兼容，原理是西文字母使用和 ASCII 中相同的代码，但是 GB 2312 只涵盖了 6000 多个汉字，还有很多没有包含在其中，所以又出现了 GBK 和 GB 18030，两种字符集都是在 GB 2312 的基础上进行了扩展。&lt;/p&gt;
+&lt;h3 id=&#34;unicode&#34;&gt;Unicode&lt;/h3&gt;
+&lt;p&gt;可以看到，光是简体中文，就先后出现了至少三种字符集，繁体中文方面也有 BIG5 等字符集，几乎每种语言都需要有一个自己的字符集，每个字符集使用了自己的编码规则，往往互不兼容。同一个字符在不同字符集下的字符代码不同，这使得跨语言交流的过程中双方必须要使用相同的字符编码才能不出现乱码的情况。为了解决传统字符编码的局限性，Unicode 诞生了，Unicoide 的全称是 Universal Multiple-Octet Coded Character Set（通用多八位字符集，简称 UCS）。Unicode 在一个字符集中包含了世界上所有文字和符号，统一编码，来终结不同编码产生乱码的问题。&lt;/p&gt;
+&lt;h3 id=&#34;字符编码-utf-8&#34;&gt;字符编码 UTF-8&lt;/h3&gt;
+&lt;p&gt;Unicode 统一了所有字符的编码，是一个 Character Set，也就是字符集，字符集只是给所有的字符一个唯一编号，但是却没有规定如何存储，一个编号为 &lt;code&gt;65&lt;/code&gt; 的字符，只需要一个字节就可以存下，但是编号 &lt;code&gt;40657&lt;/code&gt; 的字符需要两个字节的空间才可以装下，而更靠后的字符可能会需要三个甚至四个字节的空间。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>大毒瘤！卸载WeGame解决XPS 15蓝屏问题</title>
+      <link>https://simpleapples.com/zh/posts/wegame-causing-bsod-on-xps-15-9560/</link>
+      <pubDate>Wed, 20 Jun 2018 14:00:00 +0000</pubDate>
+      <guid>https://simpleapples.com/zh/posts/wegame-causing-bsod-on-xps-15-9560/</guid>
+      <description>&lt;h1 id=&#34;潜伏期&#34;&gt;潜伏期&lt;/h1&gt;
+&lt;p&gt;去年 4 月底买了一台美版 XPS 15 9560，用了几个月之后就会偶尔出现蓝屏问题，由于之前就在论坛上看到很多吐槽 XPS 品控的帖子，以为自己也中了枪，好在蓝屏也不频繁，不影响使用也就没管。&lt;/p&gt;
+&lt;h1 id=&#34;上升期&#34;&gt;上升期&lt;/h1&gt;
+&lt;p&gt;进入今年 5 月，升级了 Win10 1803 后（基本上软件有更新我都会第一时间升级，体验最新的改进），蓝屏的次数开始多了起来，开始变得影响使用，于是开始着手查找问题。&lt;/p&gt;
+&lt;p&gt;由于心急，并没有看转储文件，而是直接 Google 了 XPS 15 的蓝屏问题，希望能尽快找到方案。很快发现具有类似问题的人不在少数，也有很大一部分人以此说 XPS 15 品控不好，看了很多内容后，把怀疑的方向放在了驱动层面（Dell 有一个 Dell Update 软件，一有更新提示我就会更新驱动），于是从更新频率最高的显卡驱动入手，降级显卡驱动到上一个版本，然而并没有什么用。于是又降级了 Wifi 驱动，因为 Wifi 驱动也是最近更新的，并且 XPS 15 的 Killer 显卡兼容性似乎没有那么好。&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;XPS 15的驱动列表，可以看到Wifi和显卡驱动都是最近发布的&#34; loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20180620_01.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;降级完驱动之后，电脑进入了短暂的回光返照阶段，用了几个小时都没有蓝屏，然而紧接着更加不幸的问题就要发生了。&lt;/p&gt;
+&lt;h1 id=&#34;爆发期&#34;&gt;爆发期&lt;/h1&gt;
+&lt;p&gt;用 QQ 接收一个大文件，大概 1G，进行到一半的时候忽然蓝屏，重启后重新接收，准备传完之后再解决蓝屏问题，然而不幸的是传了一半又蓝屏了&amp;hellip; 这时我把怀疑的方向转向了硬盘，于是降级了 Intel RST 驱动，心想降级要是没用的话，有可能是 SSD 跪了&amp;hellip; 降级后怀着忐忑的心情再次重试，竟然&amp;hellip;又蓝屏了&amp;hellip;&lt;/p&gt;
+&lt;p&gt;这次把怀疑的方向转到了 QQ 或者 Wifi 上，毕竟是一用 QQ 接收大文件就出问题，那么不是 QQ 就是 Wifi 了，于是卸载 QQ，用迅雷下载一个大文件，果不其然，又跪了&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://simpleapples.com/images/20180620_02.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;然而已经降级了 Wifi 驱动，之前也一直没有什么问题，难道真的是硬件出了问题？这个时候，我内心已经有点放弃 PC，转而在京东上看 MBP 的价格了&amp;hellip;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
