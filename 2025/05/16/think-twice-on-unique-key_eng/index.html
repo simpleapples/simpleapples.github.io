@@ -18,6 +18,8 @@
 
 <!-- Website description -->
 
+<meta name="description" content="唯一索引这玩意儿，真得好好掂量掂量" />
+
 
 <!-- Website keywords -->
 
@@ -35,7 +37,7 @@
 
 
 <!-- Canonical, good for google search engine -->
-<link rel="canonical" href="http://www.simpleapples.com/2025/05/22/think-twice-on-unique-key_eng/" />
+<link rel="canonical" href="http://www.simpleapples.com/2025/05/16/think-twice-on-unique-key_eng/" />
 
 <!-- Fancybox styling -->
 
@@ -63,7 +65,7 @@
   window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
 </script>
   
-  <title> - simpleapples</title>
+  <title>唯一索引这玩意儿，真得好好掂量掂量 - simpleapples</title>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 
@@ -87,14 +89,14 @@
       <li class="mobile-menu-item">
         
         
-        首页              </li>
+        Home              </li>
     </a>
     
     <a href="/about/">
       <li class="mobile-menu-item">
         
         
-        关于              </li>
+        About              </li>
     </a>
     
   </ul>
@@ -113,7 +115,7 @@
           <a class="menu-item-link" href="/">  
               
               
-              首页  
+              Home  
               
           </a>  
         </li>  
@@ -122,7 +124,7 @@
           <a class="menu-item-link" href="/about/">  
               
               
-              关于  
+              About  
               
           </a>  
         </li>  
@@ -139,15 +141,21 @@
   <header class="post-header">
     <h1 class="post-title">
       
-      
+      唯一索引这玩意儿，真得好好掂量掂量
       
     </h1>
 
     <div class="post-meta">
       <span class="post-time">
-        2025-05-23
+        2025-05-16
       </span>
       
+      
+      <span class="post-category">
+        
+        <a href="/categories/Tech/">Tech</a>
+        
+      </span>
       
       
     </div>
@@ -155,16 +163,16 @@
 
   
   <div class="post-toc" id="post-toc">
-    <h2 class="post-toc-title">文章目录</h2>
+    <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Unique-Indexes-We-Should-Think-Twice-Especially-at-Scale"><span class="toc-number">1.</span> <span class="toc-text">#Unique Indexes: We Should Think Twice (Especially at Scale)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Why-Did-I-Start-Rethinking-Unique-Indexes-Because-I-Got-Burned"><span class="toc-number">1.1.</span> <span class="toc-text">1. Why Did I Start Rethinking Unique Indexes? Because I Got Burned.</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-UNIQUE-INDEX-Why-Do-We-Trust-It-So-Much"><span class="toc-number">1.2.</span> <span class="toc-text">2. UNIQUE INDEX: Why Do We Trust It So Much?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-UNIQUE-INDEX-Under-the-%E2%80%9CBig-Tech%E2%80%9D-Lens-Are-Those-Benefits-Still-Valid"><span class="toc-number">1.3.</span> <span class="toc-text">3. UNIQUE INDEX Under the “Big Tech” Lens: Are Those Benefits Still Valid?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Let-the-Application-Layer-Do-the-Job%E2%80%94It%E2%80%99s-What-It%E2%80%99s-Good-At"><span class="toc-number">1.4.</span> <span class="toc-text">4. Let the Application Layer Do the Job—It’s What It’s Good At!</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Conclusion"><span class="toc-number">2.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Why-Did-I-Start-Rethinking-Unique-Indexes-Because-I-Got-Burned"><span class="toc-number">1.</span> <span class="toc-text">1. Why Did I Start Rethinking Unique Indexes? Because I Got Burned.</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-UNIQUE-INDEX-Why-Do-We-Trust-It-So-Much"><span class="toc-number">2.</span> <span class="toc-text">2. UNIQUE INDEX: Why Do We Trust It So Much?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-UNIQUE-INDEX-Under-the-%E2%80%9CBig-Tech%E2%80%9D-Lens-Are-Those-Benefits-Still-Valid"><span class="toc-number">3.</span> <span class="toc-text">3. UNIQUE INDEX Under the “Big Tech” Lens: Are Those Benefits Still Valid?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Let-the-Application-Layer-Do-the-Job%E2%80%94It%E2%80%99s-What-It%E2%80%99s-Good-At"><span class="toc-number">4.</span> <span class="toc-text">4. Let the Application Layer Do the Job—It’s What It’s Good At!</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Conclusion"><span class="toc-number"></span> <span class="toc-text">Conclusion</span></a>
     </div>
   </div>
   
 
   <div class="post-content">
     
-    <h1 id="Unique-Indexes-We-Should-Think-Twice-Especially-at-Scale"><a href="#Unique-Indexes-We-Should-Think-Twice-Especially-at-Scale" class="headerlink" title="#Unique Indexes: We Should Think Twice (Especially at Scale)"></a>#Unique Indexes: We Should Think Twice (Especially at Scale)</h1><p>In “Big Tech” environments (you know, the kind with tons of users, massive datasets, and rapidly evolving requirements), relying on database <code>UNIQUE INDEX</code> constraints to prevent duplicate data—unless it’s for something like financial reconciliation where every penny must be exact—honestly, might not be as effective as you think. Plus, the cost of maintaining them can be surprisingly high. A better approach is often to handle the bulk of deduplication logic at the application layer. If you can avoid using a database unique index, consider doing so, or at least think it through very carefully before implementing one.</p>
+    <p>In “Big Tech” environments (you know, the kind with tons of users, massive datasets, and rapidly evolving requirements), relying on database <code>UNIQUE INDEX</code> constraints to prevent duplicate data—unless it’s for something like financial reconciliation where every penny must be exact—honestly, might not be as effective as you think. Plus, the cost of maintaining them can be surprisingly high. A better approach is often to handle the bulk of deduplication logic at the application layer. If you can avoid using a database unique index, consider doing so, or at least think it through very carefully before implementing one.</p>
 <hr>
 <h2 id="1-Why-Did-I-Start-Rethinking-Unique-Indexes-Because-I-Got-Burned"><a href="#1-Why-Did-I-Start-Rethinking-Unique-Indexes-Because-I-Got-Burned" class="headerlink" title="1. Why Did I Start Rethinking Unique Indexes? Because I Got Burned."></a>1. Why Did I Start Rethinking Unique Indexes? Because I Got Burned.</h2><p>Database unique indexes sound pretty reliable, right? The last line of defense against data duplication. I used to think so too. Whenever a field in a table needed to be unique, I’d casually slap a unique index on it.</p>
 <p>Until reality gave me a harsh wake-up call.</p>
@@ -226,15 +234,15 @@
 
 <div class="post-copyright">
   <p class="copyright-item">
-    <span>原文作者: </span>
+    <span>Author: </span>
     <a href="http://www.simpleapples.com">simpleapples</a>
   </p>
   <p class="copyright-item">
-    <span>原文链接: </span>
-    <a href="http://www.simpleapples.com/2025/05/22/think-twice-on-unique-key_eng/">http://www.simpleapples.com/2025/05/22/think-twice-on-unique-key_eng/</a>
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2025/05/16/think-twice-on-unique-key_eng/">http://www.simpleapples.com/2025/05/16/think-twice-on-unique-key_eng/</a>
   </p>
   <p class="copyright-item">
-    <span>许可协议: </span>
+    <span>License: </span>
     
     <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
   </p>
@@ -250,10 +258,16 @@
       
   <nav class="post-nav">  
       
+      <a class="prev" href="/2025/05/16/think-twice-on-unique-key/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">唯一索引这玩意儿，真得好好掂量掂量</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
       
-      <a class="next" href="/2025/05/16/think-twice-on-unique-key/">  
-        <span class="next-text nav-default">唯一索引这玩意儿，真得好好掂量掂量</span>  
-        <span class="prev-text nav-mobile">下一篇</span>  
+      
+      <a class="next" href="/2022/09/20/yang-le-ge-yang-crack/">  
+        <span class="next-text nav-default">羊了个羊科技通关攻略</span>  
+        <span class="prev-text nav-mobile">Next</span>  
         <i class="iconfont icon-right"></i>  
       </a>  
       
@@ -341,11 +355,11 @@
 
 <div class="copyright">
   <span class="power-by">
-    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 -
+    Theme -
     <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
