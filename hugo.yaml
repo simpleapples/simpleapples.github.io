@@ -24,7 +24,7 @@ languages:
     menu:
       main:
         - identifier: archives
-          name: archives
+          name: Archives
           url: /archives/
     params:
       homeInfoParams:
