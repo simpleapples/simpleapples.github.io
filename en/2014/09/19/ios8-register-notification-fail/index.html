@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="iOS8注册推送失败的探究" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2014/09/19/ios8-register-notification-fail/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>iOS8注册推送失败的探究 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      iOS8注册推送失败的探究
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2014-09-19
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Mobile/">Mobile</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+
+  <div class="post-content">
+    
+    <p>Apple在9月18日正式发布了iOS8，在收到更新的同时，也发现自己的应用在iOS8下无法启动。<br>并且在Console中收到如下提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2014-09-19 16:26:20.369 demo[379:30506] registerForRemoteNotificationTypes: is not supported in iOS 8.0 and later.</span><br></pre></td></tr></table></figure>
+
+<p>查询文档可以知道，在iOS8中注册推送的方法<code>registerForRemoteNotificationTypes</code>已经被废弃，文档中是这样描述的：</p>
+<p><img src="/upload/ios8-registerForRemoteNotificationTypes.png" alt="Alt text"></p>
+<p>按照文档中的提示，使用<code>registerForRemoteNotifications</code>方法代替，这个方法不接受参数。紧接着问题就来了，<strong>程序在安装过这个应用的iOS8机器上可以成功注册，而在新安装的iOS8机器上则无法注册</strong>，<code>application:didRegisterForRemoteNotificationsWithDeviceToken:</code>和<code>application:didFailToRegisterForRemoteNotificationsWithError:</code>都无法响应，并且在成功注册的机器上，收到的推送消息也没有声音提示。再次查看文档后发现这么一段话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">If you want your app’s push notifications to display alerts, play sounds, or perform other user-facing actions, you must call the registerUserNotificationSettings: method to request the types of notifications you want to use.</span><br></pre></td></tr></table></figure>
+
+<p>换句话说，如果要使用推送服务，还需要再调用<code>registerUserNotificationSettings</code>方法，而这个方法是和iOS7上的<code>registerForRemoteNotificationTypes</code>方法一样接受参数的。为什么iOS8下要把一个方法变成两个方法呢？<code>registerForRemoteNotifications</code>方法的文档中有这么一句话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Call this method to initiate the registration process with Apple Push Service. If registration succeeds, the app calls your app delegate object’s application:didRegisterForRemoteNotificationsWithDeviceToken: method and passes it a device token.</span><br></pre></td></tr></table></figure>
+
+<p>苹果可能考虑到一些应用注册提醒可能只是为了获取deviceToken，所以将获取deviceToken单独提成一个方法，而要接收推送还需要单独调用别的方法，这样就细化了逻辑，方便不用的开发需求。不过在真机调试中，一台刚重置过的搭载iOS8系统的iPhone5c，调用registerForRemoteNotifications方法后，并没有收到任何失败或成功的回调，和Apple文档中描述的不符，怀疑是SDK在这部分也有bug。</p>
+<p>下面贴一下兼容iOS7和iOS8的注册推送代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#define IS_OS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0)</span><br><span class="line">if (IS_OS_8_OR_LATER) &#123;</span><br><span class="line">    [[UIApplication sharedApplication] registerForRemoteNotifications];</span><br><span class="line">    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes: (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound) categories:nil];</span><br><span class="line">    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    [application registerForRemoteNotificationTypes:</span><br><span class="line">     UIRemoteNotificationTypeBadge |</span><br><span class="line">     UIRemoteNotificationTypeAlert |</span><br><span class="line">     UIRemoteNotificationTypeSound];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/">http://www.simpleapples.com/2014/09/19/ios8-register-notification-fail/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2014/10/23/build-a-safari-extension/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">创建一个简单的Safari扩展</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2014/03/27/difference-between-air-sdk-and-flex-sdk/">  
+        <span class="next-text nav-default">Air SDK和Flex SDK的区别</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

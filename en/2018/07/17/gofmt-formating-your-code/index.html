@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="使用gofmt格式化代码" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2018/07/17/gofmt-formating-your-code/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>使用gofmt格式化代码 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      使用gofmt格式化代码
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2018-07-17
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Golang/">Golang</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#gofmt%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">gofmt介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#go-fmt%E5%92%8Cgofmt"><span class="toc-number">2.</span> <span class="toc-text">go fmt和gofmt</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#goland%E4%B8%AD%E9%85%8D%E7%BD%AEgofmt"><span class="toc-number">3.</span> <span class="toc-text">goland中配置gofmt</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="toc-number">4.</span> <span class="toc-text">参考文章</span></a></li></ol>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p><img src="/upload/20180717_01.png"></p>
+<p>对于一门编程语言来说，代码格式化是最容易引起争议的一个问题，不同的开发者可能会有不同的编码风格和习惯，但是如果所有开发者都能使用同一种格式来编写代码，开发者就可以将宝贵的时间专注在语言要解决的问题上。</p>
+<h1 id="gofmt介绍"><a href="#gofmt介绍" class="headerlink" title="gofmt介绍"></a>gofmt介绍</h1><p>Golang的开发团队制定了统一的官方代码风格，并且推出了gofmt工具（gofmt或go fmt）来帮助开发者格式化他们的代码到统一的风格。gofmt是一个cli程序，会优先读取标准输入，如果传入了文件路径的话，会格式化这个文件，如果传入一个目录，会格式化目录中所有.go文件，如果不传参数，会格式化当前目录下的所有.go文件。</p>
+<p>gofmt默认不对代码进行简化，使用-s参数可以开启简化代码功能，具体来说会进行如下的转换：</p>
+<ul>
+<li>去除数组、切片、Map初始化时不必要的类型声明：</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">如下形式的切片表达式：</span><br><span class="line">    []T&#123;T&#123;&#125;, T&#123;&#125;&#125;</span><br><span class="line">将被简化为：</span><br><span class="line">    []T&#123;&#123;&#125;, &#123;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>去除数组切片操作时不必要的索引指定</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">如下形式的切片表达式：</span><br><span class="line">    s[a:<span class="built_in">len</span>(s)]</span><br><span class="line">将被简化为：</span><br><span class="line">    s[a:]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>去除迭代时非必要的变量赋值</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">如下形式的迭代：</span><br><span class="line">    <span class="keyword">for</span> x, _ = <span class="keyword">range</span> v &#123;...&#125;</span><br><span class="line">将被简化为：</span><br><span class="line">    <span class="keyword">for</span> x = <span class="keyword">range</span> v &#123;...&#125;</span><br><span class="line">如下形式的迭代：</span><br><span class="line">    <span class="keyword">for</span> _ = <span class="keyword">range</span> v &#123;...&#125;</span><br><span class="line">将被简化为：</span><br><span class="line">    <span class="keyword">for</span> <span class="keyword">range</span> v &#123;...&#125;</span><br></pre></td></tr></table></figure>
+
+<p>gofmt命令参数列表如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">usage: gofmt [flags] [path ...]</span><br><span class="line">  -cpuprofile string</span><br><span class="line">        write cpu profile to this file</span><br><span class="line">  -d    display diffs instead of rewriting files</span><br><span class="line">  -e    report all errors (not just the first 10 on different lines)</span><br><span class="line">  -l    list files whose formatting differs from gofmt<span class="string">&#x27;s</span></span><br><span class="line"><span class="string">  -r string</span></span><br><span class="line"><span class="string">        rewrite rule (e.g., &#x27;</span>a[b:len(a)] -&gt; a[b:]<span class="string">&#x27;)</span></span><br><span class="line"><span class="string">  -s    simplify code</span></span><br><span class="line"><span class="string">  -w    write result to (source) file instead of stdout</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，gofmt命令还支持自定义的重写规则，使用-r参数，按照pattern -&gt; replacement的格式传入规则。</p>
+<p>有如下内容的Golang程序，存储在main.go文件中。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">   a := <span class="number">1</span></span><br><span class="line">   b := <span class="number">2</span></span><br><span class="line">   c := a + b</span><br><span class="line">   fmt.Println(c)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用以下规则来格式化上面的代码。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gofmt -r <span class="string">&quot;a + b -&gt; b + a&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>格式化的结果如下。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">   a := <span class="number">1</span></span><br><span class="line">   b := <span class="number">2</span></span><br><span class="line">   c := b + a</span><br><span class="line">   fmt.Println(c)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>*注意：Gofmt使用tab来表示缩进，并且对行宽度无限制，如果手动对代码进行了换行，gofmt也不会强制把代码格式化回一行。</strong></p>
+<h1 id="go-fmt和gofmt"><a href="#go-fmt和gofmt" class="headerlink" title="go fmt和gofmt"></a>go fmt和gofmt</h1><p>gofmt是一个独立的cli程序，而go中还有一个go fmt命令，go fmt命令是gofmt的简单封装。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">usage: go <span class="built_in">fmt</span> [-n] [-x] [packages]</span><br><span class="line"></span><br><span class="line">Fmt runs the <span class="built_in">command</span> <span class="string">&#x27;gofmt -l -w&#x27;</span> on the packages named</span><br><span class="line">by the import paths. It prints the names of the files that are modified.</span><br><span class="line">For more about gofmt, see <span class="string">&#x27;go doc cmd/gofmt&#x27;</span>.</span><br><span class="line">For more about specifying packages, see <span class="string">&#x27;go help packages&#x27;</span>.</span><br><span class="line">The -n flag prints commands that would be executed.</span><br><span class="line">The -x flag prints commands as they are executed.</span><br><span class="line">To run gofmt with specific options, run gofmt itself.</span><br><span class="line"></span><br><span class="line">See also: go fix, go vet.</span><br></pre></td></tr></table></figure>
+
+<p>go fmt命令本身只有两个可选参数-n和-x，-n仅打印出内部要执行的go fmt的命令，-x命令既打印出go fmt命令又执行它，如果需要更细化的配置，需要直接执行gofmt命令。</p>
+<p>go fmt在调用gofmt时添加了-l -w参数，相当于执行了<code>gofmt -l -w</code>。</p>
+<h1 id="goland中配置gofmt"><a href="#goland中配置gofmt" class="headerlink" title="goland中配置gofmt"></a>goland中配置gofmt</h1><p>Goland是JetBrains公司推出的Go语言IDE，是一款功能强大，使用便捷的产品。</p>
+<p>在Goland中，可以通过添加一个File Watcher来在文件发生变化的时候调用gofmt进行代码格式化，具体方法是，点击Preferences -&gt; Tools -&gt; File Watchers，点加号添加一个go fmt模版，Goland中预置的go fmt模版使用的是go fmt命令，将其替换为gofmt，然后在参数中增加-l -w -s参数，启用代码简化功能。添加配置后，保存源码时，goland就会执行代码格式化了。</p>
+<p><img src="/upload/20180717_02.png"></p>
+<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a target="_blank" rel="noopener" href="https://golang.org/cmd/gofmt/">https://golang.org/cmd/gofmt/</a></p>
+<p><a target="_blank" rel="noopener" href="https://golang.org/doc/effective_go.html">https://golang.org/doc/effective_go.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://openhome.cc/Gossip/Go/gofmt.html">https://openhome.cc/Gossip/Go/gofmt.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hyper0x/go_command_tutorial/blob/master/0.9.md">https://github.com/hyper0x/go_command_tutorial&#x2F;blob&#x2F;master&#x2F;0.9.md</a></p>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2018/07/17/gofmt-formating-your-code/">http://www.simpleapples.com/2018/07/17/gofmt-formating-your-code/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2018/08/05/implementation-of-reservoir-sample-in-python/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">用Python写算法 | 蓄水池算法实现随机抽样</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2018/07/15/solving-kubernetes-dns-problem/">  
+        <span class="next-text nav-default">搭建Kubernetes集群时DNS无法解析问题的处理过程</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

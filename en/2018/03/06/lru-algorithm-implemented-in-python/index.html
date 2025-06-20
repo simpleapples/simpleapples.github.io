@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="面试不再怕，20行Python代码帮你搞懂LRU算法" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2018/03/06/lru-algorithm-implemented-in-python/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>面试不再怕，20行Python代码帮你搞懂LRU算法 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      面试不再怕，20行Python代码帮你搞懂LRU算法
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2018-03-07
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Python/">Python</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text">缓存是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LRU%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.</span> <span class="toc-text">LRU是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LRU%E7%9A%84%E6%B7%98%E6%B1%B0%E9%80%BB%E8%BE%91"><span class="toc-number">3.</span> <span class="toc-text">LRU的淘汰逻辑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#20%E8%A1%8CPython%E4%BB%A3%E7%A0%81%E5%AE%9E%E8%B7%B5LRU"><span class="toc-number">4.</span> <span class="toc-text">20行Python代码实践LRU</span></a></li></ol>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p><img src="/upload/20180306_01.png"></p>
+<p>LRU算法在后端工程师面试中，是一个比较常出现的题目，这篇文章带大家一起，理解LRU算法，并最终用Python轻松实现一个基于LRU算法的缓存。</p>
+<h2 id="缓存是什么"><a href="#缓存是什么" class="headerlink" title="缓存是什么"></a>缓存是什么</h2><p><img src="/upload/20180306_02.jpg"></p>
+<p>先看一张图，当我们访问网页，浏览器会给服务器发请求，服务器会经过一系列的运算，把页面返回给浏览器。</p>
+<p><img src="/upload/20180306_03.jpg"></p>
+<p>当有多个浏览器同时访问的时候，就会在短时间内发起多个请求，而服务器对每一个请求都要进行一系列相同的操作。重复工作不仅浪费资源，还可能导致响应速度变慢。</p>
+<p><img src="/upload/20180306_04.jpg"></p>
+<p>而缓存则可以把服务器返回的页面保存下来，当有其他的浏览器再访问时候，就不必劳服务器大驾，直接由缓存返回页面。为了保证响应速度，缓存通常是基于比较昂贵的硬件，比如RAM，这就决定了我们很难用大量的缓存把所有的页面都存下来，当恰好没有缓存浏览器请求的页面时，依然需要请求服务器。由于缓存容量有限，而数据量无限（互联网每天新产生的页面数无法估计），就需要把好刚用在刀刃上，缓存那些最有用的信息。</p>
+<h2 id="LRU是什么"><a href="#LRU是什么" class="headerlink" title="LRU是什么"></a>LRU是什么</h2><p>LRU是一种缓存淘汰算法（在OS中也叫内存换页算法），由于缓存空间是有限的，所以要淘汰缓存中不常用的数据，留下常用的数据，达到缓存效率的最大化。LRU就是这样一种决定“淘汰谁留下谁”的算法，LRU是Least recently used的缩写，从字面意思“最近最少使用”，我们就可以理解LRU的淘汰规则。</p>
+<h2 id="LRU的淘汰逻辑"><a href="#LRU的淘汰逻辑" class="headerlink" title="LRU的淘汰逻辑"></a>LRU的淘汰逻辑</h2><p><img src="/upload/20180306_05.png"></p>
+<p>我们用一张图来描述LRU的淘汰逻辑，图中的缓存是一个列表结构，上面是头结点下面是尾节点，缓存容量为8（8个小格子）：</p>
+<ul>
+<li>有新数据（意味着数据之前没有被缓存过）时，加入到列表头</li>
+<li>缓存到达最大容量时，需要淘汰数据多出来的数据，此时淘汰列表尾部的数据</li>
+<li>当缓存中有数据被命中，则将数据移动到列表头部（相当于新加入缓存）</li>
+</ul>
+<p>按上面的逻辑我们可以看到，一个数据如果经常被访问就会不断地被移动到列表头部，不会被淘汰出缓存，而越不经常访问的数据，越容易被挤出缓存。</p>
+<h2 id="20行Python代码实践LRU"><a href="#20行Python代码实践LRU" class="headerlink" title="20行Python代码实践LRU"></a>20行Python代码实践LRU</h2><p>接下来我们用Python来实现一个采用LRU算法的缓存。</p>
+<p>从前面的文章中我们可以知道，缓存简化下来就两个功能，一个是往里装数据（缓存数据），一个是往外吐数据（命中缓存），所以我们的缓存对外只需要put和get两个接口就可以了。</p>
+<p>按照前面的示意图，缓存内部我们只需要有一个列表（list）就可以实现LRU逻辑，不过用列表虽然能实现逻辑，但是在判断是否命中缓存时，速度可能非常慢（列表需要遍历才能知道数据有没有在里面）。在Python中，我们可以用基于hash的结构，比如字典（dict）或集合（set），来快速判断数据是否存在，解决列表实现的性能问题。但是字典和集合又是没有顺序的，如果能有一种既能排序，又是基于hash存储的数据结构，就好了。</p>
+<p>在Python的collections包中，已经内置了这种实用的结构OrderedDict，OrderedDict是dict的子类，但是存储在内部的元素是有序的（列表的特点）。</p>
+<p>解决了数据结构的问题，我们可以直接上手写逻辑了，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LRUCache</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, capacity</span>):</span><br><span class="line">        <span class="variable language_">self</span>.capacity = capacity</span><br><span class="line">        <span class="variable language_">self</span>.queue = collections.OrderedDict()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get</span>(<span class="params">self, key</span>):</span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> <span class="variable language_">self</span>.queue:</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span> // 要找的数据不在缓存中返回-<span class="number">1</span></span><br><span class="line">        value = <span class="variable language_">self</span>.queue.pop(key) // 将命中缓存的数据移除</span><br><span class="line">        <span class="variable language_">self</span>.queue[key] = value // 将命中缓存的数据重新添加到头部</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.queue[key]</span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">put</span>(<span class="params">self, key, value</span>):</span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> <span class="variable language_">self</span>.queue: // 如果已经在缓存中，则先移除老的数据</span><br><span class="line">            <span class="variable language_">self</span>.queue.pop(key)</span><br><span class="line">        <span class="keyword">elif</span> <span class="built_in">len</span>(<span class="variable language_">self</span>.queue.items()) == <span class="variable language_">self</span>.capacity:</span><br><span class="line">            <span class="variable language_">self</span>.queue.popitem(last=<span class="literal">False</span>) // 如果不在缓存中并且到达最大容量，则把最后的数据淘汰</span><br><span class="line">        <span class="variable language_">self</span>.queue[key] = value // 将新数据添加到头部</span><br></pre></td></tr></table></figure>
+
+<p>下次面试在遇到LRU的题目，是不是就胸有成竹了？</p>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2018/03/06/lru-algorithm-implemented-in-python/">http://www.simpleapples.com/2018/03/06/lru-algorithm-implemented-in-python/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2018/03/14/understanding-blockchain/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">最爱你的人，会让你不费脑细胞的理解区块链原理</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2018/03/03/60-lines-code-to-convert-pdf-to-word/">  
+        <span class="next-text nav-default">60行Python代码，实现多线程PDF转Word</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

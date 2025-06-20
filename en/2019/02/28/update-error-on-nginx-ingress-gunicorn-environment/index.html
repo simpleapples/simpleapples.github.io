@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      nginx + ingress + gunicorn 环境上传大文件报错问题的解决思路
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2019-02-28
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/DevOps/">DevOps</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E8%BF%87%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">文件上传过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-413-%E7%9A%84%E8%A7%A3%E5%86%B3"><span class="toc-number">2.</span> <span class="toc-text">错误 413 的解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-504-%E7%9A%84%E8%A7%A3%E5%86%B3"><span class="toc-number">3.</span> <span class="toc-text">错误 504 的解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-502-%E7%9A%84%E8%A7%A3%E5%86%B3"><span class="toc-number">4.</span> <span class="toc-text">错误 502 的解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="toc-number">5.</span> <span class="toc-text">参考文档</span></a></li></ol>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p><img src="/upload/20190228_01.jpeg"></p>
+<p>在基于 Kubernetes 部署，使用 Gunicorn 运行的 Python Web 应用中，上传大文件时出现了一系列的错误，现在将解决问题的思路记录如下。</p>
+<span id="more"></span> 
+
+<h3 id="文件上传过程"><a href="#文件上传过程" class="headerlink" title="文件上传过程"></a>文件上传过程</h3><p><img src="/upload/20190228_02.jpg"></p>
+<p>上传文件流程</p>
+<ol>
+<li>上传的文件首先到达 Kubernetes 所在的宿主机。</li>
+<li>宿主机上的 Nginx 通过 Proxy 转发给 Kubernetes 集群中的 Ingress Controller，Ingress controller 也是使用 Nginx 实现的。</li>
+<li>Ingress Controller 中的 Nginx 通过 Proxy 转发给 Gunicorn。</li>
+<li>Gunicorn 会启动若干个 Worker 处理请求，所以 Gunicorn 会再转发给 Worker。</li>
+<li>Worker 就是最终的 Python Web App</li>
+</ol>
+<h3 id="错误-413-的解决"><a href="#错误-413-的解决" class="headerlink" title="错误 413 的解决"></a>错误 413 的解决</h3><p>首先碰到的是 413 Request Entity Too Large 错误，在上传过程中连接被中断（基本上每次都是相同的上传百分比被中断），请求返回 413，首先考虑到 Nginx 对于请求体的大小有限制，查看 Nginx 文档，发现 client_max_body_size 参数控制请求体的大小，默认的设置是 1mb。</p>
+<blockquote>
+<p><strong>client_max_body_size:</strong> Sets the maximum allowed size of the client request body, specified in the “Content-Length” request header field. If the size in a request exceeds the configured value, the 413 (Request Entity Too Large) error is returned to the client. Please be aware that browsers cannot correctly display this error. Setting size to 0 disables checking of client request body size.</p>
+</blockquote>
+<p>首先在 Kubernetes 宿主机上 Nginx 的 http 域中加入如下配置。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">client_max_body_size</span> <span class="number">1024m</span>;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意，除了 Kubernetes 宿主机上跑的 Nginx，还要修改 Ingress Controller 中的 Nginx。Ingress Nginx 的修改方法在 Annotation 字段中加入如下配置。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;nginx.ingress.kubernetes.io/proxy-body-size&quot;:</span> <span class="string">&quot;1024m&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="错误-504-的解决"><a href="#错误-504-的解决" class="headerlink" title="错误 504 的解决"></a>错误 504 的解决</h3><p>再次尝试上传，发现接口依然会返回错误，这次是 504 Gateway Timeout，从 Chrome 的开发者工具中查看请求，发现上传至少要持续5分钟，接下来从 Nginx 的超时机制入手。</p>
+<p>在 Nginx 和 Ingress 中分别提高了读写的超时限制，将发送的超时设置为 600s，返回的超时设置为 30s。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_send_timeout</span> <span class="number">600s</span>;</span><br><span class="line"><span class="attribute">proxy_read_timeout</span> <span class="number">30s</span>;</span><br></pre></td></tr></table></figure>
+
+<p>再次尝试，发现依然报同样的错误 504，难道说还有别的超时字段需要设置？再次查看文档发现了端倪。</p>
+<blockquote>
+<p><strong>proxy_send_timeout:</strong> Sets a timeout for transmitting a request to the proxied server. The timeout is set only between two successive write operations, not for the transmission of the whole request. If the proxied server does not receive anything within this time, the connection is closed.</p>
+</blockquote>
+<blockquote>
+<p><strong>proxy_read_timeout:</strong> Defines a timeout for reading a response from the proxied server. The timeout is set only between two successive read operations, not for the transmission of the whole response. If the proxied server does not transmit anything within this time, the connection is closed.</p>
+</blockquote>
+<p>这里的 send 和 read，主语不是客户端，而是 Nginx 自己，超时的时候，是 Nginx 向 Upstream 发送了文件，而等到 Upstream 处理完返回时候，超过了 proxy_read_timeout 的限制，所以需要增加的是 read_timeout。</p>
+<p>将宿主机上的 Nginx 和 Ingress 分别做如下配置。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_send_timeout</span> <span class="number">30s</span>;</span><br><span class="line"><span class="attribute">proxy_read_timeout</span> <span class="number">600s</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">nginx.ingress.kubernetes.io/proxy-send-timeout:</span> <span class="string">30s</span></span><br><span class="line"><span class="attr">nginx.ingress.kubernetes.io/proxy-read-timeout:</span> <span class="string">600s</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="错误-502-的解决"><a href="#错误-502-的解决" class="headerlink" title="错误 502 的解决"></a>错误 502 的解决</h3><p>修改好了超时和上传文件大小的限制后，又出现了新的错误 502 Bad Gateway，这次就没有头绪了，由于是新的报错，上面的修改应该是生效了的，并且也不是上面两个限制导致的，通过查询 Nginx 和 Ingress 的日志，发现 Ingress 中有这样的报错。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2019/02/27 07:18:36 [error] 4265#4265: *19932411 upstream prematurely closed connection while reading response header from upstream, client: 172.20.0.1, server: example.com, request: &quot;POST /upload HTTP/1.0&quot;, upstream: &quot;http://172.0.0.1/upload&quot;, host: &quot;example.com&quot;, referrer: &quot;http://example.com/&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这就比较奇怪了，刚才已经修改了超时，为什么 Ingress 还会有超时的报错呢？从日志上看，可能是 Ingress 的 Upstream 超时了，也就是 Gunicorn，Stackoverflow 上有人遇到了类似的问题，答案是给 Gunicorn 设置 -t 参数。查看 Gunicorn 的文档，timeout 参数是这么定义的。</p>
+<blockquote>
+<p><strong>timeout:</strong> Workers silent for more than this many seconds are killed and restarted.<br>Generally set to thirty seconds. Only set this noticeably higher if you’re sure of the repercussions for sync workers. For the non sync workers it just means that the worker process is still communicating and is not tied to the length of time required to handle a single request.</p>
+</blockquote>
+<p>也就是说，当某一个 Worker 处理文件上传请求时候，如果在默认的超时时间内没有响应 Master，就会被杀掉，这也不难理解为什么 Ingress 从 Upstream 获取返回值时候连接会被关闭了。修改 Gunicorn 的配置，将超时时间设置为 600s，重新上传，问题解决。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_read_timeout">Module ngx_http_proxy_module</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md">Ingress-Nginx Annotations</a></p>
+<p><a target="_blank" rel="noopener" href="http://docs.gunicorn.org/en/0.17.2/configure.html">Gunicorn Configuration</a></p>
+<p><a target="_blank" rel="noopener" href="http://docs.gunicorn.org/en/stable/signals.html">Gunicorn Signals</a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/48046379/nginx-gunicorn-502-bad-gateway-upstream-prematurely-closed-connection-while-rea?rq=1">nginx gunicorn 502 bad gateway: upstream prematurely closed connection while reading response header from upstream</a></p>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/">http://www.simpleapples.com/2019/02/28/update-error-on-nginx-ingress-gunicorn-environment/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2019/03/26/solution-to-problem-of-jwt-token-invalidation/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">JWT 避坑指南：nbf 验签失效问题的解决</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2019/01/25/practice-on-python-logging/">  
+        <span class="next-text nav-default">Python 日志库 logging 的理解和实践经验</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

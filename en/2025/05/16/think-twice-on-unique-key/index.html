@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="唯一索引这玩意儿，真得好好掂量掂量" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2025/05/16/think-twice-on-unique-key/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>唯一索引这玩意儿，真得好好掂量掂量 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      唯一索引这玩意儿，真得好好掂量掂量
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2025-05-16
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Tech/">Tech</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81-%E4%B8%BA%E5%95%A5%E6%88%91%E5%BC%80%E5%A7%8B%E7%90%A2%E7%A3%A8%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E8%BF%99%E4%BA%8B%E5%84%BF%EF%BC%9F%E5%9B%A0%E4%B8%BA%E5%9D%91%E8%B8%A9%E4%BA%86"><span class="toc-number">1.</span> <span class="toc-text">一、 为啥我开始琢磨唯一索引这事儿？因为坑踩了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81-UNIQUE-INDEX%EF%BC%9A%E6%88%91%E4%BB%AC%E4%B8%BA%E5%95%A5%E9%82%A3%E4%B9%88%E4%BF%A1%E5%AE%83%EF%BC%9F"><span class="toc-number">2.</span> <span class="toc-text">二、 UNIQUE INDEX：我们为啥那么信它？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81-%E5%A4%A7%E5%8E%82%E6%BB%A4%E9%95%9C%E4%B8%8B%E7%9A%84UNIQUE-INDEX%EF%BC%9A%E9%82%A3%E4%BA%9B%E2%80%9C%E5%A5%BD%E5%A4%84%E2%80%9D%E8%BF%98%E5%A5%BD%E4%BD%BF%E5%90%97%EF%BC%9F"><span class="toc-number">3.</span> <span class="toc-text">三、 大厂滤镜下的UNIQUE INDEX：那些“好处”还好使吗？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81-%E6%8A%8A%E6%B4%BB%E5%84%BF%E4%BA%A4%E7%BB%99%E5%BA%94%E7%94%A8%E5%B1%82%EF%BC%8C%E4%B8%93%E4%B8%9A%EF%BC%81"><span class="toc-number">4.</span> <span class="toc-text">四、 把活儿交给应用层，专业！</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number"></span> <span class="toc-text">总结</span></a>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p>在大厂（就是那种用户多、数据量大、需求快速迭代的地方），如果不是对账那种一分钱不能错的业务，想着靠数据库的 <code>UNIQUE INDEX</code>（唯一索引）来拦重复数据，说实话，效果不一定好，伺候它的成本还很高。更好的办法是把去重的主要活儿放应用层，数据库那个唯一索引，能不用就先别用，或者想清楚了再用。</p>
+<hr>
+<h2 id="一、-为啥我开始琢磨唯一索引这事儿？因为坑踩了"><a href="#一、-为啥我开始琢磨唯一索引这事儿？因为坑踩了" class="headerlink" title="一、 为啥我开始琢磨唯一索引这事儿？因为坑踩了"></a>一、 为啥我开始琢磨唯一索引这事儿？因为坑踩了</h2><p>数据库唯一索引，听着挺靠谱，对吧？保证数据不重复的最后一道防线。以前我也是这么想的，表里哪个字段不让重，随手就给它来个唯一索引。</p>
+<p>直到被现实狠狠摩擦了。</p>
+<p>很久之前，当我头发还很茂密的时候，给一个千万级的表加个组合唯一索引（比如 <code>tenant_id</code> 和 <code>is_deleted</code> 这俩字段不能重复）。听着简单吧？结果呢，整个变更从头到尾折腾了几天！这期间，主从延迟跟过山车似的，时不时还得担心线上服务会不会抖一下。事儿完了我在想，就为了数据库层面这个“唯一”，搭进去这么多工夫、担这么大风险，值吗？</p>
+<p>还有个事儿也挺别扭。 业务上，我们都知道 <code>+44-07123456789</code> 和 <code>44-07123456789</code> 以及 <code>+4407123456789</code> 其实是一个手机号，你注册的时候，应用代码肯定也会把它们统一处理成小写再判断有没有重复。结果呢，数据库里的唯一索引不认这个账。有时候因为一些历史数据或者旁路数据同步没做好规范化，数据库里就存了两种大小写格式的“同一个”手机号。这时候，唯一索引它要么“眼瞎”发现不了这种业务上的重复，要么在你修数据的时候，因为它那死板的规矩，反而碍手碍脚。</p>
+<p>更别提业务迭代了。 比如，以前光是“手机号唯一”就行，现在要改成“租户 ID+手机号唯一”。好家伙，应用代码得改吧？数据库的唯一索引也得跟着 <code>DROP</code> 旧的 <code>CREATE</code> 新的吧？这两拨操作怎么配合？谁先谁后？万一中间出岔子怎么办？在大表上搞这种操作，每次都跟拆炸弹似的，提心吊胆。</p>
+<p>就这些事儿搞得我不得不琢磨：数据量大、并发高、需求又变得快，唯一索引这一套，是不是该重新掂量掂量了？它带来的麻烦，是不是已经比它的好处多了？</p>
+<p>这篇文章，就是想跟大家伙儿聊聊我的反思。</p>
+<hr>
+<h2 id="二、-UNIQUE-INDEX：我们为啥那么信它？"><a href="#二、-UNIQUE-INDEX：我们为啥那么信它？" class="headerlink" title="二、 UNIQUE INDEX：我们为啥那么信它？"></a>二、 <code>UNIQUE INDEX</code>：我们为啥那么信它？</h2><p>在吐槽之前，咱也得公平点，说说唯一索引为啥那么招人待见，它确实有几个看上去不错的点：</p>
+<ol>
+<li><strong>数据不跑偏的最后保险：</strong> 防止数据重复的最后一道关卡。</li>
+<li><strong>上手简单：</strong> 建表的时候或者后来加个 DDL，几行 SQL 就搞定了。</li>
+<li><strong>表结构一看就懂：</strong> Schema 里标着呢，这字段不能重。</li>
+<li><strong>顺便还能快点查：</strong> 反正也是个索引，按这个键查数据能快点。</li>
+</ol>
+<p>这些好处，在小项目或者数据量不大、业务不复杂的时候，确实挺香。但一到大数据量+快速迭代“修罗场”，情况就变了。</p>
+<hr>
+<h2 id="三、-大厂滤镜下的UNIQUE-INDEX：那些“好处”还好使吗？"><a href="#三、-大厂滤镜下的UNIQUE-INDEX：那些“好处”还好使吗？" class="headerlink" title="三、 大厂滤镜下的UNIQUE INDEX：那些“好处”还好使吗？"></a>三、 大厂滤镜下的<code>UNIQUE INDEX</code>：那些“好处”还好使吗？</h2><p>接下来咱们挨个盘盘上面说的那些“好处”，看看在大厂这环境下，它们是不是还那么“美”。</p>
+<ul>
+<li><p><strong>“最后保险”？这保险靠谱吗？保的是啥险？</strong></p>
+<p>业务上的“重复”它认不全啊！就像前面说的邮箱大小写，还有手机号带不带<code>+86</code>，用户名清不清除特殊字符……这些业务上才认的“一样”，数据库那简单粗暴的“字节必须一样”的唯一索引根本管不过来。它防不住业务层面的“逻辑重复”。</p>
+<p>应用层反正要干活。 既然这些复杂的“一样不一样”都得在应用代码里判断（总不能直接把数据库报错丢给用户吧？），那应用层才是真正保证“业务数据不重复”的主力军。数据库那个唯一索引，充其量是个标准可能还跟业务不一致的“辅警”。</p>
+<p>分布式系统里它就是个“本地保镖”。在分布式场景下一旦分表，表内的唯一索引，管不了全局唯一性。全局唯一还得靠 ID 生成服务或者应用层的全局校验。这时候，数据库本地那点“保险”作用就更小了。</p>
+<p>这个“最后保险”既可能保不到点子上，覆盖面也有限，全指望它优点悬。</p>
+</li>
+<li><p><strong>“上手简单”？一次上线，一周折腾</strong></p>
+<p>新表新加个唯一索引，确实就一条 SQL。但更多的时候是给已经跑了好久、数据堆成山的旧表改规则。你想给千万行的表改个唯一索引（比如从一个字段唯一改成俩字段组合唯一），可能就是几分钟的锁表！在线 DDL 工具，也只是让你不用停服务，但整个过程照样漫长、耗资源、有风险。</p>
+<p>敏捷？快不起来啊！在快速迭代+多区域同步+合规要求的场景下。数据库这儿一个唯一索引的变更就要卡你好几天，啥敏捷都白搭。</p>
+<p>所以开始那一下“简单”，跟后来改起来的“要老命”比，简直是钓鱼。</p>
+</li>
+<li><p><strong>“表结构一看就懂”？懂的可能跟实际要的不一样啊！</strong></p>
+<p>唯一索引在表结构里写着，是，算是一种“技术文档”。可是“文档”可能误导人，如果这个唯一索引定义的“唯一”跟业务上实际的、更复杂的唯一规则对不上（比如大小写问题），那这份“文档”不光没用，还可能误导后来的开发。 如果改这份“文档”（就是改唯一索引）就要经历九九八十一难，那我们为啥不把业务规则好好写在真正的设计文档、Wiki 或者代码注释里呢？那些地方改起来可方便多了。</p>
+</li>
+<li><p><strong>“顺便还能快点查”？为了这点醋，才包的这顿饺子？</strong></p>
+<p>这是个很常见的误解，或者说是一个被过分强调的“附加值”。如果你只是想让某个字段或某几个字段的查询快一点，你完全可以给它们建一个普普通通的、非唯一的索引（Non-Unique Index）啊！非唯一索引照样能嗖嗖地提高查询速度，而且它还没有唯一性约束带来的那些写入开销、DDL 痛苦和业务逻辑的死板限制。</p>
+</li>
+<li><p><strong>主从索引不一致，复制立马“瘫痪”：</strong></p>
+<p>我见过好几次，主库的唯一索引配置更新了（比如加了个字段，或者改了约束），从库的索引没同步改。那主库那边数据一有变化（比如插了条在从库看来会重复的数据，或者主库能写进去但在从库因为有那个错误的&#x2F;未更新的索引而写不进去），binlog 传到从库，咣当一下，<code>Slave_SQL_Running: No</code>，复制直接挂掉！这种事儿一出，数据延迟，读写分离受影响，甚至影响故障切换，你说闹不闹心？</p>
+</li>
+</ul>
+<hr>
+<h2 id="四、-把活儿交给应用层，专业！"><a href="#四、-把活儿交给应用层，专业！" class="headerlink" title="四、 把活儿交给应用层，专业！"></a>四、 把活儿交给应用层，专业！</h2><p>既然数据库唯一索引这么多毛病，数据唯一性这事儿，主要还得靠咱应用层自己来扛。</p>
+<p>应用层搞唯一性的好处，那可太多了：</p>
+<ul>
+<li><strong>灵活、精准：</strong> 业务说啥样算重，咱就按啥样写逻辑，大小写、格式化、各种复杂条件，想咋玩咋玩。</li>
+<li><strong>用户体验好：</strong> 用户输错了，咱能给出明确提示，比如“这手机号注册过了，要不要直接登录？” 而不是冷冰冰的数据库错误。</li>
+<li><strong>效率高，先拦住：</strong> 在数据还没到数据库呢，在服务接口那层甚至网关层就给它拦下来，省得白跑一趟数据库。</li>
+<li><strong>接口幂等性：</strong> 这是防止重复操作的大杀器。用户手抖点了两下提交，网络不好重试了一下，应用层做好幂等，数据就不会重。这事儿唯一索引可管不了。</li>
+</ul>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>只有当唯一索引带来的那点好处（通常是极端情况下的数据兜底），明确地、大大地超过它在大数据量+快速迭代的复杂环境里带来的各种麻烦（影响敏捷、运维痛苦）时，再考虑用它。优先把应用层的唯一性保障机制（前置校验、异步处理、幂等性、全局 ID 等等）做扎实。数据库那个唯一索引，能省则省，实在要用，也得想清楚了，当成个“特殊工具”来对待，别当成“标配”。</p>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2025/05/16/think-twice-on-unique-key/">http://www.simpleapples.com/2025/05/16/think-twice-on-unique-key/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2025/05/22/think-twice-on-unique-key_eng/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default"></span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2022/09/20/yang-le-ge-yang-crack/">  
+        <span class="next-text nav-default">羊了个羊科技通关攻略</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

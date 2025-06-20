@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="MagicSearch" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2012/12/01/magic-search/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>MagicSearch - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      MagicSearch
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2012-12-01
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Idea-Demo/">Idea&amp;Demo</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#update1"><span class="toc-number">1.</span> <span class="toc-text">update1:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#update2"><span class="toc-number">2.</span> <span class="toc-text">update2:</span></a></li></ol>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p>晚上看到一个OSX上的应用，叫<a target="_blank" rel="noopener" href="http://www.alfredapp.com/">Alfred</a>，是一个类似spotlight的工具，但比spotlight要强大很多。<br>不仅可以在里面搜本地程序，而且在搜索的内容前加“&gt;”就可以输命令，可以直接输入算式，也可以自定义搜索引擎，采用诸如“google 你好世界”的方式搜索。<br>突发奇想，是不是用Javascript也可以实现？<br>于是，首先实现了多搜索引擎集成的功能。<br>不想用以前那种下拉菜单的形式，想用自动补全的形式，着实忙活了好长时间，算是把功能做出来了。<br>例如，输入“douban 平凡的世界”就可以在豆瓣搜索“平凡的世界”，输入“weibo 前端”就可以搜索“前端”相关的微博。<br>还可以输入“t”+回车，然后再输入关键字，就可以搜索淘宝了。<br>目前只加入了简单的几个搜索工具（因为帮我设计界面的AlisterTT同学只给我了这几个图标&#x3D; &#x3D;!）：<br>微博、google、豆瓣、淘宝、亚马逊。<br>我给他起了个响亮的名字，MagicSearch，将来如果能做到手机客户端上当然更好了，应该会很有用。<br>还有很多东西和细节有待修改。而且计算器的功能也没有加进去，电脑快没电了，只能等到明天了。<br>先放个截图：</p>
+<p><img src="/upload/magicsearch1.png" alt="Alt text"></p>
+<p>对了，还有演示地址（初步版本，轻拍）：<br><a target="_blank" rel="noopener" href="http://labs.simpleapples.com/magicsearch">http://labs.simpleapples.com/magicsearch</a></p>
+<h3 id="update1"><a href="#update1" class="headerlink" title="update1:"></a>update1:</h3><p>昨天晚上犯懒，没有把搜索引擎的图标和到一张图上，导致输入amazon等搜索引擎名字敲回车之后，右边的图标因为网速没有出来，现在和到一张上了。<br>另外放出github地址：<br><a target="_blank" rel="noopener" href="http://github.com/simpleapples/magicsearch">http://github.com/simpleapples/magicsearch</a></p>
+<p>至于进入其它搜索引擎之后如何不能返回默认的google搜索的时候，只要点击右边的搜索引擎图标就可以了。</p>
+<h3 id="update2"><a href="#update2" class="headerlink" title="update2:"></a>update2:</h3><p>添加字典、发电子邮件和计算四则运算功能。<br>字典功能：输入dict 加上要查的单词或词。<br>发电子邮件功能：输入mail 加上电子邮件地址。<br>四则运算功能：直接输入算式，见图。</p>
+<p><img src="/upload/magicsearch2.png" alt="Alt text"></p>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2012/12/01/magic-search/">http://www.simpleapples.com/2012/12/01/magic-search/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2012/12/02/some-research-about-new-operator-in-javascript/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">Javascript中new操作符的探究</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2012/11/22/load-swf-in-flash-and-play-frame-by-frame/">  
+        <span class="next-text nav-default">在Flash中载入swf文件并逐帧播放</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

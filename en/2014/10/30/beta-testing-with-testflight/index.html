@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="使用TestFlight进行应用的Beta测试" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2014/10/30/beta-testing-with-testflight/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>使用TestFlight进行应用的Beta测试 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      使用TestFlight进行应用的Beta测试
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2014-10-30
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Mobile/">Mobile</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+
+  <div class="post-content">
+    
+    <p>TestFlight已经被Apple集成到iTunes Connect中，现在使用TestFlight可以很方便的进行应用的Beta测试。下面就来介绍一下如何使用TestFlight进行测试，已经其中的一些小问题。</p>
+<p>首先需要在iTunes Connect中启用TestFlight，可以针对每个App的某一版本，决定是否启用TestFlight。进入iTunes Connect -&gt; My Apps -&gt; 某个App -&gt; Prerelease，在上传的Build右上角，打开TestFlight的开关，接下来就针对这个版本启动了TestFlight。</p>
+<p><img src="/upload/testflight-1.png" alt="图1"></p>
+<p>有了可以测试的应用，接下来还要有测试用户，TestFlight测试用户有两种，一种是内测用户InternalTester，最多25个，一种是公测用户ExternalTester，最多1000个，内测用户需要首先成为iTunes Connect User，而公测用户只需要知道他的Apple Id就可。要进行公测需要先经过Apple Review团队的审核。我们以添加一个内测用户为例，进入iTunes Connect -&gt; Users and Roles -&gt; iTunes Connect Users，首先添加一个iTunes Connect User，之所以要添加iTunes Connect User，是因为TestFlight的测试用户必须是一个iTunes Connect User，并且这个用户的角色必须是Admin或者Technical。添加后，用户的邮箱里会收到一封邀请邮件，点击邮件中的链接可以激活成为iTunes Connect User。进入iTunes Connect -&gt; Users and Roles -&gt; TestFlight Beta Testers，激活的iTunes Connect User会出现在这里，选中点击右上角的保存，这个用户就成为一个内测用户了。</p>
+<p><img src="/upload/testflight-2.png" alt="图2"></p>
+<p>有了内测用户和测试App，下一步就要将两者关联了，进入iTunes Connect -&gt; My Apps -&gt; 某个App -&gt; Prerelease -&gt; Internal Testers中，这里会显示可用的内测用户，勾选用户并点击右上角的Invite，Apple就会给这个邮箱发送一封邀请邮件。接下来需要在要测试的手机上安装TestFlight，安装好后，TestFlight会自动绑定当前手机的Apple Id登录，这里你会发现TestFlight里并没有出现测试App，经过测试，*必须要在iOS的自带邮件客户端上点击邀请邮件中的链接，才会跳转到TestFlight中安装应用。*这是TestFlight让人非常不爽的一点。你可以将收到的邀请邮件转发到自带的邮件客户端所绑定的邮箱上，让后在自带邮件客户端中点击邀请链接打开TestFlight。</p>
+<p><img src="/upload/testflight-3.png" alt="图3"></p>
+<p>点击链接后会自动跳转到TestFlight中，点击Install安装应用，再次进入TestFlight中就可以看到已安装的测试应用了。</p>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2014/10/30/beta-testing-with-testflight/">http://www.simpleapples.com/2014/10/30/beta-testing-with-testflight/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2015/03/13/pushing-whitin-viewdidappear-does-not-work/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">在viewDidAppear中PushViewController失败的问题</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2014/10/25/launchsreen-and-launchimage/">  
+        <span class="next-text nav-default">iOS8中LaunchImage和LaunchScreen的完美结合</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

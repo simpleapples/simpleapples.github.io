@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="15行Python代码，帮你理解令牌桶算法" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/en/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>15行Python代码，帮你理解令牌桶算法 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        Home              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        About              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              Home  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              About  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      15行Python代码，帮你理解令牌桶算法
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2018-03-20
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Python/">Python</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BB%A4%E7%89%8C"><span class="toc-number">1.</span> <span class="toc-text">什么是令牌</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8%E4%BB%A4%E7%89%8C%E5%AE%9E%E7%8E%B0%E9%99%90%E9%80%9F%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">用令牌实现限速器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%94%B9%E8%BF%9B%E9%99%90%E9%80%9F%E5%99%A8%E2%80%94%E2%80%94%E5%8A%A0%E4%B8%AA%E6%A1%B6"><span class="toc-number">3.</span> <span class="toc-text">改进限速器——加个桶</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#15%E8%A1%8CPython%E4%BB%A3%E7%A0%81%E5%AE%9E%E8%B7%B5%E4%BB%A4%E7%89%8C%E6%A1%B6"><span class="toc-number">4.</span> <span class="toc-text">15行Python代码实践令牌桶</span></a></li></ol>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p><img src="/upload/20180320_01.jpg"></p>
+<p>在网络中传输数据时，为了防止网络拥塞，需限制流出网络的流量，使流量以比较均匀的速度向外发送，令牌桶算法就实现了这个功能，<strong>可控制发送到网络上数据的数目，并允许突发数据的发送。</strong></p>
+<h1 id="什么是令牌"><a href="#什么是令牌" class="headerlink" title="什么是令牌"></a>什么是令牌</h1><p>从名字上看令牌桶，大概就是一个装有令牌的桶吧，那么什么是令牌呢？</p>
+<p>紫薇格格拿的令箭，可以发号施令，令行禁止。在计算机的世界中，令牌也有令行禁止的意思，有令牌，则相当于得到了进行操作的授权，没有令牌，就什么都不能做。</p>
+<h1 id="用令牌实现限速器"><a href="#用令牌实现限速器" class="headerlink" title="用令牌实现限速器"></a>用令牌实现限速器</h1><p>我们用1块令牌来代表发送1字节数据的资格，假设我们源源不断的发放令牌给程序，程序就有资格源源不断的发送数据，当我们不发放令牌给程序，程序就相当于被限流，无法发送数据了。接下来我们说说限速器，所谓限速器，就是让程序在单位时间内，最多只能发送一定大小的数据。假设在1秒发放10块令牌，那么程序发送数据的速度就会被限制在10bytes&#x2F;s。如果1秒内有大于10bytes的数据需要发送，就会因为没有令牌而被丢弃。</p>
+<h1 id="改进限速器——加个桶"><a href="#改进限速器——加个桶" class="headerlink" title="改进限速器——加个桶"></a>改进限速器——加个桶</h1><p><img src="/upload/20180320_02.jpg"></p>
+<p>我们实现的限速器，速度是恒定的，但是在实际的应用中，往往会有突发的传输需求（需要更快速的发送，但是不会持续太久，也不会引起网络拥塞），这种数据碰上我们的限速器，就因为拿不到令牌而无法发送。</p>
+<p>对限速器进行一下改动，依然1秒产生10块令牌，但是我们把产生出来的令牌先放到一个桶里，当程序需要发送的时候，从桶里取令牌，不需要的时候，令牌就会在桶里沉淀下来，假设桶里沉淀了10块令牌，程序最多就可以在1秒内发送20bytes的数据，满足了突发数据传输的要求，并且由于桶里的令牌被用完，下一秒最多依然只能发10bytes的数据，不会因为持续发送大量数据，对网络造成压力。</p>
+<p><img src="/upload/20180320_03.jpg"></p>
+<h1 id="15行Python代码实践令牌桶"><a href="#15行Python代码实践令牌桶" class="headerlink" title="15行Python代码实践令牌桶"></a>15行Python代码实践令牌桶</h1><p>令牌桶需要以一定的速度生成令牌放入桶中，当程序要发送数据时，再从桶中取出令牌。这里似乎有点问题，如果我们使用一个死循环，来不停地发放令牌，程序就被阻塞住了，有没有更好的办法？</p>
+<p>我们可以在取令牌的时候，用现在的时间减去上次取令牌的时间，乘以令牌的发放速度，计算出桶里可以取的令牌数量（当然不能超过桶的大小），从而避免循环发放的逻辑。</p>
+<p>接下来看代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TokenBucket</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line"></span><br><span class="line">    <span class="comment"># rate是令牌发放速度，capacity是桶的大小</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, rate, capacity</span>):</span><br><span class="line">        <span class="variable language_">self</span>._rate = rate</span><br><span class="line">        <span class="variable language_">self</span>._capacity = capacity</span><br><span class="line">        <span class="variable language_">self</span>._current_amount = <span class="number">0</span></span><br><span class="line">        <span class="variable language_">self</span>._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># token_amount是发送数据需要的令牌数</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">consume</span>(<span class="params">self, token_amount</span>):</span><br><span class="line">        increment = (<span class="built_in">int</span>(time.time()) - <span class="variable language_">self</span>._last_consume_time) * <span class="variable language_">self</span>._rate  <span class="comment"># 计算从上次发送到这次发送，新发放的令牌数量</span></span><br><span class="line">        <span class="variable language_">self</span>._current_amount = <span class="built_in">min</span>(</span><br><span class="line">            increment + <span class="variable language_">self</span>._current_amount, <span class="variable language_">self</span>._capacity)  <span class="comment"># 令牌数量不能超过桶的容量</span></span><br><span class="line">        <span class="keyword">if</span> token_amount &gt; <span class="variable language_">self</span>._current_amount:  <span class="comment"># 如果没有足够的令牌，则不能发送数据</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="variable language_">self</span>._last_consume_time = <span class="built_in">int</span>(time.time())</span><br><span class="line">        <span class="variable language_">self</span>._current_amount -= token_amount</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>Author: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>Link: </span>
+    <a href="http://www.simpleapples.com/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/">http://www.simpleapples.com/2018/03/20/implementation-of-the-token-bucket-algorithm-in-python/</a>
+  </p>
+  <p class="copyright-item">
+    <span>License: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/2018/03/26/extract-lockscreen-wallpapers-in-win10/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">用Python批量提取Win10锁屏壁纸</span>  
+        <span class="prev-text nav-mobile">Prev</span>  
+      </a>  
+      
+      
+      <a class="next" href="/2018/03/14/understanding-blockchain/">  
+        <span class="next-text nav-default">最爱你的人，会让你不费脑细胞的理解区块链原理</span>  
+        <span class="prev-text nav-mobile">Next</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>
