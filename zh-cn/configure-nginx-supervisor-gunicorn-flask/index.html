@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en,default">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/zh-cn/configure-nginx-supervisor-gunicorn-flask/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        首页              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        关于              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              首页  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              关于  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2015-06-11
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Python/">Python</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AECentos7"><span class="toc-number">1.</span> <span class="toc-text">配置Centos7</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AENginx"><span class="toc-number">2.</span> <span class="toc-text">配置Nginx</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85Python"><span class="toc-number">3.</span> <span class="toc-text">安装Python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AEGunicorn"><span class="toc-number">4.</span> <span class="toc-text">安装配置Gunicorn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AESupervisor"><span class="toc-number">5.</span> <span class="toc-text">安装配置Supervisor</span></a></li></ol>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p>需要在阿里云的CentOS7中搭建Flask应用的生产环境，记录一下。</p>
+<h2 id="配置Centos7"><a href="#配置Centos7" class="headerlink" title="配置Centos7"></a>配置Centos7</h2><p>root登录后，首先新建一个普通用户并设置密码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser user</span><br><span class="line">passwd user</span><br></pre></td></tr></table></figure>
+
+<p>接下来将用户的公钥复制到~&#x2F;.ssh中，命名为authorised_keys，修改&#x2F;etc&#x2F;ssh&#x2F;sshd_config禁用ssh中的root登录，修改默认ssh端口，并使用证书登陆，修改如下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Port 65535</span><br><span class="line">PasswordAuthentication no</span><br><span class="line">PermitRootLogin no</span><br></pre></td></tr></table></figure>
+
+<p>配置完成后重启ssh服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart sshd.service</span><br></pre></td></tr></table></figure>
+
+<p>CentOS7中用firewalld替换了iptables，需要手动将80端口和修改后的ssh端口添加到firewalld中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">firewalld --add-port 80/tcp --permanent</span><br><span class="line">firewalld --add-port 65535/tcp --permanent</span><br><span class="line">firewalld --reload</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h2><p>yum中可以直接安装nginx</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install nginx</span><br></pre></td></tr></table></figure>
+
+<p>安装好后在&#x2F;etc&#x2F;nginx&#x2F;default.d中添加location的配置，并指向8001端口，以后Flask会监听8001端口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">	proxy_pass http://127.0.0.1:8001</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置好后重新载入nginx配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl reload nginx.service</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装Python"><a href="#安装Python" class="headerlink" title="安装Python"></a>安装Python</h2><p>CentOS自带Python2.7，如果使用Python3，需要单独安装。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz</span><br><span class="line">tar xf Python-3.4.3.tgz</span><br><span class="line">cd Python-3.4.3</span><br><span class="line">./configure --prefix=/usr/local --enable-shared</span><br><span class="line">make</span><br><span class="line">make altinstall</span><br></pre></td></tr></table></figure>
+
+<p>接下来在项目中搭建虚拟环境，Python2虚拟环境使用virtualenv安装（使用pip install virtualenv命令安装），Python3环境使用pyvenv安装（Python3自带pyvenv），以Python3环境为例，在Web项目中，建立虚拟环境文件夹venv</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pyvenv venv</span><br></pre></td></tr></table></figure>
+
+<p>接下来在项目路径下启用虚拟环境</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source venv/bin/active</span><br></pre></td></tr></table></figure>
+
+<p>退出虚拟环境使用Ctrl+C或deactive命令</p>
+<h2 id="安装配置Gunicorn"><a href="#安装配置Gunicorn" class="headerlink" title="安装配置Gunicorn"></a>安装配置Gunicorn</h2><p>Gunicorn使用pip install gunicorn安装，注意需要在虚拟环境中使用pip安装，这样才对应虚拟环境中的Python版本。安装好后，新建一个Gunicorn的配置文件，比如deploy_config.py，加入内容如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">bind=&#x27;127.0.0.1:8001&#x27; #绑定的端口</span><br><span class="line">workers=4	#worker数量</span><br><span class="line">backlog=2048</span><br><span class="line">debug=True</span><br><span class="line">proc_name=&#x27;gunicorn.pid&#x27;</span><br><span class="line">pidfile=&#x27;/var/log/gunicorn/debug.log&#x27;</span><br><span class="line">loglevel=&#x27;debug&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>保存文件后在虚拟环境中使用Gunicorn尝试启动</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gunicorn -c deploy_config.py myapp:app</span><br></pre></td></tr></table></figure>
+
+<p>myapp是入口Python文件名，app是函数名。如果输出worker相关信息，表明启动成功。</p>
+<h2 id="安装配置Supervisor"><a href="#安装配置Supervisor" class="headerlink" title="安装配置Supervisor"></a>安装配置Supervisor</h2><p>yum可以直接安装Supervisor，需要注意的是Supervisor只支持Python2，所以不要在虚拟环境中使用pip安装supervisor。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install supervisor</span><br></pre></td></tr></table></figure>
+
+<p>安装后，在&#x2F;etc&#x2F;supervisord.d中建立配置文件xxx.ini，内容如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[program:xxx]</span><br><span class="line">command=/var/proj/xxx/venv/bin/python /usr/bin/gunicorn -c /var/proj/xxx/deploy_config.py myapp:app</span><br><span class="line">autorstart=true</span><br><span class="line">directory=/var/proj/xxx</span><br><span class="line">autorestart=true</span><br><span class="line">startsecs=10</span><br><span class="line">startretries=20</span><br></pre></td></tr></table></figure>
+
+<p>xxx是项目名称，注意command中最好都写全路径，以区别系统环境和项目虚拟环境。完成后启动supervisord，使配置生效</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisord -c /etc/supervisord.conf</span><br></pre></td></tr></table></figure>
+
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>原文作者: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>原文链接: </span>
+    <a href="http://www.simpleapples.com/zh-cn/configure-nginx-supervisor-gunicorn-flask/">http://www.simpleapples.com/zh-cn/configure-nginx-supervisor-gunicorn-flask/</a>
+  </p>
+  <p class="copyright-item">
+    <span>许可协议: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/zh-cn/snake-crack/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">「贪吃蛇大作战」的刷分尝试</span>  
+        <span class="prev-text nav-mobile">上一篇</span>  
+      </a>  
+      
+      
+      <a class="next" href="/zh-cn/pushing-whitin-viewdidappear-does-not-work/">  
+        <span class="next-text nav-default">在viewDidAppear中PushViewController失败的问题</span>  
+        <span class="prev-text nav-mobile">下一篇</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>

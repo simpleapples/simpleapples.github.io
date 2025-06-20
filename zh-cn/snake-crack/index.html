@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en,default">
+
+<head>
+  <!-- Website mata -->
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<!-- Disable transformation -->
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<!-- Website description -->
+
+<meta name="description" content="「贪吃蛇大作战」的刷分尝试" />
+
+
+<!-- Website keywords -->
+
+
+
+
+<!-- Website rss -->
+
+<link rel="alternate" href="/atom.xml" title="simpleapples" type="application/atom+xml">
+
+
+<!-- Website favicon -->
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3.0.0" />
+
+
+<!-- Canonical, good for google search engine -->
+<link rel="canonical" href="http://www.simpleapples.com/zh-cn/snake-crack/" />
+
+<!-- Fancybox styling -->
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+
+
+<!-- MathJax (LaTeX) support -->
+
+
+<!-- Theme styling -->
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=3.0.0" />
+
+<!-- Analytics and push -->
+
+
+
+  
+
+
+
+<!-- LeanCloud Counter -->
+
+
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null,"server_url":null,"cdn":null},"toc":true,"fancybox":true,"latex":false};
+</script>
+  
+  <title>「贪吃蛇大作战」的刷分尝试 - simpleapples</title>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div class="scrollPercentage"></div>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">simpleapples</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+    <a href="/">
+      <li class="mobile-menu-item">
+        
+        
+        首页              </li>
+    </a>
+    
+    <a href="/about/">
+      <li class="mobile-menu-item">
+        
+        
+        关于              </li>
+    </a>
+    
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+      <div class="logo-wrapper">  
+  <a href="/." class="logo">simpleapples</a>  
+</div>  
+  
+<nav class="site-navbar">  
+    
+    <ul id="menu" class="menu">  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/">  
+              
+              
+              首页  
+              
+          </a>  
+        </li>  
+        
+        <li class="menu-item">  
+          <a class="menu-item-link" href="/about/">  
+              
+              
+              关于  
+              
+          </a>  
+        </li>  
+        
+    </ul>  
+    
+</nav>  
+
+    </header>
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      「贪吃蛇大作战」的刷分尝试
+      
+    </h1>
+
+    <div class="post-meta">
+      <span class="post-time">
+        2016-08-28
+      </span>
+      
+      
+      <span class="post-category">
+        
+        <a href="/categories/Python/">Python</a>
+        
+      </span>
+      
+      
+    </div>
+  </header>
+
+  
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Charles%E6%8A%93%E5%8F%96%E8%AF%B7%E6%B1%82"><span class="toc-number">1.</span> <span class="toc-text">使用Charles抓取请求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E9%80%86%E5%90%91APK%E8%8E%B7%E5%8F%96%E7%AD%BE%E5%90%8D%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">通过逆向APK获取签名算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E3%80%8C%E8%B4%AA%E5%90%83%E8%9B%87%E5%A4%A7%E4%BD%9C%E6%88%98%E3%80%8D%E7%9A%84%E4%B8%80%E4%BA%9B%E7%8C%9C%E6%B5%8B"><span class="toc-number">3.</span> <span class="toc-text">关于「贪吃蛇大作战」的一些猜测</span></a></li></ol>
+    </div>
+  </div>
+  
+
+  <div class="post-content">
+    
+    <p>昨天同学推荐了一个最近比较火的游戏「贪吃蛇大作战」，今天已经到了AppStore总榜第二的位置。这两天一有空就会掏出手机玩几盘，不过无尽模式玩到3000分左右就遇到了瓶颈，于是怀着单纯的目的想研究下这个游戏的接口…</p>
+<p><img src="/upload/snake-1.png" alt="图1"></p>
+<h2 id="使用Charles抓取请求"><a href="#使用Charles抓取请求" class="headerlink" title="使用Charles抓取请求"></a>使用Charles抓取请求</h2><p>既然是研究接口，第一步就是看看接口的URL和参数返回都是什么了，请出神器Charles。</p>
+<p><img src="/upload/snake-2.png" alt="图2"></p>
+<p>通过Charles可以清楚地看到，游戏提交分数的接口和参数，至于返回，貌似没什么用。接下来仔细研究下请求，有几个参数能比较容易的判断他们的含义和作用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">device_id: 设备ID</span><br><span class="line">game_mode: 1是无尽模式 2是限时模式</span><br><span class="line">kill: 击杀次数</span><br><span class="line">length: 蛇的长度</span><br><span class="line">market: 我抓的是iOS设备发的请求，所以这里是apple</span><br><span class="line">platform: 抓到的请求里是1，还不太明白具体的意思</span><br><span class="line">push_channel: 也是1，不明白意思</span><br><span class="line">push_id: 固定值111111111222222223333333344444444，后面逆向apk也证明了这一点</span><br><span class="line">sid: 每次登录都会更新</span><br><span class="line">snake_sign: 签名</span><br><span class="line">uid: 用户ID</span><br><span class="line">version: 我使用的版本是固定值2.1</span><br></pre></td></tr></table></figure>
+
+<h2 id="通过逆向APK获取签名算法"><a href="#通过逆向APK获取签名算法" class="headerlink" title="通过逆向APK获取签名算法"></a>通过逆向APK获取签名算法</h2><p>明确了参数的意思，接下来就可以伪造请求了，不过在伪造请求之前，还有一个参数比较麻烦，那就是snake_sign，请求签名，从图中snake_sign的内容看，似乎有点像是一个base64过的东西，不过base64decode发现，根本不可读。与其猜签名算法，不如考虑一下其他办法。</p>
+<p>「贪吃蛇大作战」还有安卓版本，并且引导下载的页面提供了apk，于是下载apk，使用<a target="_blank" rel="noopener" href="https://github.com/skylot/jadx">jadx-gui</a>进行逆向，使用jadx-gui打开apk后，代码一览无余。</p>
+<p>通过查看代码，可以清楚的看到snake_sign字段的签名逻辑，首先将请求中所有参数按ASCII码顺序排列拼接成字符串，然后在字符串前添加<code>POST&amp; + [URL Path]</code>，添加后使用Key进行SHA1加密，key也可以在代码中获取到。对加密生成的结果，需要做一次base64，才是最终snake_sign字段的结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST&amp;top_list_v2/update_score&amp;device_id=XXX&amp;game_mode=1&amp;kill=1&amp;length=35&amp;market=apple&amp;platform=1&amp;push_channel=1&amp;push_id=111111111222222223333333344444444&amp;sid=XXX&amp;uid=XXX&amp;version=2.1</span><br></pre></td></tr></table></figure>
+
+<p><img src="/upload/snake-3.png" alt="图3"></p>
+<h2 id="关于「贪吃蛇大作战」的一些猜测"><a href="#关于「贪吃蛇大作战」的一些猜测" class="headerlink" title="关于「贪吃蛇大作战」的一些猜测"></a>关于「贪吃蛇大作战」的一些猜测</h2><p>签名方法已经获取到，本以为可以安心刷分了，但是只成功刷了一次4000分160击杀。猜测可能进入排行版需要人工审核，一个理由是刷完后过了几分钟才显示到排行版，另一个理由是，刷完4000分169击杀后，很快刷了一个高的离谱的分，但是并没有显示在排行榜，后面无论刷多少分都再也没有显示出来过，怀疑可能被人工屏蔽。</p>
+<p>另外整个游戏和API的交互只有登录、获取用户信息、获取排行版最高分、提交分数等几种，所以游戏也不是真正的实时。</p>
+<p><img src="/upload/snake-4.png" alt="图4"></p>
+
+    
+  </div>
+
+  
+  <!-- Post Copyright -->
+
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span>原文作者: </span>
+    <a href="http://www.simpleapples.com">simpleapples</a>
+  </p>
+  <p class="copyright-item">
+    <span>原文链接: </span>
+    <a href="http://www.simpleapples.com/zh-cn/snake-crack/">http://www.simpleapples.com/zh-cn/snake-crack/</a>
+  </p>
+  <p class="copyright-item">
+    <span>许可协议: </span>
+    
+    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+  </p>
+</div>
+
+    
+
+  
+
+  
+  <footer class="post-footer">
+    
+      
+  <nav class="post-nav">  
+      
+      <a class="prev" href="/zh-cn/60-lines-code-to-convert-pdf-to-word/">  
+        <i class="iconfont icon-left"></i>  
+        <span class="prev-text nav-default">60行Python代码，实现多线程PDF转Word</span>  
+        <span class="prev-text nav-mobile">上一篇</span>  
+      </a>  
+      
+      
+      <a class="next" href="/zh-cn/configure-nginx-supervisor-gunicorn-flask/">  
+        <span class="next-text nav-default">在阿里云CentOS7中配置基于Nginx+Supervisor+Gunicorn的Flask项目</span>  
+        <span class="prev-text nav-mobile">下一篇</span>  
+        <i class="iconfont icon-right"></i>  
+      </a>  
+      
+  </nav>  
+  
+
+  </footer>
+  
+
+</article>
+        </div>
+          
+  <div class="comments" id="comments">  
+      
+  </div>  
+  
+
+      </div>
+    </main>
+    <footer id="footer" class="footer">
+      <!-- Social Links -->
+
+<div class="social-links">
+  
+  
+  
+  
+  <a href="mailto:zangzhiya@gmail.com" class="iconfont icon-email" title="email"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/zhiya-zang-a4a5a96b/" class="iconfont icon-linkedin" title="linkedin"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://github.com/simpleapples" class="iconfont icon-github" title="github"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a target="_blank" rel="noopener" href="https://www.zhihu.com/people/simpleapples" class="iconfont icon-zhihu" title="zhihu"></a>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+</div>
+
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 -
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    <span>
+      
+      &copy;
+      
+      2012 - 2025      
+    </span>
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+
+    <span class="author">simpleapples</span>
+  </span>
+
+</div>
+
+    </footer>
+    <div class="back-to-top" id="back-to-top"> <i class="iconfont icon-up"></i> </div>
+  </div>
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+
+
+
+
+
+
+
+<script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+
+
+
+<script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/even.js?v=3.0.0"></script>
+</body>
+
+</html>
