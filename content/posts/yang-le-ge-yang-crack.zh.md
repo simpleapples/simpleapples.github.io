@@ -19,7 +19,7 @@ categories:
 
 首先需要启动 HTTP Catcher，打开羊了个羊进入游戏开始挑战，然后返回 HTTP Catcher，筛选 JSON 类型的请求，找到包含 map_info_ex 的请求。
 
-<center>\{\{< figure src="/images/20220920_01.png" width="50%">}}</center>
+<center>{{< figure src="/images/20220920_01.png" width="50%">}}</center>
 
 点进这个请求里的 Response，可以看到返回内容里有个 map_md5 的列表，里面有两个 md5 值，分别对应第一个地图和第二个地图，我们要做的就是把返回值里第二个地图的 md5 替换成第一个的。
 
