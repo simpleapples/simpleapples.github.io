@@ -9,6 +9,6 @@ Flash Builder 是一个基于 Eclipse 的 IDE，在 Flash Builder 文件夹下�
 
 执行插件版安装程序后按提示进行，Eclipse 目前的最新版是 4.3，而 Flash Builder 4.7 的插件版只支持 Eclipse 3.7 或 4.2 版，无法安装在 4.3 中。
 
-![Alt text](/upload/flashbuilder4.7plugin.png)
+![Alt text](/images/flashbuilder4.7plugin.png)
 
 解决办法是，下载 Eclipse 4.2，现将 Flash Builder 插件版安装到 4.2 版的 Eclipse 中，再拷贝 Eclipse 文件夹下的 dropins 目录覆盖 Eclipse 4.3 的 dropins。启动 Eclipse 4.3，第一次启动速度会很慢，启动后，Flash Builder 插件版就已经安装到 Eclipse 4.3 中了。

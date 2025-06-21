@@ -27,7 +27,7 @@ categories:
 
 具体效果图：
 
-![Alt text](/upload/flash.png)
+![Alt text](/images/flash.png)
 
 Interval 层第一帧为计时器代码，Interval 最后一帧代码非常重要：
 

@@ -9,7 +9,7 @@ categories:
 
 使用 canvas 绘制电子表的每一个线段，而后用 js 获取时间，每毫秒执行一次，更新 canvas。
 
-![Alt text](/upload/timer-300x69.png)
+![Alt text](/images/timer-300x69.png)
 
 演示地址：[http://labs.simpleapples.com/timer/](http://labs.simpleapples.com/timer/)
 

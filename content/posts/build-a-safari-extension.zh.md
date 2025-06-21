@@ -15,15 +15,15 @@ categories:
 
 打开 Safari，在菜单中选择*Safari—Preferences-Advanced*，勾选最下方的*Show Develop menu in menu bar*，如图。
 
-![图1](/upload/safari-extension-1.png)
+![图1](/images/safari-extension-1.png)
 
 这时在菜单栏中会出现*Develop*菜单，选择*Develope-Show Extension Builder*，打开扩展编辑器，点击左下角的*+*，选择*New Extension*，保存到一个位置（例如 Desktop）。
 
-![图2](/upload/safari-extension-2.png)
+![图2](/images/safari-extension-2.png)
 
 这时，Desktop 文件夹中会出现一个*demo.safariextension*文件夹，这个文件夹里的内容就是我们生成的 Safari 扩展的根目录。如果前面的开发者证书已经正确导入，扩展的介绍里会出现 Safari 开发者的 Id。
 
-![图3](/upload/safari-extension-3.png)
+![图3](/images/safari-extension-3.png)
 
 ## 编辑扩展基本信息
 
@@ -53,7 +53,7 @@ categories:
        <key>CFBundleShortVersionString</key>
        <string>1.0</string>
        <key>URL</key>
-       <string>http://simpleapples.com/upload/url2qrcode-safari/url2qrcode.safariextz</string>
+       <string>http://simpleapples.com/images/url2qrcode-safari/url2qrcode.safariextz</string>
      </dict>
    </array>
 </dict>
@@ -62,7 +62,7 @@ categories:
 
 - Access Level: 这里需要选择插件对页面访问的权限，比如我们我们要做的 URL 转二维码插件，需要获取当前 Tab 的 URL，那么这里需要选择 ALL
 
-![图4](/upload/safari-extension-4.png)
+![图4](/images/safari-extension-4.png)
 
 ## 添加图标
 
@@ -72,13 +72,13 @@ categories:
 
 首先看一下这个扩展的完成态，如图。
 
-![图5](/upload/safari-extension-5.png)
+![图5](/images/safari-extension-5.png)
 
 可以看到这个插件有两部分组成，一个是工具栏的按钮，在 Safari 中被称为 Toolbar Item，一个是点击按钮后弹出的层，是一个 Popover，和 Chrome 中的 Popup 类似，这个 Popover 也是一个 html 页面。
 
 接下来，需要在 Safari Extension Builder 中继续编辑，添加一个 Toolbar Item 和一个 Popover，如图。
 
-![图6](/upload/safari-extension-6.png)
+![图6](/images/safari-extension-6.png)
 
 Toobar Item 红的 Image 必须是一个 8bit 的 16px \* 16px 透明背景的黑白 png 图像（繁琐的要求），而 Popover 需要是一个 html 文件。这里的路径都是相对于扩展文件夹的。到这里插件的配置工作就完成了。
 
@@ -90,4 +90,4 @@ Toobar Item 红的 Image 必须是一个 8bit 的 16px \* 16px 透明背景的�
 
 当扩展开发完成后，就可以点击 Safari Extension Builder 中的*Build Package*打包了，打包出来的会是一个*safariextz*格式的文件，双击就可以安装。如果不想提交 Safari Extension Gallery，可以直接把这个文件拷贝给他人安装。
 
-![图7](/upload/safari-extension-7.png)
+![图7](/images/safari-extension-7.png)

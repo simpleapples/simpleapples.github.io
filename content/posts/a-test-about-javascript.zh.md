@@ -8,7 +8,7 @@ categories:
 在 SAE 的微博上看到一个叫《你是否真的了解 javascript？》的小测试，虽然只有几段代码，但却很能说明一些容易忽视的问题。  
 先贴下原微博的图：
 
-![Alt text](/upload/weibocode.jpg)
+![Alt text](/images/weibocode.jpg)
 
 第一段代码执行结果：1  
 Javascript 没有提供块级作用域，所以 if 语句{}中的 a，在外部是可见的。  

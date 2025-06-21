@@ -17,7 +17,7 @@ categories:
 
 还没有仔细测试，应该还有不少 bug。
 
-![Alt text](/upload/cellphonepreview.jpg)
+![Alt text](/images/cellphonepreview.jpg)
 
 这是在我手机浏览器上运行的效果，定位有些不太准 = =!
 

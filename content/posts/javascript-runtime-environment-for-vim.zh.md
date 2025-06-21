@@ -11,6 +11,6 @@ google 了一下，有 Mozilla 的引擎 SpiderMonkey 和 google 的 v8 引擎�
 上[nodeJS 官网](http://nodejs.org)下载最新版，有针对 mac 的 pkg 安装包，安装完成后就要让 vim 使用 nodeJS 执行 js 文件了。接下来修改.vimrc 文件。  
 在.vimrc 中为 javascript 文件添加编译命令：node filename.js，如图。
 
-![图1](/upload/javascript-enviroment.png)
+![图1](/images/javascript-enviroment.png)
 
 完成这些步骤，就可以在 vim 中直接运行 javascript 了。

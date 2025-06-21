@@ -13,6 +13,6 @@ categories:
 昏黄路灯下弹吉他的少年，和穿着毕业衫来来往往的情侣，让所有人的目光变的温暖，如果这不是毕业季，就更好了。  
 入夜，带着最后一点行李从学校离开。
 
-![Alt text](/upload/leave-1024x494.jpg)
+![Alt text](/images/leave-1024x494.jpg)
 
 _Young and beautiful_

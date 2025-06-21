@@ -7,7 +7,7 @@ categories:
 
 在火狐或 IE 浏览器中点击点击`<a>`标签，标签周围会出现虚线框（如图），影响美观。
 
-![Alt text](/upload/outline.png)
+![Alt text](/images/outline.png)
 
 针对 IE 浏览器解决这个问题的方法是将
 

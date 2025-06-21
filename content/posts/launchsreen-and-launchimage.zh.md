@@ -11,16 +11,16 @@ Apple 在 iOS8 中推出了 LaunchScreen.xib 来代替之前的 LaunchImage 作�
 
 首先进入 Target 配置，找到 App Icons and Launch Images，Xcode6 中默认使用了 LaunchScreen.xib，而 LaunchImage 则没有使用。
 
-![图1](/upload/launch-screen-1.png)
+![图1](/images/launch-screen-1.png)
 
 接下来点击 Use Assets Catelog，这时 Xcode 会在 Images.xcassets 中生成 LaunchImage，这里我们只需要给 4 寸 Retina 屏和 3.5 寸 2x 屏放两张 LaunchImage 就好了。
 
 在 iOS8 中系统会优先调用 LaunchScreen 作为启动界面，而 iOS7 不支持 LaunchScreen 则会使用 LaunchImage 中的图片作为启动界面。
 
-![图2](/upload/launch-screen-2.png)
+![图2](/images/launch-screen-2.png)
 
 项目在 iOS7 模拟器中运行效果（使用 LaunchImage）
 
-![图3](/upload/launch-screen-3.png)
+![图3](/images/launch-screen-3.png)
 
 项目在 iOS8 模拟器中运行效果（使用默认的 LaunchScreen.xib）

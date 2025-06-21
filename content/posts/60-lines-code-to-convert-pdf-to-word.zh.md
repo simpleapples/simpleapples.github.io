@@ -5,21 +5,21 @@ categories:
   - Python
 ---
 
-工作中经常会遇到需要提取PDF文件中文字的情况，一个PDF还好，复制粘贴一下也花不了太多时间，如果需要把大量PDF转为Word，怎么办呢？
+工作中经常会遇到需要提取 PDF 文件中文字的情况，一个 PDF 还好，复制粘贴一下也花不了太多时间，如果需要把大量 PDF 转为 Word，怎么办呢？
 
-![](/upload/cant-do-it.jpg)
+![](/images/cant-do-it.jpg)
 
-今天教大家用60行代码实现，多线程批量PDF转Word。没兴趣看具体过程可以直接拉到最后，有代码。
+今天教大家用 60 行代码实现，多线程批量 PDF 转 Word。没兴趣看具体过程可以直接拉到最后，有代码。
 
 ## 分解任务
 
-把PDF转为Word，分几步？两步，第一步读取PDF文件，第二步写入Word文件。
+把 PDF 转为 Word，分几步？两步，第一步读取 PDF 文件，第二步写入 Word 文件。
 
-![](/upload/two-steps.jpg)
+![](/images/two-steps.jpg)
 
-是的，就是这么简单，借助Python第三方包，可以轻松实现上面两个过程，我们要用到pdfminer3k和python-docx这两个包。
+是的，就是这么简单，借助 Python 第三方包，可以轻松实现上面两个过程，我们要用到 pdfminer3k 和 python-docx 这两个包。
 
-## 读取PDF
+## 读取 PDF
 
 ```python
 from pdfminer.pdfinterp import PDFResourceManager
@@ -40,9 +40,9 @@ device.close()
 content = return_str.getvalue()
 ```
 
-content变量存储的就是我们从PDF文件中读取出的文字内容，可以看到，使用pdfminer3k可以轻松完成这个任务。接下来我们需要把文字内容写入成一个word文件。
+content 变量存储的就是我们从 PDF 文件中读取出的文字内容，可以看到，使用 pdfminer3k 可以轻松完成这个任务。接下来我们需要把文字内容写入成一个 word 文件。
 
-## 写入Word
+## 写入 Word
 
 ```python
 from docx import Document
@@ -59,13 +59,13 @@ def remove_control_characters(content):
     return content.translate(mpa)
 ```
 
-控制字符就是ASCII码在32以下的，所以我们使用str的translate方法，把32以下的字符移除就可以。
+控制字符就是 ASCII 码在 32 以下的，所以我们使用 str 的 translate 方法，把 32 以下的字符移除就可以。
 
 ## 用是能用，但是太慢了！
 
-![](/upload/too-slow.jpg)
+![](/images/too-slow.jpg)
 
-如果我们用上面代码去转换100个PDF文件，就会发现速度慢到难以接受，每个PDF都需要花很长时间才能转换好，怎么办？别急，接下来我们引入多线程，同时转换多个PDF，可以有效加快转换速度。
+如果我们用上面代码去转换 100 个 PDF 文件，就会发现速度慢到难以接受，每个 PDF 都需要花很长时间才能转换好，怎么办？别急，接下来我们引入多线程，同时转换多个 PDF，可以有效加快转换速度。
 
 ```python
 import os
@@ -93,16 +93,16 @@ while True:
         exit(0)
 ```
 
-代码中config是包含存储PDF文件夹地址和word文件夹地址的字典，使用Python标准库中的concurrent包，实现多进程，pdf_to_word方法是对上面读取PDF和写入word逻辑的封装。后面的while循环是查询任务是否进行完成。
+代码中 config 是包含存储 PDF 文件夹地址和 word 文件夹地址的字典，使用 Python 标准库中的 concurrent 包，实现多进程，pdf_to_word 方法是对上面读取 PDF 和写入 word 逻辑的封装。后面的 while 循环是查询任务是否进行完成。
 
 ## 效果
 
-到这里，我们已经实现了多线程批量转换PDF为word文档。拿谋篇著名文章来试验一下，效果如图（左侧是转换后的word，右侧是PDF）：
+到这里，我们已经实现了多线程批量转换 PDF 为 word 文档。拿谋篇著名文章来试验一下，效果如图（左侧是转换后的 word，右侧是 PDF）：
 
-![](/upload/pdf-and-word.jpg)
+![](/images/pdf-and-word.jpg)
 
 ## 不想写代码？
 
-本文介绍的所有代码，已经打包成了一个独立可运行的项目，存放在github，如果不想自己写代码，可以直接clone或下载github项目运行。项目地址如下（记得点star）：
+本文介绍的所有代码，已经打包成了一个独立可运行的项目，存放在 github，如果不想自己写代码，可以直接 clone 或下载 github 项目运行。项目地址如下（记得点 star）：
 
 [https://github.com/simpleapples/pdf2word](https://github.com/simpleapples/pdf2word)

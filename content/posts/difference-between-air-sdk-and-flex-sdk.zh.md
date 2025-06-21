@@ -7,7 +7,7 @@ categories:
 
 最近将 AS 开发的 SDK 从 Flex SDK 4.9.1 升级到了 Air SDK 4.0，导致之前写的一个 FLV 播放器不能播放视频了，最后发现 bug 是一个方法内的变量名和类中的一个 get 方法重名了。类似下图中所示情况：
 
-![Alt text](/upload/air-and-flex-sdk.png)
+![Alt text](/images/air-and-flex-sdk.png)
 
 图中变量 time 和 get 方法 time 重名，而编译器对这种重名的处理在 Flex SDK 和 Air SDK 下是不一样的。
 

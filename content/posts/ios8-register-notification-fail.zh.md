@@ -14,7 +14,7 @@ Apple 在 9 月 18 日正式发布了 iOS8，在收到更新的同时，也发�
 
 查询文档可以知道，在 iOS8 中注册推送的方法`registerForRemoteNotificationTypes`已经被废弃，文档中是这样描述的：
 
-![Alt text](/upload/ios8-registerForRemoteNotificationTypes.png)
+![Alt text](/images/ios8-registerForRemoteNotificationTypes.png)
 
 按照文档中的提示，使用`registerForRemoteNotifications`方法代替，这个方法不接受参数。紧接着问题就来了，**程序在安装过这个应用的 iOS8 机器上可以成功注册，而在新安装的 iOS8 机器上则无法注册**，`application:didRegisterForRemoteNotificationsWithDeviceToken:`和`application:didFailToRegisterForRemoteNotificationsWithError:`都无法响应，并且在成功注册的机器上，收到的推送消息也没有声音提示。再次查看文档后发现这么一段话：
 

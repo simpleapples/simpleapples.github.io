@@ -11,7 +11,7 @@ categories:
 
 于是到项目文件夹里找问题，猛然发现编译出的可执行文件名竟然是 go.exe！原来这就是问题所在。
 
-![Alt text](/upload/liteide-go.png)
+![Alt text](/images/liteide-go.png)
 
 解决问题之前首先需要了解一下 LiteIDE 在编译执行过程中做了什么。
 

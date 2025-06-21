@@ -17,4 +17,4 @@ flex sdk 4.9 中的 core.swc 的体积比 4.8 中 core.swc 的体积小了大概
 
 如果展开 framework.swc 包，可以看到 BitmapAsset 类，所以将其添加到构建路径中，就可以解决找不到基类的问题。
 
-![Alt text](/upload/frameworkswc.png)
+![Alt text](/images/frameworkswc.png)

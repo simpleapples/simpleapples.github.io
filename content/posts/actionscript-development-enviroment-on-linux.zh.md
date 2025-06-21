@@ -27,6 +27,6 @@ Flash Player 的 Debugger 版本的安装最为复杂，Adobe 已经停止对 Li
 在 64 位 Firefox 下使用 Flash Player debugger，需要通过 nspluginwrapper 将其转换为可在 64 位 Firefox 下使用的插件。使用 apt-get 或 yum 等安装 nspluginwrapper，并将 Flash Player debugger 压缩包中的 libflashplugin.so 拷贝到`/usr/lib/mozilla/plugin`下，启动 Firefox，nspluginwrapper 会自动将 libflashplugin.so 转换为 64 位插件，保存在`/usr/lib64/mozilla/plugin-wrapped`下。打开 Firefox 在地址栏中输入`about:plugins`，查看 flash player 是否安装正确。  
 在 Eclipse 中新建一个 Actionscript Project，编译运行，如果能够编译并 debug，表明配置正确，如果 Firefox 出现播放 Flash 就崩溃的情况，可能由于转换后的 Flash Player 造成的，Firefox 默认开启了插件的防崩溃机制，导致 debug 版本崩溃。在 Firefox 地址栏中输入`about:config`搜索`dom.ipc.plugins.enabled`，将其值设置为 false，重启 Firefox，Flash Player debugger 即可正常运行。
 
-![Alt text](/upload/linux-as-env.png)
+![Alt text](/images/linux-as-env.png)
 
 至此，Linux 上 Actionscript 开发环境就搭建完成了。
