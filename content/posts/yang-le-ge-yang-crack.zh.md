@@ -23,16 +23,16 @@ categories:
 
 点进这个请求里的 Response，可以看到返回内容里有个 map_md5 的列表，里面有两个 md5 值，分别对应第一个地图和第二个地图，我们要做的就是把返回值里第二个地图的 md5 替换成第一个的。
 
-![](/images/20220920_02.png)
+<center>{{< figure src="/images/20220920_02.png" width="50%">}}</center>
 
 接下来返回上一个界面，左滑选择更多，新建重写，在弹出的界面中新增规则。
 
-![](/images/20220920_03.png)
+<center>{{< figure src="/images/20220920_03.png" width="50%">}}</center>
 
 按下图的选择 Response 和 Body，将第二张地图的 md5（可以提前复制好）填入 Find，将第二张地图的 md5 填入 Replace，然后一路保存。
 
-![](/images/20220920_04.png)
+<center>{{< figure src="/images/20220920_04.png" width="50%">}}</center>
 
 接下来重新启动 HTTP Catcher，回到羊了个羊重新开始游戏，第二关就变成和第一关一样简单的地图了。
 
-![](/images/20220920_05.png)
+<center>{{< figure src="/images/20220920_05.png" width="50%">}}</center>

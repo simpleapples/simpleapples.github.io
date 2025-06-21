@@ -19,20 +19,20 @@ To achieve a tech-based victory, you need a Web debugging proxy app. On iOS, you
 
 First, start HTTP Catcher, open "Sheep a Sheep," and begin the challenge. Then return to HTTP Catcher and filter for JSON-type requests to find the request containing `map_info_ex`.
 
-![](/images/20220920_01.png)
+<center>{{< figure src="/images/20220920_01.png" width="50%">}}</center>
 
 Click into the Response of this request, and you'll see a list with `map_md5`. This list contains two md5 values corresponding to the first and second maps. Our task is to replace the md5 of the second map with that of the first in the returned values.
 
-![](/images/20220920_02.png)
+<center>{{< figure src="/images/20220920_02.png" width="50%">}}</center>
 
 Next, return to the previous screen, swipe left to select more options, and create a new rewrite rule in the pop-up interface.
 
-![](/images/20220920_03.png)
+<center>{{< figure src="/images/20220920_03.png" width="50%">}}</center>
 
 As shown below, select Response and Body, enter the md5 of the second map (which you can copy in advance) into Find, and enter the md5 of the first map into Replace. Then save all the way through.
 
-![](/images/20220920_04.png)
+<center>{{< figure src="/images/20220920_04.png" width="50%">}}</center>
 
 Next, restart HTTP Catcher, return to "Sheep a Sheep," and start the game again. The second level will now be as simple as the first map.
 
-![](/images/20220920_05.png)
+<center>{{< figure src="/images/20220920_05.png" width="50%">}}</center>

@@ -56,6 +56,9 @@ jobs:
           hugo \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
+      - name: Copy images from assets to static
+        run: |
+          cp -r assets/images/* public/images/ || true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
