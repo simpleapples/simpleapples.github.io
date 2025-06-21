@@ -1,0 +1,15 @@
+body {
+  font-family: "Cascadia Code", sans-serif;
+}
+
+.logo {
+  font-family: "Noto Serif", serif;
+}
+
+code {
+  font-family: "Cascadia Code", sans-serif;
+}
+
+[lang=zh] body {
+  font-family: "Noto Serif", serif;
+}
