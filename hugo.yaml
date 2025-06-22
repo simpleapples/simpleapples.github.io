@@ -15,6 +15,19 @@ languages:
     params:
       giscus:
         lang: "zh-CN"
+        repo: "simpleapples/simpleapples.github.io"
+        repoId: "MDEwOlJlcG9zaXRvcnkxMzA1MzgxMA=="
+        category: "Announcements"
+        categoryId: "DIC_kwDOAMcvcs4Cr2FC"
+        mapping: "pathname"
+        strict: "0"
+        reactionsEnabled: "1"
+        emitMetadata: "0"
+        inputPosition: "top"
+        lightTheme: "light"
+        darkTheme: "dark"
+        discussionTitle: "" # 按需填写，评论框上方的标题
+        discussionSubtitle: "" # 按需填写，评论框上方的副标题
       homeInfoParams:
         Title: 👋 嗨，你好！
         Content: 记录技术心得与生活点滴，见证成长的足迹。
@@ -31,6 +44,19 @@ languages:
     params:
       giscus:
         lang: "en"
+        repo: "simpleapples/simpleapples.github.io"
+        repoId: "MDEwOlJlcG9zaXRvcnkxMzA1MzgxMA=="
+        category: "Announcements"
+        categoryId: "DIC_kwDOAMcvcs4Cr2FC"
+        mapping: "pathname"
+        strict: "0"
+        reactionsEnabled: "1"
+        emitMetadata: "0"
+        inputPosition: "top"
+        lightTheme: "light"
+        darkTheme: "dark"
+        discussionTitle: "" # 按需填写，评论框上方的标题
+        discussionSubtitle: "" # 按需填写，评论框上方的副标题
       homeInfoParams:
         Title: 👋 Hi there!
         Content: Sharing thoughts on technology and everyday life — a journey of learning and growth.
@@ -63,20 +89,6 @@ params:
   ShowPageNums: true
   ShowToc: true
   tocopen: true
-  giscus:
-    repo: "simpleapples/simpleapples.github.io"
-    repoId: "MDEwOlJlcG9zaXRvcnkxMzA1MzgxMA=="
-    category: "Announcements"
-    categoryId: "DIC_kwDOAMcvcs4Cr2FC"
-    mapping: "pathname"
-    strict: "0"
-    reactionsEnabled: "1"
-    emitMetadata: "0"
-    inputPosition: "top"
-    lightTheme: "light"
-    darkTheme: "dark"
-    discussionTitle: "" # 按需填写，评论框上方的标题
-    discussionSubtitle: "" # 按需填写，评论框上方的副标题
   socialIcons:
     - name: github
       url: "https://github.com/simpleapples"
