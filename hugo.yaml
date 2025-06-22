@@ -49,6 +49,7 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+comments: true
 params:
   Author: "Zhiya"
   ShowShareButtons: true
