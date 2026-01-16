@@ -32,6 +32,6 @@ def process_folder(input_folder, output_folder):
 
 
 # 替换成你的路径
-input_folder = "/Users/zzy/Documents/workspace/simpleapples_blog/content/posts"
-output_folder = "/Users/zzy/Documents/workspace/simpleapples_blog/content/posts"
+input_folder = "/Users/zzy/Documents/workspace/blog/content/posts"
+output_folder = "/Users/zzy/Documents/workspace/blog/content/posts"
 process_folder(input_folder, output_folder)
