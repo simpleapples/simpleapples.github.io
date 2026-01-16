@@ -39,8 +39,7 @@ After installing Ollama, we need to pull Google's translation model TranslateGem
 
     > **Tips**:
     > *   `translategemma:4b` is the 4 billion parameter version, striking a good balance between speed and quality, suitable for most users.
-    > *   If you pursue extreme effects and have sufficient memory (16GB+), you can try larger versions (if available).
-    > *   The first run will automatically download the model file (about 2-3GB), please wait patiently.
+    > *   If you pursue extreme effects and have sufficient memory (16GB+), you can try larger `12b` or `27b` versions.
 
 3.  When you see the `>>>` prompt, it means the model has been successfully loaded. You can try typing a sentence in English to see the translation effect. After testing, press `Ctrl + D` to exit, and the model will be ready in the background at any time.
 
